@@ -1,0 +1,5 @@
+packages:
+  - 'packages/*'
+  - 'apps/*'
+  - 'modules/*'
+  # Maven modules can also be included if they have package.json files

@@ -1,0 +1,33 @@
+{
+  "name": "conversation-ui-assistant",
+  "version": "1.0.0",
+  "description": "AI Chat agent that helps you navigate a web application to complete your intent.",
+  "main": "index.js",
+  "scripts": {
+    "clean": "mvn clean",
+    "compile": "mvn compile",
+    "test": "mvn test",
+    "package": "mvn package",
+    "install": "mvn install",
+    "verify": "mvn verify",
+    "deploy": "mvn deploy",
+    "build": "mvn clean package",
+    "build:all": "mvn clean install",
+    "test:unit": "mvn test",
+    "test:integration": "mvn verify",
+    "develop-app": "mvn clean install",
+    "start": "mvn spring-boot:run",
+    "dev": "mvn spring-boot:run -Dspring-boot.run.profiles=dev"
+  },
+  "keywords": [
+    "ai",
+    "chat",
+    "assistant",
+    "ui",
+    "conversation",
+    "web-automation"
+  ],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.13.1"
+}
