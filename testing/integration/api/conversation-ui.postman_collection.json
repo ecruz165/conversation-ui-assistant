@@ -1,0 +1,212 @@
+{
+  "info": {
+    "name": "Conversation UI API Integration Tests",
+    "description": "Comprehensive API integration tests for Conversation UI Assistant",
+    "version": "1.0.0",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "management_service_url",
+      "value": "http://localhost:8080",
+      "type": "string"
+    },
+    {
+      "key": "navigation_service_url",
+      "value": "http://localhost:8081",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Management Service Tests",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{management_service_url}}/actuator/health",
+              "host": ["{{management_service_url}}"],
+              "path": ["actuator", "health"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Management Service is healthy', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response.status).to.eql('UP');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Metrics Endpoint",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{management_service_url}}/actuator/metrics",
+              "host": ["{{management_service_url}}"],
+              "path": ["actuator", "metrics"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Metrics endpoint is accessible', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response.names).to.be.an('array');",
+                  "    pm.expect(response.names.length).to.be.greaterThan(0);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Info Endpoint",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{management_service_url}}/actuator/info",
+              "host": ["{{management_service_url}}"],
+              "path": ["actuator", "info"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Info endpoint returns application info', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    // Info endpoint might be empty by default, just check it's accessible",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Navigation Service Tests",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{navigation_service_url}}/actuator/health",
+              "host": ["{{navigation_service_url}}"],
+              "path": ["actuator", "health"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Navigation Service is healthy', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response.status).to.eql('UP');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Metrics Endpoint",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{navigation_service_url}}/actuator/metrics",
+              "host": ["{{navigation_service_url}}"],
+              "path": ["actuator", "metrics"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Navigation metrics endpoint is accessible', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response.names).to.be.an('array');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Cross-Service Integration Tests",
+      "item": [
+        {
+          "name": "Service Discovery Test",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{management_service_url}}/actuator/health",
+              "host": ["{{management_service_url}}"],
+              "path": ["actuator", "health"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Both services are discoverable', function () {",
+                  "    // Test that management service can reach navigation service",
+                  "    pm.response.to.have.status(200);",
+                  "    ",
+                  "    // Store management service response",
+                  "    pm.globals.set('management_healthy', true);",
+                  "    ",
+                  "    // Now test navigation service",
+                  "    pm.sendRequest({",
+                  "        url: pm.variables.get('navigation_service_url') + '/actuator/health',",
+                  "        method: 'GET'",
+                  "    }, function (err, response) {",
+                  "        pm.test('Navigation service also healthy', function () {",
+                  "            pm.expect(response.code).to.eql(200);",
+                  "            pm.globals.set('navigation_healthy', true);",
+                  "        });",
+                  "    });",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

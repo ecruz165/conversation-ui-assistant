@@ -1,0 +1,86 @@
+config:
+  target: 'http://localhost:8080'
+  phases:
+    - duration: 120  # 2 minutes
+      arrivalRate: 5
+      name: "Warm up"
+    - duration: 300  # 5 minutes
+      arrivalRate: 10
+      name: "Ramp up load"
+    - duration: 300  # 5 minutes
+      arrivalRate: 20
+      name: "Sustained load"
+    - duration: 120  # 2 minutes
+      arrivalRate: 5
+      name: "Cool down"
+  
+  # Performance thresholds
+  ensure:
+    p95: 500  # 95% of requests should complete within 500ms
+    p99: 1000 # 99% of requests should complete within 1s
+    maxErrorRate: 5  # Error rate should be below 5%
+
+  # Plugins for enhanced reporting
+  plugins:
+    metrics-by-endpoint:
+      useOnlyRequestNames: true
+    
+  # Variables for different environments
+  variables:
+    managementService: 'http://localhost:8080'
+    navigationService: 'http://localhost:8081'
+    adminPortal: 'http://localhost:3000'
+
+scenarios:
+  - name: "Health Check Load Test"
+    weight: 40
+    flow:
+      - get:
+          url: "{{ managementService }}/actuator/health"
+          name: "Management Service Health"
+          expect:
+            - statusCode: 200
+            - hasProperty: "status"
+      - think: 1
+      
+      - get:
+          url: "{{ navigationService }}/actuator/health"
+          name: "Navigation Service Health"
+          expect:
+            - statusCode: 200
+            - hasProperty: "status"
+      - think: 1
+
+  - name: "Metrics Load Test"
+    weight: 30
+    flow:
+      - get:
+          url: "{{ managementService }}/actuator/metrics"
+          name: "Management Service Metrics"
+          expect:
+            - statusCode: 200
+      - think: 2
+      
+      - get:
+          url: "{{ navigationService }}/actuator/metrics"
+          name: "Navigation Service Metrics"
+          expect:
+            - statusCode: 200
+      - think: 2
+
+  - name: "Admin Portal Load Test"
+    weight: 30
+    flow:
+      - get:
+          url: "{{ adminPortal }}/"
+          name: "Admin Portal Homepage"
+          expect:
+            - statusCode: 200
+      - think: 3
+      
+      # Simulate user navigation
+      - get:
+          url: "{{ adminPortal }}/static/js/main.js"
+          name: "Load JavaScript Bundle"
+          ifTrue: "{{ $randomNumber(1, 100) <= 80 }}"  # 80% chance
+      - think: 1

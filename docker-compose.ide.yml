@@ -1,0 +1,149 @@
+# IDE Profile Docker Compose - Complete Project Setup
+# Usage: docker-compose -f docker-compose.ide.yml up
+# This setup uses the 'ide' profile for all services for comprehensive development
+
+version: '3.8'
+
+services:
+  # PostgreSQL Database (Primary - Port 5432 for management-service)
+  postgres-main:
+    image: postgres:15-alpine
+    container_name: conversation-ui-postgres-main
+    environment:
+      POSTGRES_DB: conversation_ui
+      POSTGRES_USER: conversation_user
+      POSTGRES_PASSWORD: conversation_pass
+      PGDATA: /var/lib/postgresql/data/pgdata
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_main_data:/var/lib/postgresql/data
+      - ./infrastructure/docker/postgres/init:/docker-entrypoint-initdb.d:ro
+    networks:
+      - conversation-ide-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U conversation_user -d conversation_ui"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  # PostgreSQL Database (Secondary - Port 5433 for navigation-service)
+  postgres-nav:
+    image: postgres:15-alpine
+    container_name: conversation-ui-postgres-nav
+    environment:
+      POSTGRES_DB: conversation_ui
+      POSTGRES_USER: conversation_user
+      POSTGRES_PASSWORD: conversation_pass
+      PGDATA: /var/lib/postgresql/data/pgdata
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_nav_data:/var/lib/postgresql/data
+      - ./infrastructure/docker/postgres/init:/docker-entrypoint-initdb.d:ro
+    networks:
+      - conversation-ide-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U conversation_user -d conversation_ui"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  # Management Service (Backend)
+  management-service:
+    build:
+      context: ./backend/management-service
+      dockerfile: Dockerfile
+      target: builder  # Use builder stage for development
+    container_name: conversation-ui-management-ide
+    environment:
+      SPRING_PROFILES_ACTIVE: ide
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-main:5432/conversation_ui
+      SPRING_DATASOURCE_USERNAME: conversation_user
+      SPRING_DATASOURCE_PASSWORD: conversation_pass
+      SPRING_FLYWAY_URL: jdbc:postgresql://postgres-main:5432/conversation_ui
+      SPRING_FLYWAY_USER: conversation_user
+      SPRING_FLYWAY_PASSWORD: conversation_pass
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-ide-dummy-key}
+      OPENAI_ENABLED: ${OPENAI_ENABLED:-false}
+      SPRING_DEVTOOLS_RESTART_ENABLED: true
+      SPRING_DEVTOOLS_LIVERELOAD_ENABLED: true
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./backend/management-service/src:/app/src:ro
+      - ./backend/management-service/target:/app/target
+    networks:
+      - conversation-ide-network
+    restart: unless-stopped
+    depends_on:
+      postgres-main:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    command: ["mvn", "spring-boot:run", "-Dspring-boot.run.profiles=ide"]
+
+  # Navigation Service (Backend)
+  navigation-service:
+    build:
+      context: ./backend/navigation-service
+      dockerfile: Dockerfile
+      target: builder  # Use builder stage for development
+    container_name: conversation-ui-navigation-ide
+    environment:
+      SPRING_PROFILES_ACTIVE: ide
+      SPRING_R2DBC_URL: r2dbc:postgresql://postgres-nav:5432/conversation_ui
+      SPRING_R2DBC_USERNAME: conversation_user
+      SPRING_R2DBC_PASSWORD: conversation_pass
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-nav:5432/conversation_ui
+      SPRING_DATASOURCE_USERNAME: conversation_user
+      SPRING_DATASOURCE_PASSWORD: conversation_pass
+      SPRING_FLYWAY_URL: jdbc:postgresql://postgres-nav:5432/conversation_ui
+      SPRING_FLYWAY_USER: conversation_user
+      SPRING_FLYWAY_PASSWORD: conversation_pass
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-ide-dummy-key}
+      OPENAI_ENABLED: ${OPENAI_ENABLED:-false}
+      SPRING_DEVTOOLS_RESTART_ENABLED: true
+      SPRING_DEVTOOLS_LIVERELOAD_ENABLED: true
+    ports:
+      - "8081:8081"
+      - "8082:8082"  # Management/Actuator port
+    volumes:
+      - ./backend/navigation-service/src:/app/src:ro
+      - ./backend/navigation-service/target:/app/target
+    networks:
+      - conversation-ide-network
+    restart: unless-stopped
+    depends_on:
+      postgres-nav:
+        condition: service_healthy
+      management-service:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8081/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    command: ["mvn", "spring-boot:run", "-Dspring-boot.run.profiles=ide"]
+
+volumes:
+  postgres_main_data:
+    driver: local
+  postgres_nav_data:
+    driver: local
+
+networks:
+  conversation-ide-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.30.0.0/16

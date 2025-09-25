@@ -1,0 +1,111 @@
+# See https://pre-commit.com for more information
+# See https://pre-commit.com/hooks.html for more hooks
+repos:
+  # Pre-commit hooks for general file checks
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: trailing-whitespace
+        exclude: '\.md$'
+      - id: end-of-file-fixer
+        exclude: '\.md$'
+      - id: check-yaml
+        args: ['--unsafe']
+      - id: check-json
+      - id: check-toml
+      - id: check-xml
+      - id: check-added-large-files
+        args: ['--maxkb=1000']
+      - id: check-case-conflict
+      - id: check-merge-conflict
+      - id: check-symlinks
+      - id: check-executables-have-shebangs
+      - id: check-shebang-scripts-are-executable
+      - id: detect-private-key
+      - id: fix-byte-order-marker
+      - id: mixed-line-ending
+        args: ['--fix=lf']
+
+  # Biome for JavaScript/TypeScript formatting and linting
+  - repo: https://github.com/biomejs/pre-commit
+    rev: v0.4.0
+    hooks:
+      - id: biome-check
+        additional_dependencies: ["@biomejs/biome@^2.2.4"]
+        args: ["--write", "--unsafe"]
+
+  # Docker hooks
+  - repo: https://github.com/hadolint/hadolint
+    rev: v2.12.0
+    hooks:
+      - id: hadolint-docker
+        args: ["--ignore", "DL3008", "--ignore", "DL3009"]
+
+  # Security checks
+  - repo: https://github.com/Yelp/detect-secrets
+    rev: v1.5.0
+    hooks:
+      - id: detect-secrets
+        args: ['--baseline', '.secrets.baseline']
+        exclude: '.*\.lock$|pnpm-lock\.yaml$|package-lock\.json$'
+
+  # Markdown formatting
+  - repo: https://github.com/igorshubovych/markdownlint-cli
+    rev: v0.42.0
+    hooks:
+      - id: markdownlint
+        args: ['--fix']
+        exclude: 'node_modules/|\.output/|dist/|build/|target/'
+
+  # Git commit message formatting
+  - repo: https://github.com/compilerla/conventional-pre-commit
+    rev: v3.4.0
+    hooks:
+      - id: conventional-pre-commit
+        stages: [commit-msg]
+        args: [optional-scope]
+
+  # Local hooks for project-specific checks
+  - repo: local
+    hooks:
+      # TypeScript type checking
+      - id: typescript-check
+        name: TypeScript Check
+        entry: pnpm run type-check
+        language: system
+        files: '\.(ts|tsx)$'
+        pass_filenames: false
+
+      # Frontend tests
+      - id: frontend-tests
+        name: Frontend Tests
+        entry: pnpm run test:frontend
+        language: system
+        files: '^frontend/.*\.(ts|tsx|js|jsx)$'
+        pass_filenames: false
+
+      # Java formatting check (if needed)
+      - id: java-format-check
+        name: Java Format Check
+        entry: mvn spotless:check
+        language: system
+        files: '\.java$'
+        pass_filenames: false
+
+# Global configuration
+default_stages: [commit]
+fail_fast: false
+minimum_pre_commit_version: '3.0.0'
+
+# CI configuration
+ci:
+  autofix_commit_msg: |
+    [pre-commit.ci] auto fixes from pre-commit.com hooks
+
+    for more information, see https://pre-commit.ci
+  autofix_prs: true
+  autoupdate_branch: ''
+  autoupdate_commit_msg: '[pre-commit.ci] pre-commit autoupdate'
+  autoupdate_schedule: weekly
+  skip: []
+  submodules: false
