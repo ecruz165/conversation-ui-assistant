@@ -4,17 +4,19 @@ This directory contains the frontend applications for the Conversation UI Assist
 
 ## Applications
 
-### 1. Admin Portal (`admin-portal/`)
+### 1. Management UI (`management-ui/`)
+
 - **Framework**: TanStack Start (React 19)
 - **Port**: 3000
 - **Description**: Administrative interface for managing the conversation UI system
-- **Features**: 
+- **Features**:
   - Server-side rendering (SSR)
   - File-based routing
   - TypeScript support
   - Tailwind CSS styling
 
 ### 2. Demo App (`demo-app/`)
+
 - **Framework**: React 18 + Vite
 - **Port**: 3001
 - **Description**: Demo application for testing the conversation UI assistant
@@ -48,8 +50,9 @@ pnpm run dev:frontend
 ```
 
 This will start both applications in parallel:
-- Admin Portal: http://localhost:3000
-- Demo App: http://localhost:3001
+
+- Admin Portal: <http://localhost:3000>
+- Demo App: <http://localhost:3001>
 
 ## Building
 
@@ -74,7 +77,7 @@ cd frontend/demo-app && pnpm build
 
 ```
 frontend/
-├── admin-portal/          # TanStack Start application
+├── management-ui/         # TanStack Start application
 │   ├── src/              # Source code
 │   ├── public/           # Static assets
 │   ├── dist/             # Build output
@@ -91,6 +94,7 @@ frontend/
 ## Integration with Backend
 
 The frontend applications are designed to work with the backend services:
+
 - **Management Service**: Port 8080
 - **Navigation Service**: Port 8081
 

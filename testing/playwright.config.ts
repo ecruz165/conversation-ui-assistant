@@ -75,7 +75,7 @@ export default defineConfig({
   /* Run your local dev server before starting the tests */
   webServer: [
     {
-      command: 'cd ../frontend/admin-portal && npm run dev',
+      command: 'cd ../frontend/management-ui && pnpm dev',
       url: 'http://localhost:3000',
       reuseExistingServer: !process.env.CI,
       timeout: 120 * 1000,
@@ -95,8 +95,8 @@ export default defineConfig({
   ],
 
   /* Global setup and teardown */
-  globalSetup: './common/global-setup.ts',
-  globalTeardown: './common/global-teardown.ts',
+  // globalSetup: './common/global-setup.ts',
+  // globalTeardown: './common/global-teardown.ts',
 
   /* Test timeout */
   timeout: 30 * 1000,

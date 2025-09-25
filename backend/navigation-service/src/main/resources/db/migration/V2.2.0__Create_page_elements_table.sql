@@ -17,7 +17,7 @@ CREATE TABLE page_elements (
     is_visible BOOLEAN NOT NULL DEFAULT true,
     confidence_score DECIMAL(3,2) DEFAULT 0.0,
     created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    
+
     CONSTRAINT fk_page_elements_page_snapshot_id FOREIGN KEY (page_snapshot_id) REFERENCES page_snapshots(id) ON DELETE CASCADE,
     CONSTRAINT page_elements_element_type_check CHECK (element_type IN ('button', 'input', 'link', 'text', 'image', 'form', 'select', 'textarea', 'div', 'span', 'other')),
     CONSTRAINT page_elements_confidence_score_range CHECK (confidence_score >= 0.0 AND confidence_score <= 1.0)
@@ -34,7 +34,7 @@ CREATE TABLE element_interactions (
     error_message TEXT,
     execution_time_ms INTEGER,
     created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    
+
     CONSTRAINT fk_element_interactions_navigation_session_id FOREIGN KEY (navigation_session_id) REFERENCES navigation_sessions(id) ON DELETE CASCADE,
     CONSTRAINT fk_element_interactions_page_element_id FOREIGN KEY (page_element_id) REFERENCES page_elements(id) ON DELETE SET NULL,
     CONSTRAINT element_interactions_type_check CHECK (interaction_type IN ('click', 'type', 'select', 'hover', 'scroll', 'wait', 'navigate', 'screenshot', 'extract')),
@@ -52,7 +52,7 @@ CREATE TABLE element_selectors (
     success_rate DECIMAL(5,2) DEFAULT 0.0,
     last_used_at TIMESTAMP WITH TIME ZONE,
     created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    
+
     CONSTRAINT fk_element_selectors_page_element_id FOREIGN KEY (page_element_id) REFERENCES page_elements(id) ON DELETE CASCADE,
     CONSTRAINT element_selectors_type_check CHECK (selector_type IN ('id', 'class', 'name', 'xpath', 'css', 'text', 'attribute')),
     CONSTRAINT element_selectors_priority_positive CHECK (priority > 0),

@@ -77,7 +77,7 @@ check_dependencies() {
 
 setup_environment() {
     local env_type=$1
-    
+
     if [ "$env_type" = "dev" ]; then
         if [ ! -f "$SCRIPT_DIR/.env.dev" ]; then
             print_warning ".env.dev not found, copying from .env.example"
@@ -96,15 +96,15 @@ setup_environment() {
 start_development() {
     print_info "Starting development environment..."
     setup_environment "dev"
-    
+
     local build_flag=""
     if [ "$BUILD" = "true" ]; then
         build_flag="--build"
     fi
-    
+
     cd "$SCRIPT_DIR"
     docker-compose -f docker-compose.yml -f docker-compose.dev.yml --env-file .env.dev up -d $build_flag
-    
+
     print_success "Development environment started!"
     print_info "Services available at:"
     echo "  - Management API: http://localhost:8080"
@@ -117,15 +117,15 @@ start_development() {
 start_production() {
     print_info "Starting production environment..."
     setup_environment "prod"
-    
+
     local build_flag=""
     if [ "$BUILD" = "true" ]; then
         build_flag="--build"
     fi
-    
+
     cd "$SCRIPT_DIR"
     docker-compose -f docker-compose.yml -f docker-compose.prod.yml --env-file .env up -d $build_flag
-    
+
     print_success "Production environment started!"
     print_info "Services available at:"
     echo "  - Application: http://localhost"
@@ -143,11 +143,11 @@ stop_services() {
 show_logs() {
     local service=$1
     local follow_flag=""
-    
+
     if [ "$FOLLOW" = "true" ]; then
         follow_flag="-f"
     fi
-    
+
     cd "$SCRIPT_DIR"
     if [ -n "$service" ]; then
         docker-compose logs $follow_flag "$service"
@@ -189,7 +189,7 @@ open_shell() {
         print_error "Please specify a service with --service option"
         exit 1
     fi
-    
+
     print_info "Opening shell in $service container..."
     cd "$SCRIPT_DIR"
     docker-compose exec "$service" /bin/sh
@@ -198,7 +198,7 @@ open_shell() {
 database_operations() {
     local operation=$1
     cd "$SCRIPT_DIR"
-    
+
     case $operation in
         migrate)
             print_info "Running database migrations..."

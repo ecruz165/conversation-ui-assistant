@@ -1,11 +1,13 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { MessageCircle, X, Send, Minimize2 } from 'lucide-react';
-import { ChatWidgetProps, Message } from '../types';
-import useConversation from '../hooks/useConversation';
-import MessageList from './MessageList';
-import MessageInput from './MessageInput';
+import React from 'react';
+
+import { AnimatePresence, motion } from 'framer-motion';
+import { MessageCircle, Minimize2, Send, X } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import { useConversation } from '../hooks/useConversation';
+import type { ChatWidgetProps, Message } from '../types';
 import { getTheme } from '../utils/theme';
+import MessageInput from './MessageInput';
+import MessageList from './MessageList';
 
 /**
  * Main chat widget component for conversational navigation
@@ -29,7 +31,9 @@ const ChatWidget: React.FC<ChatWidgetProps> = ({
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
-  const { state, sendMessage } = useConversation();
+  const { state, sendMessage } = useConversation(
+    'ws://localhost:8081/ws/chat'
+  );
   const widgetRef = useRef<HTMLDivElement>(null);
   const currentTheme = getTheme(theme);
 
@@ -55,9 +59,9 @@ const ChatWidget: React.FC<ChatWidgetProps> = ({
   };
 
   // Handle message sending
-  const handleSendMessage = async (content: string) => {
+  const handleSendMessage = async (content: string, audioBlob?: Blob) => {
     try {
-      await sendMessage(content);
+      await sendMessage(content, audioBlob);
       onMessageSent?.(content);
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Failed to send message';
@@ -189,6 +193,7 @@ const ChatWidget: React.FC<ChatWidgetProps> = ({
                 )}
               </div>
               <div style={{ display: 'flex', gap: currentTheme.spacing.xs }}>
+                {/** biome-ignore lint/a11y/useButtonType: <explanation> */}
                 <button
                   onClick={() => setIsMinimized(!isMinimized)}
                   style={{
@@ -206,6 +211,7 @@ const ChatWidget: React.FC<ChatWidgetProps> = ({
                 >
                   <Minimize2 size={16} />
                 </button>
+                {/** biome-ignore lint/a11y/useButtonType: <explanation> */}
                 <button
                   onClick={() => setIsOpen(false)}
                   style={{

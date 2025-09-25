@@ -11,7 +11,7 @@ CREATE TABLE ai_models (
     is_default BOOLEAN NOT NULL DEFAULT false,
     created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    
+
     CONSTRAINT ai_models_provider_check CHECK (provider IN ('openai', 'anthropic', 'google', 'azure', 'local')),
     CONSTRAINT ai_models_name_not_empty CHECK (LENGTH(TRIM(name)) > 0),
     CONSTRAINT ai_models_model_id_not_empty CHECK (LENGTH(TRIM(model_id)) > 0)
@@ -30,7 +30,7 @@ CREATE TABLE user_preferences (
     custom_settings JSONB DEFAULT '{}',
     created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    
+
     CONSTRAINT fk_user_preferences_user_id FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     CONSTRAINT fk_user_preferences_ai_model_id FOREIGN KEY (preferred_ai_model_id) REFERENCES ai_models(id) ON DELETE SET NULL,
     CONSTRAINT user_preferences_ui_theme_check CHECK (ui_theme IN ('light', 'dark', 'auto')),
@@ -48,7 +48,7 @@ CREATE TABLE applications (
     created_by BIGINT,
     created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    
+
     CONSTRAINT fk_applications_created_by FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL,
     CONSTRAINT applications_name_not_empty CHECK (LENGTH(TRIM(name)) > 0),
     CONSTRAINT applications_base_url_format CHECK (base_url ~* '^https?://.*')
@@ -68,19 +68,19 @@ CREATE INDEX idx_applications_created_by ON applications(created_by);
 CREATE INDEX idx_applications_base_url ON applications(base_url);
 
 -- Create triggers for updated_at
-CREATE TRIGGER update_ai_models_updated_at 
-    BEFORE UPDATE ON ai_models 
-    FOR EACH ROW 
+CREATE TRIGGER update_ai_models_updated_at
+    BEFORE UPDATE ON ai_models
+    FOR EACH ROW
     EXECUTE FUNCTION update_updated_at_column();
 
-CREATE TRIGGER update_user_preferences_updated_at 
-    BEFORE UPDATE ON user_preferences 
-    FOR EACH ROW 
+CREATE TRIGGER update_user_preferences_updated_at
+    BEFORE UPDATE ON user_preferences
+    FOR EACH ROW
     EXECUTE FUNCTION update_updated_at_column();
 
-CREATE TRIGGER update_applications_updated_at 
-    BEFORE UPDATE ON applications 
-    FOR EACH ROW 
+CREATE TRIGGER update_applications_updated_at
+    BEFORE UPDATE ON applications
+    FOR EACH ROW
     EXECUTE FUNCTION update_updated_at_column();
 
 -- Add comments for documentation

@@ -1,12 +1,12 @@
 -- Insert default AI models
 INSERT INTO ai_models (name, provider, model_id, version, description, configuration, is_default) VALUES
-('GPT-4 Turbo', 'openai', 'gpt-4-turbo-preview', '2024-01', 'OpenAI GPT-4 Turbo model for advanced conversations', 
+('GPT-4 Turbo', 'openai', 'gpt-4-turbo-preview', '2024-01', 'OpenAI GPT-4 Turbo model for advanced conversations',
  '{"max_tokens": 4096, "temperature": 0.7, "top_p": 1.0, "frequency_penalty": 0.0, "presence_penalty": 0.0}', true),
-('GPT-3.5 Turbo', 'openai', 'gpt-3.5-turbo', '2024-01', 'OpenAI GPT-3.5 Turbo model for general conversations', 
+('GPT-3.5 Turbo', 'openai', 'gpt-3.5-turbo', '2024-01', 'OpenAI GPT-3.5 Turbo model for general conversations',
  '{"max_tokens": 4096, "temperature": 0.7, "top_p": 1.0, "frequency_penalty": 0.0, "presence_penalty": 0.0}', false),
-('Claude 3 Sonnet', 'anthropic', 'claude-3-sonnet-20240229', '2024-02', 'Anthropic Claude 3 Sonnet model for balanced performance', 
+('Claude 3 Sonnet', 'anthropic', 'claude-3-sonnet-20240229', '2024-02', 'Anthropic Claude 3 Sonnet model for balanced performance',
  '{"max_tokens": 4096, "temperature": 0.7, "top_p": 1.0}', false),
-('Claude 3 Haiku', 'anthropic', 'claude-3-haiku-20240307', '2024-03', 'Anthropic Claude 3 Haiku model for fast responses', 
+('Claude 3 Haiku', 'anthropic', 'claude-3-haiku-20240307', '2024-03', 'Anthropic Claude 3 Haiku model for fast responses',
  '{"max_tokens": 4096, "temperature": 0.7, "top_p": 1.0}', false);
 
 -- Insert default system settings
@@ -29,15 +29,15 @@ INSERT INTO system_settings (setting_key, setting_value, setting_type, descripti
 
 -- Insert sample applications for navigation
 INSERT INTO applications (name, base_url, description, configuration) VALUES
-('GitHub', 'https://github.com', 'GitHub code repository platform', 
+('GitHub', 'https://github.com', 'GitHub code repository platform',
  '{"selectors": {"login_button": "[href=\"/login\"]", "search_input": "[data-test-selector=\"nav-search-input\"]"}, "auth_required": true}'),
-('Google Drive', 'https://drive.google.com', 'Google Drive cloud storage service', 
+('Google Drive', 'https://drive.google.com', 'Google Drive cloud storage service',
  '{"selectors": {"new_button": "[data-target=\"new\"]", "search_input": "[data-test-id=\"search-input\"]"}, "auth_required": true}'),
-('Slack', 'https://slack.com', 'Slack team communication platform', 
+('Slack', 'https://slack.com', 'Slack team communication platform',
  '{"selectors": {"workspace_input": "[data-qa=\"signin_domain_input\"]", "message_input": "[data-qa=\"message_input\"]"}, "auth_required": true}'),
-('Notion', 'https://notion.so', 'Notion workspace and note-taking application', 
+('Notion', 'https://notion.so', 'Notion workspace and note-taking application',
  '{"selectors": {"new_page": "[data-test-id=\"new-page\"]", "search": "[data-test-id=\"search-input\"]"}, "auth_required": true}'),
-('Demo App', 'http://localhost:3001', 'Local demo application for testing', 
+('Demo App', 'http://localhost:3001', 'Local demo application for testing',
  '{"selectors": {"counter_button": "button", "title": "h1"}, "auth_required": false}');
 
 -- Create default admin user (password should be changed in production)
@@ -53,9 +53,9 @@ DECLARE
 BEGIN
     SELECT id INTO admin_user_id FROM users WHERE username = 'admin';
     SELECT id INTO default_model_id FROM ai_models WHERE is_default = true LIMIT 1;
-    
+
     -- Insert default preferences for admin user
-    INSERT INTO user_preferences (user_id, preferred_ai_model_id, ui_theme, language, timezone) 
+    INSERT INTO user_preferences (user_id, preferred_ai_model_id, ui_theme, language, timezone)
     VALUES (admin_user_id, default_model_id, 'light', 'en', 'UTC');
 END $$;
 

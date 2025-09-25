@@ -1,6 +1,6 @@
 -- Insert sample navigation workflows for common patterns
 INSERT INTO navigation_workflows (name, description, application_pattern, workflow_steps, tags, created_by) VALUES
-('GitHub Login', 'Standard GitHub login workflow', 'https://github.com%', 
+('GitHub Login', 'Standard GitHub login workflow', 'https://github.com%',
  '[
     {"step": 1, "type": "navigate", "description": "Navigate to GitHub login page", "data": {"url": "https://github.com/login"}},
     {"step": 2, "type": "type", "description": "Enter username", "data": {"selector": "#login_field", "text": "{username}"}},
@@ -61,8 +61,8 @@ END $$;
 
 -- Insert sample element recognition cache entries
 INSERT INTO element_recognition_cache (page_url_hash, element_description_hash, recognition_result, confidence_score, model_version, expires_at) VALUES
-('a1b2c3d4e5f6', 'login_button_hash', 
- '{"selector": "#login-button", "element_type": "button", "text": "Sign In", "attributes": {"class": "btn btn-primary"}}', 
+('a1b2c3d4e5f6', 'login_button_hash',
+ '{"selector": "#login-button", "element_type": "button", "text": "Sign In", "attributes": {"class": "btn btn-primary"}}',
  0.95, 'v1.0.0', CURRENT_TIMESTAMP + INTERVAL '7 days'),
 
 ('a1b2c3d4e5f6', 'username_field_hash',

@@ -10,7 +10,7 @@ CREATE TABLE audit_logs (
     user_agent TEXT,
     session_id VARCHAR(255),
     created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    
+
     CONSTRAINT fk_audit_logs_user_id FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL,
     CONSTRAINT audit_logs_action_not_empty CHECK (LENGTH(TRIM(action)) > 0)
 );
@@ -25,7 +25,7 @@ CREATE TABLE system_settings (
     is_encrypted BOOLEAN NOT NULL DEFAULT false,
     created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    
+
     CONSTRAINT system_settings_key_not_empty CHECK (LENGTH(TRIM(setting_key)) > 0),
     CONSTRAINT system_settings_type_check CHECK (setting_type IN ('string', 'number', 'boolean', 'json'))
 );
@@ -42,7 +42,7 @@ CREATE TABLE user_sessions (
     expires_at TIMESTAMP WITH TIME ZONE NOT NULL,
     created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
     last_accessed_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    
+
     CONSTRAINT fk_user_sessions_user_id FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     CONSTRAINT user_sessions_token_not_empty CHECK (LENGTH(TRIM(session_token)) > 0)
 );
@@ -66,9 +66,9 @@ CREATE INDEX idx_user_sessions_expires_at ON user_sessions(expires_at);
 CREATE INDEX idx_user_sessions_last_accessed ON user_sessions(last_accessed_at);
 
 -- Create triggers for updated_at
-CREATE TRIGGER update_system_settings_updated_at 
-    BEFORE UPDATE ON system_settings 
-    FOR EACH ROW 
+CREATE TRIGGER update_system_settings_updated_at
+    BEFORE UPDATE ON system_settings
+    FOR EACH ROW
     EXECUTE FUNCTION update_updated_at_column();
 
 -- Create function to clean up expired sessions
@@ -77,9 +77,9 @@ RETURNS INTEGER AS $$
 DECLARE
     deleted_count INTEGER;
 BEGIN
-    DELETE FROM user_sessions 
+    DELETE FROM user_sessions
     WHERE expires_at < CURRENT_TIMESTAMP OR is_active = false;
-    
+
     GET DIAGNOSTICS deleted_count = ROW_COUNT;
     RETURN deleted_count;
 END;

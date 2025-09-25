@@ -15,7 +15,7 @@ if (process.env.NODE_ENV === 'development') {
 export { default as ChatWidget } from './components/ChatWidget';
 export { default as NavigationHelper } from './components/NavigationHelper';
 export { default as ConversationProvider } from './providers/ConversationProvider';
-export { default as useConversation } from './hooks/useConversation';
+export { useConversation } from './hooks/useConversation';
 
 // Export types for TypeScript consumers
 export type {

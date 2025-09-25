@@ -35,6 +35,7 @@ This directory contains the complete Docker infrastructure for the Conversation 
 ### Core Services
 
 #### 1. **Management Service**
+
 - **Container**: `conversation-ui-management`
 - **Port**: 8080
 - **Purpose**: Core business logic, user management, conversations, AI models
@@ -42,6 +43,7 @@ This directory contains the complete Docker infrastructure for the Conversation 
 - **Dependencies**: PostgreSQL
 
 #### 2. **Navigation Service**
+
 - **Container**: `conversation-ui-navigation`
 - **Port**: 8081
 - **Purpose**: Web navigation, page analysis, automation workflows
@@ -49,6 +51,7 @@ This directory contains the complete Docker infrastructure for the Conversation 
 - **Dependencies**: PostgreSQL, Management Service
 
 #### 3. **PostgreSQL Database**
+
 - **Container**: `conversation-ui-postgres`
 - **Port**: 5432
 - **Purpose**: Shared database for both services
@@ -56,12 +59,14 @@ This directory contains the complete Docker infrastructure for the Conversation 
 - **Volumes**: Persistent data storage
 
 #### 4. **Redis Cache**
+
 - **Container**: `conversation-ui-redis`
 - **Port**: 6379
 - **Purpose**: Caching, session storage, performance optimization
 - **Health Check**: `redis-cli ping`
 
 #### 5. **Nginx Reverse Proxy**
+
 - **Container**: `conversation-ui-nginx`
 - **Ports**: 80, 443
 - **Purpose**: Load balancing, SSL termination, API routing
@@ -70,12 +75,14 @@ This directory contains the complete Docker infrastructure for the Conversation 
 ### Development Services
 
 #### 6. **pgAdmin** (Development Only)
+
 - **Container**: `conversation-ui-pgadmin`
 - **Port**: 8082
 - **Purpose**: Database administration interface
-- **Credentials**: admin@conversation-ui.local / admin
+- **Credentials**: <admin@conversation-ui.local> / admin
 
 #### 7. **Frontend Dev Server** (Development Only)
+
 - **Container**: `conversation-ui-frontend-dev`
 - **Ports**: 3000, 3001
 - **Purpose**: Hot-reload frontend development
@@ -84,6 +91,7 @@ This directory contains the complete Docker infrastructure for the Conversation 
 ## Quick Start
 
 ### Prerequisites
+
 - Docker 20.10+
 - Docker Compose 2.0+
 - 4GB+ available RAM
@@ -158,18 +166,20 @@ The `docker-manager.sh` script provides convenient commands for managing the Doc
 ## Service URLs
 
 ### Development
-- **Application**: http://localhost
-- **Management API**: http://localhost:8080
-- **Navigation API**: http://localhost:8081
-- **pgAdmin**: http://localhost:8082
-- **Frontend Dev**: http://localhost:3000
-- **Demo App**: http://localhost:3001
+
+- **Application**: <http://localhost>
+- **Management API**: <http://localhost:8080>
+- **Navigation API**: <http://localhost:8081>
+- **pgAdmin**: <http://localhost:8082>
+- **Frontend Dev**: <http://localhost:3000>
+- **Demo App**: <http://localhost:3001>
 
 ### Production
-- **Application**: http://localhost
-- **Management API**: http://localhost/api/management/
-- **Navigation API**: http://localhost/api/navigation/
-- **Monitoring**: http://monitoring.localhost (internal network only)
+
+- **Application**: <http://localhost>
+- **Management API**: <http://localhost/api/management/>
+- **Navigation API**: <http://localhost/api/navigation/>
+- **Monitoring**: <http://monitoring.localhost> (internal network only)
 
 ## Configuration
 
@@ -208,11 +218,13 @@ LOG_LEVEL=INFO
 ## Networking
 
 ### Internal Network
+
 - **Network**: `conversation-network`
 - **Subnet**: `172.20.0.0/16`
 - **Driver**: Bridge
 
 ### Service Communication
+
 - Services communicate using container names as hostnames
 - Example: `http://management-service:8080`
 - Database: `postgres:5432`
@@ -221,12 +233,14 @@ LOG_LEVEL=INFO
 ## Volumes
 
 ### Persistent Data
+
 - **`postgres_data`**: Database files
 - **`redis_data`**: Redis persistence
 - **`nginx_logs`**: Nginx access/error logs
 - **`pgadmin_data`**: pgAdmin configuration
 
 ### Development Volumes
+
 - **`postgres_dev_data`**: Development database
 - **`frontend_node_modules`**: Node.js dependencies
 
@@ -242,12 +256,14 @@ All services include comprehensive health checks:
 ## Security Features
 
 ### Nginx Security
+
 - Rate limiting (API: 10 req/s, Login: 1 req/s)
 - Security headers (XSS, CSRF, Content-Type)
 - Request size limits (100MB max)
 - Access restrictions for monitoring endpoints
 
 ### Container Security
+
 - Non-root user execution
 - Resource limits and reservations
 - Health check monitoring
@@ -256,17 +272,20 @@ All services include comprehensive health checks:
 ## Monitoring and Logging
 
 ### Logging
+
 - JSON structured logging
 - Log rotation (10MB max, 3 files)
 - Centralized log collection via Docker
 
 ### Metrics
+
 - Spring Boot Actuator metrics
 - Prometheus endpoints
 - Nginx status monitoring
 - Custom application metrics
 
 ### Health Monitoring
+
 - Service health checks every 30s
 - Dependency health verification
 - Automatic restart on failure
@@ -276,6 +295,7 @@ All services include comprehensive health checks:
 ### Common Issues
 
 1. **Port Conflicts**
+
    ```bash
    # Check port usage
    netstat -tulpn | grep :8080
@@ -285,6 +305,7 @@ All services include comprehensive health checks:
    ```
 
 2. **Database Connection Issues**
+
    ```bash
    # Check database health
    docker-compose exec postgres pg_isready -U conversation_user
@@ -294,6 +315,7 @@ All services include comprehensive health checks:
    ```
 
 3. **Build Failures**
+
    ```bash
    # Clean rebuild
    ./docker-manager.sh clean
@@ -301,6 +323,7 @@ All services include comprehensive health checks:
    ```
 
 4. **Memory Issues**
+
    ```bash
    # Check resource usage
    docker stats
@@ -331,26 +354,31 @@ docker volume ls | grep conversation
 ## Development Workflow
 
 1. **Start Development Environment**
+
    ```bash
    ./docker-manager.sh dev --build
    ```
 
 2. **Run Database Migrations**
+
    ```bash
    ./docker-manager.sh db migrate
    ```
 
 3. **View Logs**
+
    ```bash
    ./docker-manager.sh logs --follow
    ```
 
 4. **Run Tests**
+
    ```bash
    ./docker-manager.sh test
    ```
 
 5. **Stop Environment**
+
    ```bash
    ./docker-manager.sh stop
    ```

@@ -8,7 +8,7 @@ CREATE TABLE performance_metrics (
     metric_unit VARCHAR(20) NOT NULL,
     measurement_timestamp TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
     context_data JSONB DEFAULT '{}',
-    
+
     CONSTRAINT fk_performance_metrics_navigation_session_id FOREIGN KEY (navigation_session_id) REFERENCES navigation_sessions(id) ON DELETE CASCADE,
     CONSTRAINT performance_metrics_type_check CHECK (metric_type IN ('timing', 'count', 'size', 'rate', 'score', 'custom')),
     CONSTRAINT performance_metrics_name_not_empty CHECK (LENGTH(TRIM(metric_name)) > 0),
@@ -25,7 +25,7 @@ CREATE TABLE browser_automation_logs (
     log_data JSONB DEFAULT '{}',
     stack_trace TEXT,
     created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    
+
     CONSTRAINT fk_browser_automation_logs_navigation_session_id FOREIGN KEY (navigation_session_id) REFERENCES navigation_sessions(id) ON DELETE CASCADE,
     CONSTRAINT browser_automation_logs_level_check CHECK (log_level IN ('DEBUG', 'INFO', 'WARN', 'ERROR', 'FATAL')),
     CONSTRAINT browser_automation_logs_source_not_empty CHECK (LENGTH(TRIM(log_source)) > 0),
@@ -44,7 +44,7 @@ CREATE TABLE element_recognition_cache (
     created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
     last_accessed_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
     expires_at TIMESTAMP WITH TIME ZONE,
-    
+
     CONSTRAINT element_recognition_cache_confidence_range CHECK (confidence_score >= 0.0 AND confidence_score <= 1.0),
     CONSTRAINT element_recognition_cache_hits_non_negative CHECK (cache_hits >= 0),
     CONSTRAINT element_recognition_cache_unique_entry UNIQUE (page_url_hash, element_description_hash)
@@ -69,7 +69,7 @@ CREATE TABLE session_analytics (
     screenshots_taken INTEGER NOT NULL DEFAULT 0,
     created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    
+
     CONSTRAINT fk_session_analytics_navigation_session_id FOREIGN KEY (navigation_session_id) REFERENCES navigation_sessions(id) ON DELETE CASCADE,
     CONSTRAINT session_analytics_steps_non_negative CHECK (total_steps >= 0 AND successful_steps >= 0 AND failed_steps >= 0),
     CONSTRAINT session_analytics_times_non_negative CHECK (total_execution_time_ms >= 0),
@@ -101,9 +101,9 @@ CREATE INDEX idx_session_analytics_error_rate ON session_analytics(error_rate);
 CREATE INDEX idx_session_analytics_created_at ON session_analytics(created_at);
 
 -- Create trigger for session_analytics updated_at
-CREATE TRIGGER update_session_analytics_updated_at 
-    BEFORE UPDATE ON session_analytics 
-    FOR EACH ROW 
+CREATE TRIGGER update_session_analytics_updated_at
+    BEFORE UPDATE ON session_analytics
+    FOR EACH ROW
     EXECUTE FUNCTION update_updated_at_column();
 
 -- Create function to clean up expired cache entries
@@ -112,9 +112,9 @@ RETURNS INTEGER AS $$
 DECLARE
     deleted_count INTEGER;
 BEGIN
-    DELETE FROM element_recognition_cache 
+    DELETE FROM element_recognition_cache
     WHERE expires_at IS NOT NULL AND expires_at < CURRENT_TIMESTAMP;
-    
+
     GET DIAGNOSTICS deleted_count = ROW_COUNT;
     RETURN deleted_count;
 END;

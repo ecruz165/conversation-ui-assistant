@@ -12,7 +12,7 @@ CREATE TABLE navigation_sessions (
     created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
     ended_at TIMESTAMP WITH TIME ZONE,
-    
+
     CONSTRAINT navigation_sessions_status_check CHECK (status IN ('active', 'paused', 'completed', 'failed', 'timeout')),
     CONSTRAINT navigation_sessions_session_id_not_empty CHECK (LENGTH(TRIM(session_id)) > 0),
     CONSTRAINT navigation_sessions_application_url_format CHECK (application_url ~* '^https?://.*')
@@ -29,7 +29,7 @@ CREATE TABLE page_snapshots (
     dom_elements JSONB DEFAULT '[]',
     metadata JSONB DEFAULT '{}',
     created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    
+
     CONSTRAINT fk_page_snapshots_navigation_session_id FOREIGN KEY (navigation_session_id) REFERENCES navigation_sessions(id) ON DELETE CASCADE,
     CONSTRAINT page_snapshots_page_url_not_empty CHECK (LENGTH(TRIM(page_url)) > 0)
 );
@@ -58,16 +58,16 @@ CREATE INDEX idx_page_snapshots_created_at ON page_snapshots(created_at);
 CREATE INDEX idx_page_snapshots_dom_elements ON page_snapshots USING GIN(dom_elements);
 
 -- Create trigger to automatically update navigation_sessions.updated_at
-CREATE TRIGGER update_navigation_sessions_updated_at 
-    BEFORE UPDATE ON navigation_sessions 
-    FOR EACH ROW 
+CREATE TRIGGER update_navigation_sessions_updated_at
+    BEFORE UPDATE ON navigation_sessions
+    FOR EACH ROW
     EXECUTE FUNCTION update_updated_at_column();
 
 -- Create function to update navigation session when page snapshot is added
 CREATE OR REPLACE FUNCTION update_navigation_session_on_snapshot()
 RETURNS TRIGGER AS $$
 BEGIN
-    UPDATE navigation_sessions 
+    UPDATE navigation_sessions
     SET updated_at = CURRENT_TIMESTAMP,
         current_page_url = NEW.page_url
     WHERE id = NEW.navigation_session_id;

@@ -12,13 +12,11 @@ help:
 	@echo "  clean            Clean test artifacts and reports"
 	@echo ""
 	@echo "Test Commands:"
-	@echo "  test-e2e         Run end-to-end tests"
+	@echo "  test-e2e         Run E2E tests (assumes services running)"
+	@echo "  test-e2e-full    Run E2E tests with auto-start services"
 	@echo "  test-e2e-ui      Run E2E tests with UI mode"
 	@echo "  test-load        Run load tests"
-	@echo "  test-stress      Run stress tests"
-	@echo "  test-integration Run integration tests"
 	@echo "  test-security    Run security tests"
-	@echo "  test-api         Run API tests"
 	@echo ""
 	@echo "Comprehensive Commands:"
 	@echo "  test-all         Run all test suites"
@@ -46,30 +44,35 @@ clean:
 
 # E2E Testing
 test-e2e:
-	@echo "🎭 Running end-to-end tests..."
+	@echo "🎭 Running end-to-end tests (assumes services are running)..."
+	npx playwright test --config=playwright-simple.config.ts
+
+test-e2e-full:
+	@echo "🎭 Running E2E tests with auto-start services..."
 	npx playwright test
 
 test-e2e-ui:
 	@echo "🎭 Running E2E tests with UI..."
-	npx playwright test --ui
+	npx playwright test --config=playwright-simple.config.ts --ui
 
 test-e2e-headed:
 	@echo "🎭 Running E2E tests in headed mode..."
-	npx playwright test --headed
+	npx playwright test --config=playwright-simple.config.ts --headed
 
 # Load Testing
 test-load:
 	@echo "⚡ Running load tests..."
-	k6 run load/scenarios/basic-load.js
+	artillery run load/scenarios/basic-load.yml
 
 test-load-spike:
 	@echo "📈 Running spike load tests..."
-	k6 run load/scenarios/spike-test.js
+	artillery run load/scenarios/spike-test.yml
 
-# Stress Testing
-test-stress:
-	@echo "💪 Running stress tests..."
-	k6 run stress/scenarios/stress-test.js
+test-load-playwright:
+	@echo "🎭 Running Playwright-based load tests..."
+	artillery run load/scenarios/playwright-load.yml
+
+
 
 # Integration Testing
 test-integration:

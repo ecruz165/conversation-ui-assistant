@@ -1,7 +1,14 @@
 # Chat Widget MFE Makefile
 # Consistent commands for the chat widget micro frontend module
 
-.PHONY: help build test run dev install clean package logs
+.PHONY: help build test run dev install clean package logs ensure-build
+
+# Reusable function to ensure build exists
+ensure-build:
+	@if [ ! -d "dist" ]; then \
+		echo "📦 No build found. Building first..."; \
+		$(MAKE) build; \
+	fi
 
 # Default target
 help:
@@ -28,6 +35,13 @@ help:
 	@echo "📊 Analysis:"
 	@echo "  make analyze    - Analyze bundle size"
 	@echo "  make logs       - Show development logs"
+	@echo ""
+	@echo "🗄️  Backend Services:"
+	@echo "  backend-up    - Start navigation-service and database"
+	@echo "  backend-down  - Stop backend services"
+	@echo "  backend-logs  - View backend service logs"
+	@echo "  backend-status - Check backend service status"
+	@echo "  full-dev      - Start backend services and widget dev server"
 
 # Development
 dev:
@@ -47,11 +61,12 @@ build:
 	@echo "🏗️ Building chat widget MFE for production..."
 	npm run build
 
-package:
+package: ensure-build
 	@echo "📦 Creating chat widget MFE package..."
+	@echo "✅ Build already exists or created"
 	npm run package
 
-run:
+run: ensure-build
 	@echo "🚀 Starting chat widget MFE production preview..."
 	npm run preview
 
@@ -84,6 +99,43 @@ logs:
 	@echo "Remote Entry: http://localhost:3002/remoteEntry.js"
 	@echo "Exposed modules:"
 	@echo "  - ./ChatWidget"
-	@echo "  - ./NavigationHelper" 
+	@echo "  - ./NavigationHelper"
 	@echo "  - ./ConversationProvider"
 	@echo "  - ./useConversation"
+
+# Start backend services (navigation-service + database)
+backend-up:
+	@echo "🚀 Starting backend services for Chat Widget MFE..."
+	docker-compose up -d
+	@echo "⏳ Waiting for services to be ready..."
+	@sleep 10
+	@echo "✅ Backend services started:"
+	@echo "  💬 Navigation Service: http://localhost:8081"
+	@echo "  🗄️  PostgreSQL: localhost:5432"
+	@echo "  🔍 Health Check: http://localhost:8081/actuator/health"
+
+# Stop backend services
+backend-down:
+	@echo "🛑 Stopping backend services..."
+	docker-compose down
+
+# View backend service logs
+backend-logs:
+	@echo "📋 Backend service logs..."
+	docker-compose logs -f
+
+# Check backend service status
+backend-status:
+	@echo "📊 Backend service status..."
+	@docker-compose ps
+	@echo ""
+	@echo "🔍 Health checks:"
+	@curl -s http://localhost:8081/actuator/health 2>/dev/null | jq . || echo "❌ Navigation Service not responding"
+
+# Start backend services and widget dev server
+full-dev: backend-up
+	@echo "🔥 Starting full development environment..."
+	@echo "⏳ Waiting for backend to be fully ready..."
+	@sleep 15
+	@echo "🚀 Starting chat widget development server..."
+	npm run dev

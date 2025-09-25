@@ -107,7 +107,9 @@ const MessageInput: React.FC<MessageInputProps> = ({
       mediaRecorderRef.current.stop();
     }
     if (streamRef.current) {
-      streamRef.current.getTracks().forEach(track => track.stop());
+      for (const track of streamRef.current.getTracks()) {
+          track.stop();
+      }
       streamRef.current = null;
     }
   };
@@ -185,7 +187,7 @@ const MessageInput: React.FC<MessageInputProps> = ({
       }
       stopAudioRecording();
     };
-  }, []);
+  }, [stopAudioRecording]);
 
   // Demo mode for testing transcription display
   const simulateTranscription = () => {
@@ -271,15 +273,15 @@ const MessageInput: React.FC<MessageInputProps> = ({
 
   // Add CSS animation for pulse effect
   React.useEffect(() => {
-    const style = document.createElement('style');
-    style.textContent = `
+      const style = document.createElement('style');
+      style.textContent = `
       @keyframes pulse {
         0%, 100% { opacity: 1; transform: scale(1); }
         50% { opacity: 0.7; transform: scale(1.1); }
       }
     `;
-    document.head.appendChild(style);
-    return () => document.head.removeChild(style);
+      document.head.appendChild(style);
+      return () => document.head.removeChild(style);
   }, []);
 
   return (
@@ -390,6 +392,7 @@ const MessageInput: React.FC<MessageInputProps> = ({
         )}
 
         {/* Voice Input Button */}
+        {/** biome-ignore lint/a11y/useButtonType: <explanation> */}
         <button
           onClick={toggleVoiceInput}
           disabled={disabled}
@@ -412,6 +415,7 @@ const MessageInput: React.FC<MessageInputProps> = ({
         </button>
 
         {/* Send Button */}
+        {/** biome-ignore lint/a11y/useButtonType: <explanation> */}
         <button
           onClick={handleSend}
           disabled={!canSend}
@@ -458,7 +462,8 @@ const MessageInput: React.FC<MessageInputProps> = ({
         }}
       >
         {['Help', 'Navigation', 'Search'].map((suggestion) => (
-          <button
+          // biome-ignore lint/a11y/useButtonType: <explanation>
+<button
             key={suggestion}
             onClick={() => {
               if (!disabled) {

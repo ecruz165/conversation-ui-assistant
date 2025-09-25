@@ -6,6 +6,7 @@ export interface Message {
   sender: 'user' | 'assistant';
   timestamp: Date;
   type?: 'text' | 'navigation' | 'error';
+  messageCount?: number;
   metadata?: {
     navigationTarget?: string;
     confidence?: number;
@@ -67,7 +68,7 @@ export interface ConversationProviderProps {
 
 export interface UseConversationReturn {
   state: ConversationState;
-  sendMessage: (content: string) => Promise<void>;
+  sendMessage: (content: string, audioBlob?: Blob) => Promise<void>;
   clearConversation: () => void;
   reconnect: () => void;
 }

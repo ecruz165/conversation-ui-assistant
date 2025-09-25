@@ -8,10 +8,9 @@
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:headed": "playwright test --headed",
-    "test:load": "k6 run load/scenarios/basic-load.js",
-    "test:load:spike": "k6 run load/scenarios/spike-test.js",
-    "test:stress": "k6 run stress/scenarios/stress-test.js",
-    "test:api": "newman run integration/api/postman-collection.json",
+    "test:load": "artillery run load/scenarios/basic-load.yml",
+    "test:load:spike": "artillery run load/scenarios/spike-test.yml",
+    "test:load:playwright": "artillery run load/scenarios/playwright-load.yml",
     "test:security": "zap-baseline.py -t http://localhost:8080",
     "install:tools": "npm install && npx playwright install",
     "setup": "npm run install:tools"
@@ -19,8 +18,9 @@
   "devDependencies": {
     "@playwright/test": "^1.40.0",
     "@types/node": "^20.0.0",
-    "k6": "^0.0.0",
-    "newman": "^6.0.0",
+    "artillery": "^2.0.0",
+    "artillery-engine-playwright": "^1.0.0",
+
     "typescript": "^5.0.0"
   },
   "engines": {
@@ -30,8 +30,8 @@
     "testing",
     "e2e",
     "load-testing",
-    "stress-testing",
-    "integration-testing",
-    "security-testing"
+    "security-testing",
+    "artillery",
+    "playwright"
   ]
 }

@@ -7,15 +7,14 @@ Comprehensive testing framework for the Conversation UI Assistant project.
 ```
 testing/
 ├── e2e/                    # End-to-end tests (Playwright)
-├── load/                   # Load testing (K6)
-├── stress/                 # Stress testing (K6)
-├── integration/            # Integration tests (Newman/Postman)
+├── load/                   # Load testing (Artillery)
 ├── security/               # Security testing (OWASP ZAP)
 ├── performance/            # Performance benchmarks
 ├── common/                 # Shared utilities and helpers
 ├── reports/                # Test reports and results
 ├── package.json            # Node.js dependencies
-├── playwright.config.ts    # Playwright configuration
+├── playwright.config.ts    # Playwright configuration (auto-start services)
+├── playwright-simple.config.ts # Simple config (assumes services running)
 ├── Makefile               # Testing commands
 └── README.md              # This file
 ```
@@ -26,8 +25,8 @@ testing/
 
 - Node.js 18+
 - Docker (for containerized testing)
-- K6 (for load testing)
-- Newman (for API testing)
+- Artillery (for load testing)
+- OWASP ZAP (for security testing)
 
 ### Setup
 

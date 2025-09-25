@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
          http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
@@ -22,11 +22,8 @@
     </properties>
 
     <modules>
-        <!-- Add your modules here as you create them -->
-        <!-- Example: -->
-        <!-- <module>conversation-core</module> -->
-        <!-- <module>conversation-api</module> -->
-        <!-- <module>conversation-ui</module> -->
+        <module>backend/management-service</module>
+        <module>backend/navigation-service</module>
     </modules>
 
     <dependencyManagement>
@@ -43,6 +40,12 @@
                 <artifactId>junit-jupiter</artifactId>
                 <version>${junit.version}</version>
                 <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-docker-compose</artifactId>
+                <scope>runtime</scope>
+                <optional>true</optional>
             </dependency>
         </dependencies>
     </dependencyManagement>

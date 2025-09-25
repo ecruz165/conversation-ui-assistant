@@ -1,5 +1,5 @@
 # Docker Compose for Demo App Development
-# Launches both backend services and PostgreSQL for full demo testing
+# Launches navigation-service, management-ui (host), and PostgreSQL for full demo testing
 
 version: '3.8'
 
@@ -28,41 +28,6 @@ services:
     networks:
       - demo-app-network
 
-  # Management Service
-  management-service:
-    build:
-      context: ../../backend/management-service
-      dockerfile: Dockerfile
-      target: builder
-    container_name: demo-app-management
-    environment:
-      SPRING_PROFILES_ACTIVE: local
-      DB_HOST: postgres
-      DB_PORT: 5432
-      DB_NAME: conversation_ui
-      DB_USERNAME: conversation_user
-      DB_PASSWORD: conversation_pass
-      OPENAI_API_KEY: ${OPENAI_API_KEY:-demo-dummy-key}
-      OPENAI_ENABLED: ${OPENAI_ENABLED:-false}
-    ports:
-      - "8080:8080"
-      - "8081:8081"  # Management/Actuator port
-    volumes:
-      - ../../backend/management-service/src:/app/src:ro
-      - ../../backend/management-service/target:/app/target
-    depends_on:
-      postgres:
-        condition: service_healthy
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 60s
-    restart: unless-stopped
-    networks:
-      - demo-app-network
-
   # Navigation Service
   navigation-service:
     build:
@@ -80,15 +45,13 @@ services:
       OPENAI_API_KEY: ${OPENAI_API_KEY:-demo-dummy-key}
       OPENAI_ENABLED: ${OPENAI_ENABLED:-false}
     ports:
-      - "8082:8081"  # Different external port to avoid conflicts
-      - "8083:8082"  # Management/Actuator port
+      - "8081:8081"  # Navigation service port
+      - "8082:8082"  # Management/Actuator port
     volumes:
       - ../../backend/navigation-service/src:/app/src:ro
       - ../../backend/navigation-service/target:/app/target
     depends_on:
       postgres:
-        condition: service_healthy
-      management-service:
         condition: service_healthy
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8081/actuator/health"]
@@ -96,6 +59,98 @@ services:
       timeout: 10s
       retries: 3
       start_period: 60s
+    restart: unless-stopped
+    networks:
+      - demo-app-network
+
+  # Management Service (Required by Management UI)
+  management-service:
+    build:
+      context: ../../backend/management-service
+      dockerfile: Dockerfile
+      target: builder
+    container_name: demo-app-management
+    environment:
+      SPRING_PROFILES_ACTIVE: local
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: conversation_ui
+      DB_USERNAME: conversation_user
+      DB_PASSWORD: conversation_pass
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-demo-dummy-key}
+      OPENAI_ENABLED: ${OPENAI_ENABLED:-false}
+    ports:
+      - "8080:8080"  # Management service port
+      - "8083:8081"  # Management/Actuator port (different external port)
+    volumes:
+      - ../../backend/management-service/src:/app/src:ro
+      - ../../backend/management-service/target:/app/target
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    restart: unless-stopped
+    networks:
+      - demo-app-network
+
+  # Management UI (Host Application for MFEs)
+  management-ui:
+    build:
+      context: ../management-ui
+      dockerfile: Dockerfile
+      target: builder
+    container_name: demo-app-management-ui
+    environment:
+      NODE_ENV: development
+      MANAGEMENT_SERVICE_URL: http://management-service:8080
+      NAVIGATION_SERVICE_URL: http://navigation-service:8081
+      CHAT_WIDGET_MFE_URL: http://chat-widget-mfe:3002
+    ports:
+      - "3000:3000"  # Management UI port
+    volumes:
+      - ../management-ui/src:/app/src:ro
+      - ../management-ui/vite.config.ts:/app/vite.config.ts:ro
+    depends_on:
+      navigation-service:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    restart: unless-stopped
+    networks:
+      - demo-app-network
+
+  # Chat Widget MFE (Micro Frontend)
+  chat-widget-mfe:
+    build:
+      context: ../chat-widget-mfe
+      dockerfile: Dockerfile
+    container_name: demo-app-chat-widget
+    environment:
+      NODE_ENV: development
+      NAVIGATION_SERVICE_URL: http://navigation-service:8081
+    ports:
+      - "3002:3002"  # Chat widget MFE port
+    volumes:
+      - ../chat-widget-mfe/src:/app/src:ro
+      - ../chat-widget-mfe/webpack.config.js:/app/webpack.config.js:ro
+    depends_on:
+      navigation-service:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3002/remoteEntry.js"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
     restart: unless-stopped
     networks:
       - demo-app-network

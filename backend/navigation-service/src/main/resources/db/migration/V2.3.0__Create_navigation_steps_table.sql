@@ -14,7 +14,7 @@ CREATE TABLE navigation_steps (
     error_message TEXT,
     retry_count INTEGER NOT NULL DEFAULT 0,
     created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    
+
     CONSTRAINT fk_navigation_steps_navigation_session_id FOREIGN KEY (navigation_session_id) REFERENCES navigation_sessions(id) ON DELETE CASCADE,
     CONSTRAINT fk_navigation_steps_target_element_id FOREIGN KEY (target_element_id) REFERENCES page_elements(id) ON DELETE SET NULL,
     CONSTRAINT navigation_steps_type_check CHECK (step_type IN ('navigate', 'click', 'type', 'select', 'wait', 'scroll', 'hover', 'screenshot', 'extract', 'verify', 'custom')),
@@ -39,7 +39,7 @@ CREATE TABLE navigation_workflows (
     created_by VARCHAR(100),
     created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    
+
     CONSTRAINT navigation_workflows_name_not_empty CHECK (LENGTH(TRIM(name)) > 0),
     CONSTRAINT navigation_workflows_success_rate_range CHECK (success_rate >= 0.0 AND success_rate <= 100.0),
     CONSTRAINT navigation_workflows_usage_count_non_negative CHECK (usage_count >= 0)
@@ -58,7 +58,7 @@ CREATE TABLE workflow_executions (
     failed_steps INTEGER NOT NULL DEFAULT 0,
     execution_data JSONB DEFAULT '{}',
     error_message TEXT,
-    
+
     CONSTRAINT fk_workflow_executions_navigation_workflow_id FOREIGN KEY (navigation_workflow_id) REFERENCES navigation_workflows(id) ON DELETE CASCADE,
     CONSTRAINT fk_workflow_executions_navigation_session_id FOREIGN KEY (navigation_session_id) REFERENCES navigation_sessions(id) ON DELETE CASCADE,
     CONSTRAINT workflow_executions_status_check CHECK (execution_status IN ('running', 'completed', 'failed', 'cancelled', 'timeout')),
@@ -87,9 +87,9 @@ CREATE INDEX idx_workflow_executions_status ON workflow_executions(execution_sta
 CREATE INDEX idx_workflow_executions_started_at ON workflow_executions(started_at);
 
 -- Create triggers for updated_at
-CREATE TRIGGER update_navigation_workflows_updated_at 
-    BEFORE UPDATE ON navigation_workflows 
-    FOR EACH ROW 
+CREATE TRIGGER update_navigation_workflows_updated_at
+    BEFORE UPDATE ON navigation_workflows
+    FOR EACH ROW
     EXECUTE FUNCTION update_updated_at_column();
 
 -- Add comments for documentation

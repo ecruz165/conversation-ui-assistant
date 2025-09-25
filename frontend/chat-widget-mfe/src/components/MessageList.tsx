@@ -1,4 +1,4 @@
-import type React from 'react';
+import React from 'react';
 import { useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { User, Bot, Loader2 } from 'lucide-react';
@@ -116,15 +116,32 @@ const MessageList: React.FC<MessageListProps> = ({ messages, isLoading, theme })
               {message.content}
             </div>
 
-            {/* Timestamp */}
+            {/* Timestamp and Message Count */}
             <div
               style={{
                 fontSize: theme.typography.fontSize.xs,
                 opacity: 0.7,
                 textAlign: isUser ? 'right' : 'left',
+                display: 'flex',
+                justifyContent: isUser ? 'flex-end' : 'flex-start',
+                alignItems: 'center',
+                gap: theme.spacing.xs,
               }}
             >
-              {formatTime(message.timestamp)}
+              <span>{formatTime(message.timestamp)}</span>
+              {message.messageCount && message.sender === 'assistant' && (
+                <span
+                  style={{
+                    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                    padding: '2px 6px',
+                    borderRadius: '10px',
+                    fontSize: '10px',
+                    fontWeight: 'bold',
+                  }}
+                >
+                  #{message.messageCount}
+                </span>
+              )}
             </div>
 
             {/* Metadata (confidence, suggestions, etc.) */}

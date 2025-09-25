@@ -9,7 +9,7 @@ CREATE TABLE conversations (
     created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
     ended_at TIMESTAMP WITH TIME ZONE,
-    
+
     CONSTRAINT fk_conversations_user_id FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     CONSTRAINT conversations_status_check CHECK (status IN ('active', 'paused', 'completed', 'cancelled'))
 );
@@ -23,7 +23,7 @@ CREATE TABLE messages (
     message_type VARCHAR(50) DEFAULT 'text',
     metadata JSONB,
     created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    
+
     CONSTRAINT fk_messages_conversation_id FOREIGN KEY (conversation_id) REFERENCES conversations(id) ON DELETE CASCADE,
     CONSTRAINT messages_role_check CHECK (role IN ('user', 'assistant', 'system')),
     CONSTRAINT messages_content_not_empty CHECK (LENGTH(TRIM(content)) > 0)
@@ -41,17 +41,17 @@ CREATE INDEX idx_messages_created_at ON messages(created_at);
 CREATE INDEX idx_messages_message_type ON messages(message_type);
 
 -- Create trigger to automatically update conversations.updated_at
-CREATE TRIGGER update_conversations_updated_at 
-    BEFORE UPDATE ON conversations 
-    FOR EACH ROW 
+CREATE TRIGGER update_conversations_updated_at
+    BEFORE UPDATE ON conversations
+    FOR EACH ROW
     EXECUTE FUNCTION update_updated_at_column();
 
 -- Create function to update conversation updated_at when messages are added
 CREATE OR REPLACE FUNCTION update_conversation_on_message_insert()
 RETURNS TRIGGER AS $$
 BEGIN
-    UPDATE conversations 
-    SET updated_at = CURRENT_TIMESTAMP 
+    UPDATE conversations
+    SET updated_at = CURRENT_TIMESTAMP
     WHERE id = NEW.conversation_id;
     RETURN NEW;
 END;

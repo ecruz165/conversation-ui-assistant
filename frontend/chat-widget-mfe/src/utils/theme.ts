@@ -99,7 +99,7 @@ const darkTheme: Theme = {
 /**
  * Get theme based on theme preference
  */
-export const getTheme = (themeType: 'light' | 'dark' | 'auto'): Theme => {
+export const getTheme = (themeType: string): Theme => {
   if (themeType === 'auto') {
     // Check system preference
     if (typeof window !== 'undefined' && window.matchMedia) {

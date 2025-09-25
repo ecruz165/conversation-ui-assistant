@@ -54,14 +54,11 @@ services:
       - ./docker/postgres/init:/docker-entrypoint-initdb.d
 
   # Development Redis with exposed port
-  redis:
-    ports:
-      - "6379:6379"
-    command: redis-server --appendonly yes --appendfsync everysec
+
 
   # Hot reload for frontend development (placeholder)
   frontend-dev:
-    image: node:18-alpine
+    image: node:22-alpine
     container_name: conversation-ui-frontend-dev
     working_dir: /app
     volumes:
@@ -75,7 +72,7 @@ services:
     environment:
       NODE_ENV: development
       CHOKIDAR_USEPOLLING: true
-    command: sh -c "cd admin-portal && npm install && npm run dev"
+    command: sh -c "cd management-ui && npm install && npm run dev"
     depends_on:
       - management-service
       - navigation-service

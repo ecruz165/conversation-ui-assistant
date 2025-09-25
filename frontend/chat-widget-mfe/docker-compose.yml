@@ -33,15 +33,18 @@ services:
     build:
       context: ../../backend/navigation-service
       dockerfile: Dockerfile
-      target: builder
     container_name: chat-widget-navigation
     environment:
-      SPRING_PROFILES_ACTIVE: local
-      DB_HOST: postgres
-      DB_PORT: 5432
-      DB_NAME: conversation_ui
-      DB_USERNAME: conversation_user
-      DB_PASSWORD: conversation_pass
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_R2DBC_URL: r2dbc:postgresql://postgres:5432/conversation_ui
+      SPRING_R2DBC_USERNAME: conversation_user
+      SPRING_R2DBC_PASSWORD: conversation_pass
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/conversation_ui
+      SPRING_DATASOURCE_USERNAME: conversation_user
+      SPRING_DATASOURCE_PASSWORD: conversation_pass
+      SPRING_FLYWAY_URL: jdbc:postgresql://postgres:5432/conversation_ui
+      SPRING_FLYWAY_USER: conversation_user
+      SPRING_FLYWAY_PASSWORD: conversation_pass
       OPENAI_API_KEY: ${OPENAI_API_KEY:-widget-dummy-key}
       OPENAI_ENABLED: ${OPENAI_ENABLED:-false}
     ports:

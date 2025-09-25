@@ -1,5 +1,4 @@
 packages:
-  - 'packages/*'
-  - 'apps/*'
-  - 'modules/*'
-  # Maven modules can also be included if they have package.json files
+  - 'frontend/*'
+  - 'backend/*'
+  # Include any directories that have package.json files

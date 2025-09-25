@@ -2,8 +2,6 @@
 # Usage: docker-compose -f docker-compose.ide.yml up
 # This setup uses the 'ide' profile for all services for comprehensive development
 
-version: '3.8'
-
 services:
   # PostgreSQL Database (Primary - Port 5432 for management-service)
   postgres-main:
@@ -135,10 +133,108 @@ services:
       start_period: 60s
     command: ["mvn", "spring-boot:run", "-Dspring-boot.run.profiles=ide"]
 
+  # Management UI (Frontend Development Server)
+  management-ui:
+    image: node:22-alpine
+    container_name: conversation-ui-management-ui-ide
+    working_dir: /app
+    environment:
+      NODE_ENV: development
+      CHOKIDAR_USEPOLLING: true
+      REACT_APP_API_BASE_URL: http://localhost:8080
+      REACT_APP_NAVIGATION_API_URL: http://localhost:8081
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend/management-ui:/app:cached
+      - management_ui_node_modules:/app/node_modules
+    networks:
+      - conversation-ide-network
+    restart: unless-stopped
+    depends_on:
+      management-service:
+        condition: service_healthy
+      navigation-service:
+        condition: service_healthy
+    command: sh -c "npm install && npm run dev"
+
+  # Chat Widget MFE (Frontend Development Server)
+  chat-widget-mfe:
+    image: node:22-alpine
+    container_name: conversation-ui-chat-widget-ide
+    working_dir: /app
+    environment:
+      NODE_ENV: development
+      CHOKIDAR_USEPOLLING: true
+      REACT_APP_NAVIGATION_API_URL: http://localhost:8081
+      WEBPACK_DEV_SERVER_HOST: 0.0.0.0
+    ports:
+      - "3002:3002"
+    volumes:
+      - ./frontend/chat-widget-mfe:/app:cached
+      - chat_widget_node_modules:/app/node_modules
+    networks:
+      - conversation-ide-network
+    restart: unless-stopped
+    depends_on:
+      navigation-service:
+        condition: service_healthy
+    command: sh -c "npm install && npm run dev"
+
+  # Demo App (Frontend Development Server)
+  demo-app:
+    image: node:22-alpine
+    container_name: conversation-ui-demo-app-ide
+    working_dir: /app
+    environment:
+      NODE_ENV: development
+      CHOKIDAR_USEPOLLING: true
+      REACT_APP_CHAT_WIDGET_URL: http://localhost:3002
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./frontend/demo-app:/app:cached
+      - demo_app_node_modules:/app/node_modules
+    networks:
+      - conversation-ide-network
+    restart: unless-stopped
+    depends_on:
+      - chat-widget-mfe
+    command: sh -c "npm install && npm run dev"
+
+  # pgAdmin for Database Management
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: conversation-ui-pgadmin-ide
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@conversation-ui.local
+      PGADMIN_DEFAULT_PASSWORD: admin
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    ports:
+      - "8083:80"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    networks:
+      - conversation-ide-network
+    restart: unless-stopped
+    depends_on:
+      postgres-main:
+        condition: service_healthy
+      postgres-nav:
+        condition: service_healthy
+
 volumes:
   postgres_main_data:
     driver: local
   postgres_nav_data:
+    driver: local
+  management_ui_node_modules:
+    driver: local
+  chat_widget_node_modules:
+    driver: local
+  demo_app_node_modules:
+    driver: local
+  pgadmin_data:
     driver: local
 
 networks:

@@ -1,5 +1,5 @@
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const { ModuleFederationPlugin } = require('@module-federation/webpack');
+const { ModuleFederationPlugin } = require('@module-federation/enhanced');
 const path = require('path');
 
 const isProduction = process.env.NODE_ENV === 'production';
@@ -57,15 +57,15 @@ module.exports = {
         './useConversation': './src/hooks/useConversation',
       },
       shared: {
-        react: { 
-          singleton: true, 
+        react: {
+          singleton: true,
           requiredVersion: '^18.2.0',
-          eager: false,
+          eager: true,
         },
-        'react-dom': { 
-          singleton: true, 
+        'react-dom': {
+          singleton: true,
           requiredVersion: '^18.2.0',
-          eager: false,
+          eager: true,
         },
       },
     }),
