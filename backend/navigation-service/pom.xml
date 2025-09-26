@@ -188,39 +188,50 @@
 				</configuration>
 			</plugin>
 
-			<!-- Docker Compose Maven Plugin for development -->
-			<plugin>
-				<groupId>com.dkanejs.maven.plugins</groupId>
-				<artifactId>docker-compose-maven-plugin</artifactId>
-				<version>4.0.0</version>
-				<configuration>
-					<composeFile>compose-ide.yaml</composeFile>
-					<detachedMode>true</detachedMode>
-					<removeVolumes>false</removeVolumes>
-					<projectName>navigation-service-ide</projectName>
-					<services>
-						<service>postgres</service>
-					</services>
-				</configuration>
-				<executions>
-					<execution>
-						<id>start-postgres</id>
-						<phase>pre-integration-test</phase>
-						<goals>
-							<goal>up</goal>
-						</goals>
-					</execution>
-					<execution>
-						<id>stop-postgres</id>
-						<phase>post-integration-test</phase>
-						<goals>
-							<goal>down</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-
 		</plugins>
 	</build>
+
+	<!-- Maven Profiles -->
+	<profiles>
+		<!-- IDE Development Profile -->
+		<profile>
+			<id>ide</id>
+			<build>
+				<plugins>
+					<!-- Docker Compose Maven Plugin for IDE development -->
+					<plugin>
+						<groupId>com.dkanejs.maven.plugins</groupId>
+						<artifactId>docker-compose-maven-plugin</artifactId>
+						<version>4.0.0</version>
+						<configuration>
+							<composeFile>compose-ide.yaml</composeFile>
+							<detachedMode>true</detachedMode>
+							<removeVolumes>false</removeVolumes>
+							<projectName>navigation-service-ide</projectName>
+							<services>
+								<service>postgres</service>
+							</services>
+						</configuration>
+						<executions>
+							<execution>
+								<id>start-postgres</id>
+								<phase>pre-integration-test</phase>
+								<goals>
+									<goal>up</goal>
+								</goals>
+							</execution>
+							<execution>
+								<id>stop-postgres</id>
+								<phase>post-integration-test</phase>
+								<goals>
+									<goal>down</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 
 </project>
