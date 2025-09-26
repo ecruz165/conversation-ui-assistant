@@ -212,7 +212,7 @@
 							<composeFile>compose-ide.yaml</composeFile>
 							<detachedMode>true</detachedMode>
 							<removeVolumes>false</removeVolumes>
-							<projectName>management-service-ide</projectName>
+							<projectName>management-service</projectName>
 							<services>
 								<service>postgres</service>
 							</services>

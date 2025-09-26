@@ -42,7 +42,7 @@ build:
 	mvn clean compile
 
 # Run tests
-test:
+run: ensure-postgres
 	@echo "🧪 Running Navigation Service tests..."
 	mvn test
 
