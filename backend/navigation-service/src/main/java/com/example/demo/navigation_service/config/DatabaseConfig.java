@@ -2,6 +2,7 @@ package com.example.demo.navigation_service.config;
 
 import org.flywaydb.core.Flyway;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.flyway.FlywayConfigurationCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,6 +14,7 @@ import org.springframework.context.annotation.Configuration;
  * - Flyway configuration customization for reactive setup
  * - R2DBC remains the primary reactive database access
  * - No JDBC DataSource to avoid conflicts with reactive stack
+ * - Mock AI configuration to prevent startup errors
  */
 @Configuration
 public class DatabaseConfig {
