@@ -14,7 +14,8 @@ import org.springframework.context.annotation.Configuration;
  * - Flyway configuration customization for reactive setup
  * - R2DBC remains the primary reactive database access
  * - No JDBC DataSource to avoid conflicts with reactive stack
- * - Mock AI configuration to prevent startup errors
+ * - In-memory vector store with async persistence queue
+ * - Message queue for background persistence processing
  */
 @Configuration
 public class DatabaseConfig {
