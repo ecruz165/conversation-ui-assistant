@@ -27,20 +27,20 @@ const NavigationHelper: React.FC<NavigationHelperProps> = ({
     if (!query.trim()) return;
 
     setIsLoading(true);
-    
+
     try {
       // Simulate navigation processing
       await new Promise(resolve => setTimeout(resolve, 500));
-      
+
       onMessageSent?.(query);
-      
+
       // Simulate navigation action
       onNavigationAction?.({
         type: 'navigate',
         target: query.toLowerCase(),
         data: { query, timestamp: Date.now() }
       });
-      
+
       setQuery('');
     } catch (error) {
       console.error('Navigation error:', error);
@@ -76,14 +76,14 @@ const NavigationHelper: React.FC<NavigationHelperProps> = ({
             transition: theme.transitions.normal,
           }}
         >
-          <Search 
-            size={20} 
-            style={{ 
+          <Search
+            size={20}
+            style={{
               color: theme.colors.textSecondary,
-              marginRight: theme.spacing.sm 
-            }} 
+              marginRight: theme.spacing.sm
+            }}
           />
-          
+
           <input
             type="text"
             value={query}
@@ -100,7 +100,7 @@ const NavigationHelper: React.FC<NavigationHelperProps> = ({
               fontFamily: theme.typography.fontFamily,
             }}
           />
-          
+
           <button
             type="submit"
             disabled={!query.trim() || isLoading}

@@ -75,10 +75,10 @@ const MessageList: React.FC<MessageListProps> = ({ messages, isLoading, theme })
           {/* Message Content */}
           <div
             style={{
-              backgroundColor: isError 
-                ? theme.colors.error 
-                : isUser 
-                  ? theme.colors.primary 
+              backgroundColor: isError
+                ? theme.colors.error
+                : isUser
+                  ? theme.colors.primary
                   : theme.colors.surface,
               color: isError || isUser ? 'white' : theme.colors.text,
               padding: `${theme.spacing.sm} ${theme.spacing.md}`,
@@ -99,10 +99,10 @@ const MessageList: React.FC<MessageListProps> = ({ messages, isLoading, theme })
                 width: '0',
                 height: '0',
                 borderTop: `6px solid ${
-                  isError 
-                    ? theme.colors.error 
-                    : isUser 
-                      ? theme.colors.primary 
+                  isError
+                    ? theme.colors.error
+                    : isUser
+                      ? theme.colors.primary
                       : theme.colors.surface
                 }`,
                 borderLeft: isUser ? '6px solid transparent' : 'none',
@@ -158,7 +158,7 @@ const MessageList: React.FC<MessageListProps> = ({ messages, isLoading, theme })
                     (Low confidence: {Math.round(message.metadata.confidence * 100)}%)
                   </div>
                 )}
-                
+
                 {message.metadata.suggestions && message.metadata.suggestions.length > 0 && (
                   <div style={{ marginTop: theme.spacing.xs }}>
                     <div

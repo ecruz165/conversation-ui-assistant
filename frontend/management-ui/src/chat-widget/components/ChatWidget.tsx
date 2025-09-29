@@ -75,7 +75,7 @@ const ChatWidget: React.FC<ChatWidgetProps> = ({
       const lastMessage = state.messages[state.messages.length - 1];
       if (lastMessage.sender === 'assistant') {
         onMessageReceived?.(lastMessage);
-        
+
         // Handle navigation actions
         if (lastMessage.metadata?.navigationTarget && onNavigationAction) {
           onNavigationAction({

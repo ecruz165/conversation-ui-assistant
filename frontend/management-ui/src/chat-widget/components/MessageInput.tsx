@@ -61,7 +61,7 @@ const MessageInput: React.FC<MessageInputProps> = ({
     const value = e.target.value;
     if (value.length <= maxLength) {
       setMessage(value);
-      
+
       // Auto-resize
       const textarea = e.target;
       textarea.style.height = 'auto';
