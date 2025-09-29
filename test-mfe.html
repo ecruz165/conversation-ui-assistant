@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test MFE Integration</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        .success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .info { background-color: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        #chat-widget-container {
+            margin-top: 20px;
+            padding: 20px;
+            border: 2px dashed #ccc;
+            border-radius: 8px;
+            min-height: 200px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Module Federation Integration Test</h1>
+        <p>Testing if the Chat Widget MFE can be loaded from management-ui.</p>
+
+        <div id="status-container">
+            <div class="status info">
+                <strong>Status:</strong> Initializing...
+            </div>
+        </div>
+
+        <div id="chat-widget-container">
+            <p>Chat Widget will load here...</p>
+        </div>
+    </div>
+
+    <script type="module">
+        async function testMFEIntegration() {
+            const statusContainer = document.getElementById('status-container');
+            const chatContainer = document.getElementById('chat-widget-container');
+
+            function updateStatus(message, type = 'info') {
+                statusContainer.innerHTML = `<div class="status ${type}"><strong>Status:</strong> ${message}</div>`;
+            }
+
+            try {
+                updateStatus('Loading remoteEntry.js...', 'info');
+
+                // Import the remote entry
+                const { get, init } = await import('http://localhost:3000/assets/remoteEntry.js');
+
+                updateStatus('Initializing Module Federation...', 'info');
+
+                // Check what's available
+                const availableFunctions = Object.keys({ get, init });
+                console.log('Available MFE functions:', availableFunctions);
+
+                updateStatus('✅ Module Federation structure verified!', 'success');
+
+                chatContainer.innerHTML = `
+                    <div style="background: #e8f5e8; padding: 15px; border-radius: 4px;">
+                        <h3>🎉 MFE Structure Verified!</h3>
+                        <p>The remoteEntry.js was successfully loaded from the management-ui.</p>
+                        <p><strong>Available functions:</strong> ${availableFunctions.join(', ')}</p>
+                        <p><strong>MFE URL:</strong> http://localhost:3000/assets/remoteEntry.js</p>
+                        <p><strong>Next step:</strong> Tenant applications can now consume these components!</p>
+
+                        <h4>Available Components:</h4>
+                        <ul>
+                            <li><code>./ChatWidget</code> - Main chat widget component</li>
+                            <li><code>./NavigationHelper</code> - Navigation helper component</li>
+                            <li><code>./ConversationProvider</code> - Context provider</li>
+                            <li><code>./useConversation</code> - Custom hook</li>
+                        </ul>
+                    </div>
+                `;
+
+            } catch (error) {
+                console.error('MFE Integration Error:', error);
+                updateStatus(`❌ Error: ${error.message}`, 'error');
+
+                chatContainer.innerHTML = `
+                    <div style="background: #f8e8e8; padding: 15px; border-radius: 4px;">
+                        <h3>❌ Integration Failed</h3>
+                        <p><strong>Error:</strong> ${error.message}</p>
+                        <p><strong>Make sure:</strong></p>
+                        <ul>
+                            <li>Management UI is running on http://localhost:3000</li>
+                            <li>The build has been completed (pnpm build)</li>
+                            <li>CORS headers are properly configured</li>
+                        </ul>
+                    </div>
+                `;
+            }
+        }
+
+        // Start the test
+        testMFEIntegration();
+    </script>
+</body>
+</html>

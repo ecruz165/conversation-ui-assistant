@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Webpack MFE Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        .success { background-color: #d4edda; color: #155724; }
+        .error { background-color: #f8d7da; color: #721c24; }
+        .info { background-color: #d1ecf1; color: #0c5460; }
+        pre { background: #f8f9fa; padding: 10px; border-radius: 4px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Webpack Module Federation Test</h1>
+        <p>Testing the webpack-based chat widget wrapper...</p>
+
+        <div id="results"></div>
+
+        <h2>Test Results:</h2>
+        <div id="test-output"></div>
+    </div>
+
+    <script type="module">
+        const results = document.getElementById('results');
+        const output = document.getElementById('test-output');
+
+        function addResult(message, type = 'info') {
+            const div = document.createElement('div');
+            div.className = `status ${type}`;
+            div.textContent = message;
+            results.appendChild(div);
+            console.log(message);
+        }
+
+        function addOutput(content) {
+            const pre = document.createElement('pre');
+            pre.textContent = content;
+            output.appendChild(pre);
+        }
+
+        async function testWebpackMFE() {
+            addResult('🧪 Testing Webpack MFE...', 'info');
+
+            try {
+                // Test 1: Load remoteEntry.js
+                addResult('📡 Loading remoteEntry.js...', 'info');
+                const response = await fetch('http://localhost:3002/remoteEntry.js');
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                addResult('✅ remoteEntry.js loaded successfully', 'success');
+
+                // Test 2: Import as module
+                addResult('📦 Importing as ES module...', 'info');
+                const chatWidgetWrapper = await import('http://localhost:3002/remoteEntry.js');
+                addResult('✅ Module imported successfully', 'success');
+                addOutput(`Module exports: ${Object.keys(chatWidgetWrapper).join(', ')}`);
+
+                // Test 3: Initialize Module Federation
+                addResult('🔧 Initializing Module Federation...', 'info');
+                await chatWidgetWrapper.init({});
+                addResult('✅ Module Federation initialized', 'success');
+
+                // Test 4: Get ChatWidget component
+                addResult('🎯 Loading ChatWidget component...', 'info');
+                const ChatWidget = await chatWidgetWrapper.get('./ChatWidget');
+                addResult('✅ ChatWidget component loaded', 'success');
+                addOutput(`ChatWidget type: ${typeof ChatWidget}`);
+
+                // Test 5: Get all components
+                const components = ['./ChatWidget', './NavigationHelper', './ConversationProvider', './useConversation'];
+                for (const comp of components) {
+                    try {
+                        const component = await chatWidgetWrapper.get(comp);
+                        addResult(`✅ ${comp} loaded successfully`, 'success');
+                    } catch (error) {
+                        addResult(`❌ ${comp} failed: ${error.message}`, 'error');
+                    }
+                }
+
+                addResult('🎉 All tests passed! Webpack MFE is working correctly.', 'success');
+
+            } catch (error) {
+                addResult(`❌ Test failed: ${error.message}`, 'error');
+                addOutput(`Error details: ${error.stack}`);
+            }
+        }
+
+        // Run tests when page loads
+        testWebpackMFE();
+    </script>
+</body>
+</html>

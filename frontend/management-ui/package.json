@@ -6,8 +6,11 @@
   "scripts": {
     "dev": "vite dev --host",
     "build": "vite build && tsc --noEmit",
+    "build:webcomponent": "vite build --config vite.webcomponent.config.ts",
+    "dev:webcomponent": "vite build --config vite.webcomponent.config.ts --watch",
     "start": "node dist/server/server.js",
     "preview": "vite preview --port 3000",
+    "preview:webcomponent": "vite preview --dir dist/web-component --port 3001",
     "clean": "rm -rf .output dist node_modules/.vite",
     "type-check": "tsc --noEmit",
     "lint": "biome check src/",
@@ -17,11 +20,17 @@
     "test": "echo \"No tests specified\" && exit 0"
   },
   "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
     "@tanstack/react-router": "^1.132.2",
     "@tanstack/react-router-devtools": "^1.132.2",
     "@tanstack/react-start": "^1.132.4",
+    "framer-motion": "^10.18.0",
+    "lucide-react": "^0.294.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-router-dom": "^7.9.3",
+    "socket.io-client": "^4.8.1",
     "tailwind-merge": "^2.6.0",
     "zod": "^3.24.2"
   },

@@ -1,4 +1,9 @@
-# Two Modulith Architecture
+# Conversation UI Assistant
+
+## Smart Dependency Management with Standardized Make Commands
+
+> **📚 Quick Start**: See [QUICK_REFERENCE.md](.docs/QUICK_REFERENCE.md) for all available commands
+> **📖 Full Documentation**: See [README_MAKE_COMMANDS.md](.docs/README_MAKE_COMMANDS.md) for comprehensive guide
 
 ## Maven-based Spring Moduliths with pnpm wrapper
 
@@ -44,6 +49,40 @@ conversational-navigation-system/
 └── infrastructure/
     └── docker/
 ```
+
+## 🚀 Quick Start
+
+### System Overview
+
+```bash
+# Check what's currently running
+make deps-overview
+
+# Start full system demo
+make run
+
+# Stop everything
+make stop
+```
+
+### Development Workflow
+
+```bash
+# Start backend development
+cd backend/management-service && make dev-with-deps
+
+# Start frontend development (in another terminal)
+cd frontend/management-ui && make dev-with-deps
+
+# Deploy to localstack for testing
+make deploy PROFILE=local
+```
+
+### Available Commands
+
+- **📚 Quick Reference**: [QUICK_REFERENCE.md](.docs/QUICK_REFERENCE.md) - One-page command reference
+- **📖 Full Guide**: [README_MAKE_COMMANDS.md](.docs/README_MAKE_COMMANDS.md) - Comprehensive documentation
+- **🧪 Testing**: `./test-commands.sh` - Automated command testing
 
 ---
 
@@ -303,7 +342,7 @@ navigation-service/
 @SpringBootApplication
 @EnableModulith
 public class NavigationServiceApplication {
-    public static void main(String[] args) {
+    static void main(String[] args) {
         SpringApplication.run(NavigationServiceApplication.class, args);
     }
 }
@@ -1331,11 +1370,11 @@ make test-e2e
 
 ### Service URLs
 
-- **Management UI**: http://localhost:3000 (TanStack Start + React)
-- **Demo App**: http://localhost:3001 (React + Module Federation)
-- **Widget SDK**: http://localhost:3002 (React MFE)
-- **Management Service**: http://localhost:8080 (Spring MVC + JPA)
-- **Navigation Service**: http://localhost:8081 (Spring WebFlux + R2DBC)
+- **Management UI**: <http://localhost:3000> (TanStack Start + React)
+- **Demo App**: <http://localhost:3001> (React + Module Federation)
+- **Widget SDK**: <http://localhost:3002> (React MFE)
+- **Management Service**: <http://localhost:8080> (Spring MVC + JPA)
+- **Navigation Service**: <http://localhost:8081> (Spring WebFlux + R2DBC)
 - **PostgreSQL**: localhost:5432 (with pgvector extension)
 
 ### Architecture Highlights

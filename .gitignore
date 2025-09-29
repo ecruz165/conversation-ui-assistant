@@ -1,5 +1,5 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
-
+tenants/
 # =============================================================================
 # OS & IDE
 # =============================================================================
@@ -7,6 +7,11 @@
 **/.idea/
 **/.vscode/
 **/.gradle/
+**/.mcp.json
+**/.taskmaster/
+**/.claude/
+**/CLAUDE.md
+**/AGENTS.md
 
 # =============================================================================
 # Environment & Configuration
@@ -92,3 +97,26 @@ storybook-static/
 /.project
 
 *storybook.log
+
+# Logs
+logs
+*.log
+dev-debug.log
+# Dependency directories
+node_modules/
+# Environment variables
+.env
+# Editor directories and files
+.idea
+.vscode
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+# OS specific
+.DS_Store
+
+# Task files
+tasks.json
+tasks/

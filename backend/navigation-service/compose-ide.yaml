@@ -1,21 +1,21 @@
 # Docker Compose for IDE Profile - Navigation Service
-# Minimal PostgreSQL setup for individual module development
+# Shared PostgreSQL setup for module development
 
 version: '3.8'
 
 services:
   postgres:
     image: postgres:15-alpine
-    container_name: navigation-service-postgres-ide
+    container_name: shared-postgres-ide
     environment:
       POSTGRES_DB: conversation_ui
       POSTGRES_USER: conversation_user
       POSTGRES_PASSWORD: conversation_pass
       POSTGRES_INITDB_ARGS: "--encoding=UTF-8"
     ports:
-      - "5433:5432"  # Different port to avoid conflicts with management service
+      - "5432:5432"  # Shared port for all services
     volumes:
-      - postgres_data_ide:/var/lib/postgresql/data
+      - shared_postgres_data_ide:/var/lib/postgresql/data
       - ./src/main/resources/db/init:/docker-entrypoint-initdb.d:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U conversation_user -d conversation_ui"]
@@ -25,12 +25,14 @@ services:
       start_period: 30s
     restart: unless-stopped
     networks:
-      - navigation-ide-network
+      - shared-ide-network
 
 volumes:
-  postgres_data_ide:
+  shared_postgres_data_ide:
     driver: local
+    external: false
 
 networks:
-  navigation-ide-network:
+  shared-ide-network:
     driver: bridge
+    external: false

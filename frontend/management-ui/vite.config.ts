@@ -1,7 +1,8 @@
-import { tanstackStart } from "@tanstack/react-start/plugin/vite";
 import { defineConfig } from "vite";
 import tsConfigPaths from "vite-tsconfig-paths";
 import viteReact from "@vitejs/plugin-react";
+import { resolve } from 'path';
+import { readFileSync, existsSync } from 'fs';
 
 export default defineConfig({
   server: {
@@ -14,17 +15,46 @@ export default defineConfig({
       usePolling: true,
       interval: 1000,
     },
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, PATCH, OPTIONS',
+      'Access-Control-Allow-Headers': 'X-Requested-With, content-type, Authorization',
+    },
+    // Serve static files from web-component dist
+    middlewareMode: false,
+    fs: {
+      allow: ['..', './dist']
+    }
   },
+  // Configure public directory to also serve web component files
+  publicDir: false,
   plugins: [
     tsConfigPaths({
       projects: ["./tsconfig.json"],
     }),
-    tanstackStart({
-      srcDirectory: "src",
-      start: { entry: "./start.tsx" },
-      server: { entry: "./server.ts" },
-    }),
     viteReact(),
+    // Custom plugin to serve web component files
+    {
+      name: 'serve-web-component',
+      configureServer(server) {
+        server.middlewares.use('/web-component', (req, res, next) => {
+          const filePath = resolve(__dirname, 'dist/web-component' + req.url);
+          try {
+            if (existsSync(filePath)) {
+              const content = readFileSync(filePath);
+              if (req.url?.endsWith('.js')) {
+                res.setHeader('Content-Type', 'application/javascript');
+              }
+              res.end(content);
+              return;
+            }
+          } catch (error) {
+            console.error('Error serving web component file:', error);
+          }
+          next();
+        });
+      }
+    }
   ],
   // Optimize dependencies for faster dev server startup
   optimizeDeps: {
@@ -32,7 +62,10 @@ export default defineConfig({
   },
   // Build configuration
   build: {
+    target: 'esnext',
     sourcemap: true,
-    // Let TanStack Start handle chunking for SSR compatibility
+    rollupOptions: {
+      input: './index.html',
+    },
   },
 });

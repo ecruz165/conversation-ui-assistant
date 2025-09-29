@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Widget Web Component Demo</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            background: #f8fafc;
+        }
+
+        .demo-section {
+            background: white;
+            padding: 2rem;
+            margin: 2rem 0;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .code-block {
+            background: #f1f5f9;
+            padding: 1rem;
+            border-radius: 4px;
+            border-left: 4px solid #3b82f6;
+            margin: 1rem 0;
+            overflow-x: auto;
+        }
+
+        .code-block code {
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 0.875rem;
+        }
+
+        .controls {
+            display: flex;
+            gap: 1rem;
+            margin: 1rem 0;
+            flex-wrap: wrap;
+        }
+
+        .controls button {
+            padding: 0.5rem 1rem;
+            border: 1px solid #d1d5db;
+            border-radius: 4px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .controls button:hover {
+            background: #3b82f6;
+            color: white;
+            border-color: #3b82f6;
+        }
+
+        .controls select, .controls input {
+            padding: 0.5rem;
+            border: 1px solid #d1d5db;
+            border-radius: 4px;
+        }
+
+        .status {
+            padding: 1rem;
+            background: #f0f9ff;
+            border: 1px solid #0ea5e9;
+            border-radius: 4px;
+            margin: 1rem 0;
+        }
+
+        .demo-container {
+            position: relative;
+            min-height: 400px;
+            background: #f8fafc;
+            border: 2px dashed #cbd5e1;
+            border-radius: 8px;
+            padding: 2rem;
+            margin: 1rem 0;
+        }
+
+        h1 { color: #1e293b; }
+        h2 { color: #334155; }
+        h3 { color: #475569; }
+
+        .event-log {
+            background: #1e293b;
+            color: #f8fafc;
+            padding: 1rem;
+            border-radius: 4px;
+            max-height: 200px;
+            overflow-y: auto;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 0.75rem;
+            line-height: 1.4;
+        }
+    </style>
+</head>
+<body>
+    <h1>🤖 Chat Widget Web Component Demo</h1>
+
+    <div class="demo-section">
+        <h2>📋 Component Status</h2>
+        <div id="status" class="status">
+            <strong>Status:</strong> <span id="status-text">Loading...</span>
+        </div>
+    </div>
+
+    <div class="demo-section">
+        <h2>🎮 Interactive Demo</h2>
+        <p>Use the controls below to test different configurations of the chat widget:</p>
+
+        <div class="controls">
+            <label>
+                Theme:
+                <select id="theme-select">
+                    <option value="light">Light</option>
+                    <option value="dark">Dark</option>
+                </select>
+            </label>
+
+            <label>
+                Position:
+                <select id="position-select">
+                    <option value="bottom-right">Bottom Right</option>
+                    <option value="bottom-left">Bottom Left</option>
+                    <option value="top-right">Top Right</option>
+                    <option value="top-left">Top Left</option>
+                </select>
+            </label>
+
+            <label>
+                API Endpoint:
+                <input type="text" id="api-endpoint" value="http://localhost:8080" style="width: 200px;">
+            </label>
+
+            <button onclick="updateWidget()">Update Widget</button>
+            <button onclick="removeWidget()">Remove Widget</button>
+            <button onclick="createWidget()">Create Widget</button>
+        </div>
+
+        <div class="demo-container" id="demo-container">
+            <p style="text-align: center; color: #64748b;">
+                Chat widget will appear here. Use the controls above to modify it.
+            </p>
+        </div>
+    </div>
+
+    <div class="demo-section">
+        <h2>📝 Event Log</h2>
+        <p>Real-time events from the chat widget:</p>
+        <div id="event-log" class="event-log"></div>
+        <button onclick="clearLog()" style="margin-top: 1rem;">Clear Log</button>
+    </div>
+
+    <div class="demo-section">
+        <h2>🔧 Usage Examples</h2>
+
+        <h3>Basic Usage</h3>
+        <div class="code-block">
+            <code>&lt;!-- Include the web component script --&gt;<br>
+&lt;script src="http://localhost:3000/chat-widget.iife.js"&gt;&lt;/script&gt;<br><br>
+&lt;!-- Use the chat widget --&gt;<br>
+&lt;chat-widget
+&nbsp;&nbsp;api-endpoint="http://localhost:8080"
+&nbsp;&nbsp;theme="light"
+&nbsp;&nbsp;position="bottom-right"&gt;
+&lt;/chat-widget&gt;</code>
+        </div>
+
+        <h3>Programmatic Creation</h3>
+        <div class="code-block">
+            <code>// Create widget programmatically<br>
+const container = document.getElementById('my-container');<br>
+window.createChatWidget(container, {<br>
+&nbsp;&nbsp;'api-endpoint': 'http://localhost:8080',<br>
+&nbsp;&nbsp;'theme': 'dark',<br>
+&nbsp;&nbsp;'position': 'bottom-left'<br>
+});</code>
+        </div>
+
+        <h3>Event Handling</h3>
+        <div class="code-block">
+            <code>const widget = document.querySelector('chat-widget');<br><br>
+widget.addEventListener('navigation-action', (e) => {<br>
+&nbsp;&nbsp;console.log('Navigation:', e.detail);<br>
+});<br><br>
+widget.addEventListener('message-sent', (e) => {<br>
+&nbsp;&nbsp;console.log('Message sent:', e.detail.message);<br>
+});<br><br>
+widget.addEventListener('message-received', (e) => {<br>
+&nbsp;&nbsp;console.log('Message received:', e.detail.message);<br>
+});</code>
+        </div>
+    </div>
+
+    <!-- Load the web component -->
+    <script src="./dist/web-component/chat-widget.iife.js"></script>
+
+    <script>
+        let currentWidget = null;
+
+        // Update status when component loads
+        function updateStatus() {
+            const statusText = document.getElementById('status-text');
+            const isLoaded = window.ChatWidgetElement && customElements.get('chat-widget');
+
+            if (isLoaded) {
+                statusText.textContent = '✅ Chat Widget Web Component loaded successfully';
+                statusText.style.color = '#059669';
+
+                // Create initial widget
+                createWidget();
+            } else {
+                statusText.textContent = '❌ Failed to load Chat Widget Web Component';
+                statusText.style.color = '#dc2626';
+            }
+        }
+
+        function createWidget() {
+            removeWidget(); // Remove existing widget first
+
+            const container = document.getElementById('demo-container');
+            const theme = document.getElementById('theme-select').value;
+            const position = document.getElementById('position-select').value;
+            const apiEndpoint = document.getElementById('api-endpoint').value;
+
+            currentWidget = window.createChatWidget(container, {
+                'api-endpoint': apiEndpoint,
+                'websocket-url': 'ws://localhost:8081/ws/chat',
+                'theme': theme,
+                'position': 'static', // Use static positioning for demo
+                'welcome-message': 'Hello! This is a web component demo.',
+                'placeholder': 'Try typing a message...'
+            });
+
+            // Add event listeners
+            if (currentWidget) {
+                currentWidget.addEventListener('navigation-action', logEvent);
+                currentWidget.addEventListener('message-sent', logEvent);
+                currentWidget.addEventListener('message-received', logEvent);
+                currentWidget.addEventListener('error', logEvent);
+
+                // Override position for demo
+                currentWidget.style.position = 'static';
+                currentWidget.style.display = 'block';
+                currentWidget.style.margin = '2rem auto';
+                currentWidget.style.maxWidth = 'fit-content';
+            }
+
+            logEvent({ type: 'widget-created', detail: { theme, position, apiEndpoint } });
+        }
+
+        function updateWidget() {
+            if (currentWidget) {
+                const theme = document.getElementById('theme-select').value;
+                const position = document.getElementById('position-select').value;
+                const apiEndpoint = document.getElementById('api-endpoint').value;
+
+                currentWidget.setAttribute('theme', theme);
+                currentWidget.setAttribute('position', position);
+                currentWidget.setAttribute('api-endpoint', apiEndpoint);
+
+                logEvent({ type: 'widget-updated', detail: { theme, position, apiEndpoint } });
+            }
+        }
+
+        function removeWidget() {
+            if (currentWidget) {
+                currentWidget.remove();
+                currentWidget = null;
+                logEvent({ type: 'widget-removed' });
+            }
+        }
+
+        function logEvent(event) {
+            const log = document.getElementById('event-log');
+            const timestamp = new Date().toLocaleTimeString();
+            const eventType = event.type || 'custom';
+            const detail = event.detail ? JSON.stringify(event.detail, null, 2) : '';
+
+            const logEntry = document.createElement('div');
+            logEntry.innerHTML = `<strong>[${timestamp}]</strong> ${eventType}`;
+            if (detail) {
+                logEntry.innerHTML += `<br><pre style="margin-left: 1rem; opacity: 0.8;">${detail}</pre>`;
+            }
+
+            log.appendChild(logEntry);
+            log.scrollTop = log.scrollHeight;
+        }
+
+        function clearLog() {
+            document.getElementById('event-log').innerHTML = '';
+        }
+
+        // Initialize when page loads
+        window.addEventListener('load', () => {
+            setTimeout(updateStatus, 100); // Small delay to ensure component is registered
+        });
+
+        // Log when the component is defined
+        customElements.whenDefined('chat-widget').then(() => {
+            console.log('✅ chat-widget element defined');
+            updateStatus();
+        });
+    </script>
+</body>
+</html>

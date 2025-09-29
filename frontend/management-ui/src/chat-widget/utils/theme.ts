@@ -108,7 +108,7 @@ export const getTheme = (themeType: string): Theme => {
     }
     return lightTheme;
   }
-  
+
   return themeType === 'dark' ? darkTheme : lightTheme;
 };
 
@@ -117,7 +117,7 @@ export const getTheme = (themeType: string): Theme => {
  */
 export const createTheme = (baseTheme: 'light' | 'dark', overrides: Partial<Theme> = {}): Theme => {
   const base = baseTheme === 'dark' ? darkTheme : lightTheme;
-  
+
   return {
     ...base,
     ...overrides,

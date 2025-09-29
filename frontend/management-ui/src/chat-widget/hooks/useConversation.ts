@@ -43,10 +43,10 @@ export const useConversation = (
 
       wsRef.current.onopen = () => {
         console.log('✅ WebSocket connected');
-        setState(prev => ({ 
-          ...prev, 
-          isConnected: true, 
-          error: null 
+        setState(prev => ({
+          ...prev,
+          isConnected: true,
+          error: null
         }));
       };
 
@@ -76,20 +76,20 @@ export const useConversation = (
           }
         } catch (error) {
           console.error('❌ Error parsing WebSocket message:', error);
-          setState(prev => ({ 
-            ...prev, 
+          setState(prev => ({
+            ...prev,
             error: 'Failed to parse server response',
-            isLoading: false 
+            isLoading: false
           }));
         }
       };
 
       wsRef.current.onerror = (error) => {
         console.error('❌ WebSocket error:', error);
-        setState(prev => ({ 
-          ...prev, 
+        setState(prev => ({
+          ...prev,
           error: 'Connection error',
-          isConnected: false 
+          isConnected: false
         }));
       };
 
@@ -112,10 +112,10 @@ export const useConversation = (
       };
     } catch (error) {
       console.error('❌ Failed to create WebSocket connection:', error);
-      setState(prev => ({ 
-        ...prev, 
+      setState(prev => ({
+        ...prev,
         error: 'Failed to connect to chat service',
-        isConnected: false 
+        isConnected: false
       }));
     }
   }, [websocketUrl]);
@@ -186,18 +186,18 @@ export const useConversation = (
         wsRef.current.send(JSON.stringify(message));
       } catch (error) {
         console.error('❌ Failed to send WebSocket message:', error);
-        setState(prev => ({ 
-          ...prev, 
+        setState(prev => ({
+          ...prev,
           error: 'Failed to send message',
-          isLoading: false 
+          isLoading: false
         }));
       }
     } else {
       console.warn('⚠️ WebSocket not connected, attempting to reconnect...');
-      setState(prev => ({ 
-        ...prev, 
+      setState(prev => ({
+        ...prev,
         error: 'Not connected to chat service',
-        isLoading: false 
+        isLoading: false
       }));
       connect();
     }
@@ -218,10 +218,10 @@ export const useConversation = (
     if (wsRef.current) {
       wsRef.current.close();
     }
-    setState(prev => ({ 
-      ...prev, 
-      isConnected: false, 
-      error: null 
+    setState(prev => ({
+      ...prev,
+      isConnected: false,
+      error: null
     }));
     connect();
   }, [connect]);
