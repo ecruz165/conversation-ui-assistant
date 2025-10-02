@@ -92,11 +92,9 @@ run: deps-start
 	mvn spring-boot:run -Dspring-boot.run.arguments="--spring.profiles.active=ide"
 
 # Development mode with IDE profile
-dev:
+dev: deps-start
 	@echo "🔥 Starting Navigation Service in development mode (IDE profile)..."
 	mvn spring-boot:run -Dspring-boot.run.arguments="--spring.profiles.active=ide"
-
-
 
 # Create deployable artifact
 package:
@@ -107,8 +105,6 @@ package:
 install:
 	@echo "📥 Installing Navigation Service dependencies..."
 	mvn clean install -DskipTests
-
-
 
 # Clean build artifacts
 clean:

@@ -209,7 +209,7 @@
 						<artifactId>docker-compose-maven-plugin</artifactId>
 						<version>4.0.0</version>
 						<configuration>
-							<composeFile>compose-ide.yaml</composeFile>
+							<composeFile>../../infrastructure/docker-compose-ide.yml</composeFile>
 							<detachedMode>true</detachedMode>
 							<removeVolumes>false</removeVolumes>
 							<projectName>management-service</projectName>

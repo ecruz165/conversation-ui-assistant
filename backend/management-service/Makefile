@@ -77,8 +77,6 @@ build:
 	@echo "🔨 Building Management Service..."
 	mvn clean compile
 
-
-
 # Run tests (integration tests with dependencies using IDE profile)
 test: deps-start
 	@echo "🧪 Running Management Service tests with dependencies..."
@@ -87,20 +85,10 @@ test: deps-start
 	@echo "🚀 Running tests..."
 	mvn test -P ide
 
-# Run module with live code changes (starts dependencies + service)
-run: deps-start
-	@echo "🚀 Running Management Service with live code changes..."
-	@echo "⏳ Waiting for dependencies to be fully ready..."
-	@sleep 3
-	@echo "🔥 Starting Management Service (supports live reloading)..."
-	mvn spring-boot:run -Dspring-boot.run.arguments="--spring.profiles.active=ide"
-
 # Development mode with IDE profile
-dev:
+dev: deps-start
 	@echo "🔥 Starting Management Service in development mode (IDE profile)..."
 	mvn spring-boot:run -Dspring-boot.run.arguments="--spring.profiles.active=ide"
-
-
 
 # Create deployable package
 package:
@@ -111,8 +99,6 @@ package:
 install:
 	@echo "📥 Installing Management Service dependencies..."
 	mvn clean install -DskipTests
-
-
 
 # Clean build artifacts
 clean:
