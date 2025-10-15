@@ -59,6 +59,10 @@ export default defineConfig({
   // Optimize dependencies for faster dev server startup
   optimizeDeps: {
     include: ["react", "react-dom"],
+    exclude: [
+      "@tanstack/react-start",
+      "@tanstack/start-server-core",
+    ],
   },
   // Build configuration
   build: {

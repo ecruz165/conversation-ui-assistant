@@ -1,12 +1,23 @@
 /// <reference types="vite/client" />
 import { HeadContent, Link, Scripts, createRootRoute } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import * as React from "react";
 import { DefaultCatchBoundary } from "~/components/DefaultCatchBoundary";
 import { NotFound } from "~/components/NotFound";
 import { Test, startInstance } from "~/start";
 import appCss from "~/styles/app.css?url";
 import { seo } from "~/utils/seo";
+
+// Create QueryClient instance
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 1000 * 60 * 5, // 5 minutes
+      retry: 1,
+    },
+  },
+});
 
 export const testServerMw = startInstance.createMiddleware().server(({ next, context }) => {
   context.fromFetch;
@@ -189,62 +200,11 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <HeadContent />
       </head>
       <body>
-        <div className="p-2 flex gap-2 text-lg">
-          <Link
-            to="/"
-            activeProps={{
-              className: "font-bold",
-            }}
-            activeOptions={{ exact: true }}
-          >
-            Home
-          </Link>{" "}
-          <Link
-            to="/posts"
-            activeProps={{
-              className: "font-bold",
-            }}
-          >
-            Posts
-          </Link>{" "}
-          <Link
-            to="/users"
-            activeProps={{
-              className: "font-bold",
-            }}
-          >
-            Users
-          </Link>{" "}
-          <Link
-            to="/route-a"
-            activeProps={{
-              className: "font-bold",
-            }}
-          >
-            Pathless Layout
-          </Link>{" "}
-          <Link
-            to="/deferred"
-            activeProps={{
-              className: "font-bold",
-            }}
-          >
-            Deferred
-          </Link>{" "}
-          <Link
-            // @ts-expect-error
-            to="/this-route-does-not-exist"
-            activeProps={{
-              className: "font-bold",
-            }}
-          >
-            This Route Does Not Exist
-          </Link>
-        </div>
-        <hr />
-        {children}
-        <TanStackRouterDevtools position="bottom-right" />
-        <Scripts />
+        <QueryClientProvider client={queryClient}>
+          {children}
+          <TanStackRouterDevtools position="bottom-right" />
+          <Scripts />
+        </QueryClientProvider>
       </body>
     </html>
   );

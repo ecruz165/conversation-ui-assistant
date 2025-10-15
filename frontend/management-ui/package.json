@@ -22,19 +22,26 @@
   "dependencies": {
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
+    "@mui/icons-material": "^7.3.4",
+    "@mui/material": "^7.3.4",
+    "@tanstack/react-query": "^5.90.3",
     "@tanstack/react-router": "^1.132.2",
     "@tanstack/react-router-devtools": "^1.132.2",
     "@tanstack/react-start": "^1.132.4",
+    "@tanstack/react-table": "^8.21.3",
     "framer-motion": "^10.18.0",
     "lucide-react": "^0.294.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-hook-form": "^7.65.0",
     "react-router-dom": "^7.9.3",
     "socket.io-client": "^4.8.1",
     "tailwind-merge": "^2.6.0",
-    "zod": "^3.24.2"
+    "zod": "^3.24.2",
+    "zustand": "^5.0.8"
   },
   "devDependencies": {
+    "@playwright/test": "^1.56.0",
     "@types/node": "^22.5.4",
     "@types/react": "^19.0.8",
     "@types/react-dom": "^19.0.3",
