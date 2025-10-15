@@ -1,2 +1,123 @@
-<testsuites id="" name="" tests="0" failures="0" skipped="0" errors="0" time="0.018480999999999994">
+<testsuites id="" name="" tests="4" failures="2" skipped="0" errors="0" time="0.689739">
+<testsuite name="infrastructure-test.spec.ts" timestamp="2025-10-15T19:17:03.480Z" hostname="chromium" tests="4" failures="2" skipped="0" time="0.778" errors="0">
+<testcase name="Testing Infrastructure Verification › should verify Playwright is working" classname="infrastructure-test.spec.ts" time="0.195">
+</testcase>
+<testcase name="Testing Infrastructure Verification › should verify browser capabilities" classname="infrastructure-test.spec.ts" time="0.187">
+<failure message="infrastructure-test.spec.ts:13:3 should verify browser capabilities" type="FAILURE">
+<![CDATA[  [chromium] › infrastructure-test.spec.ts:13:3 › Testing Infrastructure Verification › should verify browser capabilities 
+
+    Error: page.evaluate: SecurityError: Failed to read the 'localStorage' property from 'Window': Access is denied for this document.
+        at UtilityScript.evaluate (<anonymous>:293:16)
+        at UtilityScript.<anonymous> (<anonymous>:1:44)
+        at UtilityScript.evaluate (<anonymous>:293:16)
+        at UtilityScript.<anonymous> (<anonymous>:1:44)
+        at /Users/edwincruz/Development/Workspaces/ecruz165/conversation-ui-assistant/testing/e2e/infrastructure-test.spec.ts:15:31
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../test-results/infrastructure-test-Testin-b7bfb-verify-browser-capabilities-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../test-results/infrastructure-test-Testin-b7bfb-verify-browser-capabilities-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|../test-results/infrastructure-test-Testin-b7bfb-verify-browser-capabilities-chromium/test-failed-1.png]]
+
+[[ATTACHMENT|../test-results/infrastructure-test-Testin-b7bfb-verify-browser-capabilities-chromium/video.webm]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Testing Infrastructure Verification › should verify network capabilities" classname="infrastructure-test.spec.ts" time="0.229">
+<failure message="infrastructure-test.spec.ts:30:3 should verify network capabilities" type="FAILURE">
+<![CDATA[  [chromium] › infrastructure-test.spec.ts:30:3 › Testing Infrastructure Verification › should verify network capabilities 
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: 200
+    Received: 503
+
+      31 |     // Test that we can make network requests
+      32 |     const response = await page.goto('https://httpbin.org/json');
+    > 33 |     expect(response?.status()).toBe(200);
+         |                                ^
+      34 |     
+      35 |     // Verify we can read the response
+      36 |     const content = await page.textContent('body');
+        at /Users/edwincruz/Development/Workspaces/ecruz165/conversation-ui-assistant/testing/e2e/infrastructure-test.spec.ts:33:32
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../test-results/infrastructure-test-Testin-9c62e-verify-network-capabilities-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../test-results/infrastructure-test-Testin-9c62e-verify-network-capabilities-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../test-results/infrastructure-test-Testin-9c62e-verify-network-capabilities-chromium/error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|../test-results/infrastructure-test-Testin-9c62e-verify-network-capabilities-chromium/test-failed-1.png]]
+
+[[ATTACHMENT|../test-results/infrastructure-test-Testin-9c62e-verify-network-capabilities-chromium/video.webm]]
+
+[[ATTACHMENT|../test-results/infrastructure-test-Testin-9c62e-verify-network-capabilities-chromium/error-context.md]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Testing Infrastructure Verification › should verify local server connectivity" classname="infrastructure-test.spec.ts" time="0.167">
+<system-out>
+<![CDATA[Admin portal connection failed: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/
+Call log:
+[2m  - navigating to "http://localhost:3000/", waiting until "load"[22m
+
+    at [90m/Users/edwincruz/Development/Workspaces/ecruz165/conversation-ui-assistant/testing/[39me2e/infrastructure-test.spec.ts:43:35 {
+  name: [32m'Error'[39m,
+  [[32mSymbol(step)[39m]: {
+    location: {
+      file: [32m'/Users/edwincruz/Development/Workspaces/ecruz165/conversation-ui-assistant/testing/e2e/infrastructure-test.spec.ts'[39m,
+      line: [33m43[39m,
+      column: [33m35[39m
+    },
+    category: [32m'pw:api'[39m,
+    title: [32m'Navigate to "/"'[39m,
+    apiName: [32m'page.goto'[39m,
+    params: { url: [32m'http://localhost:3000'[39m, waitUntil: [32m'load'[39m, timeout: [33m0[39m },
+    group: [90mundefined[39m,
+    stepId: [32m'pw:api@35'[39m,
+    boxedStack: [90mundefined[39m,
+    steps: [],
+    attachmentIndices: [],
+    info: TestStepInfoImpl {
+      annotations: [],
+      _testInfo: [36m[TestInfoImpl][39m,
+      _stepId: [32m'pw:api@35'[39m,
+      _title: [32m'Navigate to "/"'[39m,
+      _parentStep: [90mundefined[39m,
+      skip: [36m[Function (anonymous)][39m
+    },
+    recoverFromStepError: [36m[AsyncFunction: recoverFromStepError][39m,
+    complete: [36m[Function: complete][39m,
+    endWallTime: [33m1760555823988[39m,
+    error: {
+      message: [32m'Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/\n'[39m +
+        [32m'Call log:\n'[39m +
+        [32m'\x1B[2m  - navigating to "http://localhost:3000/", waiting until "load"\x1B[22m\n'[39m,
+      stack: [32m'Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/\n'[39m +
+        [32m'Call log:\n'[39m +
+        [32m'\x1B[2m  - navigating to "http://localhost:3000/", waiting until "load"\x1B[22m\n'[39m +
+        [32m'\n'[39m +
+        [32m'    at /Users/edwincruz/Development/Workspaces/ecruz165/conversation-ui-assistant/testing/e2e/infrastructure-test.spec.ts:43:35'[39m,
+      cause: [90mundefined[39m
+    }
+  }
+}
+]]>
+</system-out>
+</testcase>
+</testsuite>
 </testsuites>

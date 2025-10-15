@@ -1,7 +1,9 @@
 # Product Requirements Document
+
 ## Admin Portal Frontend - MVP
 
 ### Version 1.0
+
 **Date:** October 2025  
 **Author:** Product Team  
 **Status:** Draft
@@ -11,16 +13,20 @@
 ## 1. Executive Summary
 
 ### 1.1 Product Overview
+
 The Admin Portal Frontend is a web-based administration interface that enables users to register websites, manage navigation links, and obtain widget integration code for the Conversational Navigation System. This MVP focuses on delivering core functionality for website onboarding and configuration management.
 
 ### 1.2 Objective
+
 Provide a streamlined, self-service portal for users to:
+
 - Register their websites/applications
 - Configure navigation links and intent mappings
 - Generate and retrieve widget integration code
 - Monitor basic usage metrics
 
 ### 1.3 Success Metrics
+
 - Time to complete website registration: < 3 minutes
 - Time to obtain widget code: < 30 seconds
 - Zero-friction integration process
@@ -31,26 +37,28 @@ Provide a streamlined, self-service portal for users to:
 ## 2. User Personas
 
 ### 2.1 Primary Persona: Website Administrator
+
 - **Role:** Technical or semi-technical user responsible for website management
 - **Goals:**
-    - Quickly integrate conversational navigation into their website
-    - Configure navigation paths without coding
-    - Monitor widget performance
+  - Quickly integrate conversational navigation into their website
+  - Configure navigation paths without coding
+  - Monitor widget performance
 - **Pain Points:**
-    - Complex integration processes
-    - Lack of visibility into navigation patterns
-    - Manual link management
+  - Complex integration processes
+  - Lack of visibility into navigation patterns
+  - Manual link management
 
 ### 2.2 Secondary Persona: Developer
+
 - **Role:** Frontend/Backend developer implementing the widget
 - **Goals:**
-    - Obtain clean, well-documented integration code
-    - Test widget functionality before production
-    - Configure multiple environments
+  - Obtain clean, well-documented integration code
+  - Test widget functionality before production
+  - Configure multiple environments
 - **Pain Points:**
-    - Poor documentation
-    - Inflexible integration options
-    - Environment management complexity
+  - Poor documentation
+  - Inflexible integration options
+  - Environment management complexity
 
 ---
 
@@ -59,89 +67,98 @@ Provide a streamlined, self-service portal for users to:
 ### 3.1 Website Registration Flow
 
 #### 3.1.1 Landing Page
+
 **Purpose:** Entry point showcasing value proposition and system metrics
 
 **Components:**
+
 - Hero section with product messaging
 - Live system metrics display:
-    - Service Health percentage
-    - Total Applications count
-    - Active Users count
-    - Intent Match Rate percentage
+  - Service Health percentage
+  - Total Applications count
+  - Active Users count
+  - Intent Match Rate percentage
 - Two primary CTAs:
-    - "Register New Website" (primary action)
-    - "View Documentation" (secondary action)
+  - "Register New Website" (primary action)
+  - "View Documentation" (secondary action)
 - "Websites" section header (for future website list)
 
 **User Actions:**
+
 - Click "Register New Website" → Navigate to registration form
 - Click "View Documentation" → Open documentation (external link)
 
 #### 3.1.2 Registration Form
+
 **Purpose:** Collect website information for widget configuration
 
 **Form Sections:**
 
 **A. Website Information**
+
 - **Website Name** (required)
-    - Text input
-    - Max 100 characters
-    - Validation: Required, alphanumeric + spaces
+  - Text input
+  - Max 100 characters
+  - Validation: Required, alphanumeric + spaces
 
 - **Website Type** (required)
-    - Radio button group:
-        - Website (Public)
-        - Internal App (Internal)
-        - Mobile App (Public)
-    - Default: Website
+  - Radio button group:
+    - Website (Public)
+    - Internal App (Internal)
+    - Mobile App (Public)
+  - Default: Website
 
 - **Description** (optional)
-    - Textarea
-    - Max 500 characters
-    - Placeholder: "Brief description of your website/application"
+  - Textarea
+  - Max 500 characters
+  - Placeholder: "Brief description of your website/application"
 
 **B. Contact Information**
+
 - **Primary Contact Name** (required)
-    - Text input
-    - Max 100 characters
+  - Text input
+  - Max 100 characters
 
 - **Contact Email** (required)
-    - Email input
-    - Validation: Valid email format
+  - Email input
+  - Validation: Valid email format
 
 - **Department/Team** (optional)
-    - Text input
-    - Max 50 characters
+  - Text input
+  - Max 50 characters
 
 - **Contact Phone** (optional)
-    - Phone input
-    - Format: International format accepted
+  - Phone input
+  - Format: International format accepted
 
 **C. Domain & Environment Configuration**
+
 - **Primary Domain URL** (required)
-    - URL input
-    - Validation: Valid URL format with protocol
-    - Example: https://example.com
-    - This is the production domain where the widget will be deployed
+  - URL input
+  - Validation: Valid URL format with protocol
+  - Example: <https://example.com>
+  - This is the production domain where the widget will be deployed
 
 - **Domains to Scan** (required - at least one)
-    - URL input
-    - Minimum one entry required
-    - Support multiple entries via "+ Add another URL" button
-    - **Purpose:** These domains will be crawled and scanned to extract page content, analyze intent, and build the navigation knowledge base
-    - Use cases: Development, staging, QA, or any environment with complete content
-    - The system will crawl these URLs to:
-        - Extract page structure and content
-        - Analyze navigation patterns
-        - Generate intent mappings
-        - Build vector embeddings for AI navigation
-    - Validation: Valid URL format with protocol
+  - URL input
+  - Minimum one entry required
+  - Support multiple entries via "+ Add another URL" button
+  - **Purpose:** These domains will be crawled and scanned to extract page content, analyze intent, and build the navigation knowledge base
+  - Use cases: Development, staging, QA, or any environment with complete content
+  - The system will crawl these URLs to:
+    - Extract page structure and content
+    - Analyze navigation patterns
+    - Generate intent mappings
+    - Build vector embeddings for AI navigation
+  - Validation: Valid URL format with protocol
 
 **Form Actions:**
+
 - **Cancel**: Return to landing page without saving
 - **Register**: Validate and submit form
 
 **Validation Rules:**
+
 - All required fields must be completed
 - Email must be valid format
 - URLs must include protocol (http:// or https://)
@@ -149,6 +166,7 @@ Provide a streamlined, self-service portal for users to:
 - At least one domain to scan required (content source for AI training)
 
 **Success Flow:**
+
 - On successful submission → Redirect to Website Overview page
 - Generate unique app-key for the website
 - Create initial configuration
@@ -156,38 +174,43 @@ Provide a streamlined, self-service portal for users to:
 ### 3.2 Website Management Interface
 
 #### 3.2.1 Website Overview Tab
+
 **Purpose:** Display registered website information and key metrics
 
 **Components:**
+
 - Website name as page header
 - Tab navigation: Overview | Link Management | Widget Code
 - Information cards displaying:
-    - Website Information (name, type, description)
-    - Contact Information (all contact details)
-    - Domain Configuration:
-        - **Primary Domain:** Where the widget will be deployed (production)
-        - **Scanned Domains:** Domains that are crawled for content analysis and intent extraction
-    - App Key (unique identifier, masked with show/hide toggle)
-    - Registration Date
-    - Last Modified Date
-    - **Crawl Status** (if applicable):
-        - Last crawl date/time
-        - Number of pages indexed
-        - Status indicator (pending/in-progress/completed)
+  - Website Information (name, type, description)
+  - Contact Information (all contact details)
+  - Domain Configuration:
+    - **Primary Domain:** Where the widget will be deployed (production)
+    - **Scanned Domains:** Domains that are crawled for content analysis and intent extraction
+  - App Key (unique identifier, masked with show/hide toggle)
+  - Registration Date
+  - Last Modified Date
+  - **Crawl Status** (if applicable):
+    - Last crawl date/time
+    - Number of pages indexed
+    - Status indicator (pending/in-progress/completed)
 
 **User Actions:**
+
 - Edit website information (opens edit modal)
 - Navigate between tabs
 - Copy app-key to clipboard
 - Trigger re-crawl of scanned domains (future enhancement)
 
 #### 3.2.2 Link Management Tab
+
 **Purpose:** Configure navigation intents and URL mappings
 
 **Components:**
 
 **A. Link Table**
 Columns:
+
 - Intent/Action (text)
 - Display Name (text)
 - Target URL (text)
@@ -197,62 +220,69 @@ Columns:
 
 **B. Add Link Form** (Modal or inline)
 Fields:
+
 - **Intent/Action** (required)
-    - Text input
-    - Examples: "view_portfolio", "check_balance", "contact_support"
-    - Validation: lowercase, underscore separated
+  - Text input
+  - Examples: "view_portfolio", "check_balance", "contact_support"
+  - Validation: lowercase, underscore separated
 
 - **Display Name** (required)
-    - Text input
-    - User-friendly label
-    - Example: "View Portfolio Dashboard"
+  - Text input
+  - User-friendly label
+  - Example: "View Portfolio Dashboard"
 
 - **Target URL** (required)
-    - URL path or full URL
-    - Examples: "/dashboard", "https://app.example.com/portfolio"
+  - URL path or full URL
+  - Examples: "/dashboard", "<https://app.example.com/portfolio>"
 
 - **Path Type** (required)
-    - Dropdown options:
-        - Relative Path (within same domain)
-        - Absolute URL (external or specific domain)
-        - Dynamic Route (contains parameters)
+  - Dropdown options:
+    - Relative Path (within same domain)
+    - Absolute URL (external or specific domain)
+    - Dynamic Route (contains parameters)
 
 - **Keywords** (optional)
-    - Tag input
-    - Comma-separated keywords for better intent matching
-    - Example: "portfolio, investments, holdings"
+  - Tag input
+  - Comma-separated keywords for better intent matching
+  - Example: "portfolio, investments, holdings"
 
 - **Description** (optional)
-    - Textarea for additional context
+  - Textarea for additional context
 
 **C. Bulk Actions**
+
 - Import links from CSV
 - Export current configuration
 - Enable/Disable multiple links
 
 **Table Features:**
+
 - Pagination (10/25/50 items per page)
 - Search/filter by intent or display name
 - Sort by any column
 - Inline edit for quick updates
 
 #### 3.2.3 Widget Code Tab
+
 **Purpose:** Provide integration code and implementation guidance
 
 **Components:**
 
 **A. Integration Method Selection**
+
 - Radio button options:
-    - Script Tag (default)
-    - NPM Package
-    - React Component
+  - Script Tag (default)
+  - NPM Package
+  - React Component
 
 **B. Code Display Section**
+
 - Syntax-highlighted code block
 - Copy button
 - Environment selector (if multiple domains configured)
 
 **C. Script Tag Code Example:**
+
 ```html
 <!-- Conversational Navigation Widget -->
 <script>
@@ -272,15 +302,17 @@ Fields:
 ```
 
 **D. Configuration Options Panel**
+
 - Visual configurator for:
-    - Position (bottom-right, bottom-left, etc.)
-    - Theme (light, dark, auto)
-    - Initial state (minimized, expanded)
-    - Custom colors (primary, secondary)
+  - Position (bottom-right, bottom-left, etc.)
+  - Theme (light, dark, auto)
+  - Initial state (minimized, expanded)
+  - Custom colors (primary, secondary)
 - Live preview of changes
 - Generate updated code based on selections
 
 **E. Testing Section**
+
 - "Test Widget" button (opens preview)
 - Troubleshooting checklist
 - Common integration issues
@@ -288,10 +320,12 @@ Fields:
 ### 3.3 Navigation and Layout
 
 #### 3.3.1 Global Navigation
+
 - Logo/Brand ("Access 360 Console")
 - Help/Documentation link (top right)
 
 #### 3.3.2 Responsive Behavior
+
 - Desktop: Full layout with sidebar navigation (if multiple websites)
 - Tablet: Collapsible sidebar
 - Mobile: Bottom tab navigation for Overview/Links/Code
@@ -301,6 +335,7 @@ Fields:
 ## 4. Technical Requirements
 
 ### 4.1 Frontend Stack
+
 - **Framework:** React 19
 - **Routing:** React Router v6
 - **State Management:** Zustand
@@ -311,9 +346,11 @@ Fields:
 - **Development Port:** 3000
 
 ### 4.2 API Integration
+
 All API calls to Management Service (port 8090):
 
 **Endpoints Required:**
+
 - `POST /api/websites` - Register new website
 - `GET /api/websites/{id}` - Get website details
 - `PUT /api/websites/{id}` - Update website info
@@ -326,6 +363,7 @@ All API calls to Management Service (port 8090):
 ### 4.3 Mock Data Layer
 
 #### 4.3.1 Mock Configuration
+
 ```typescript
 // config/mock.config.ts
 export const mockConfig = {
@@ -336,6 +374,7 @@ export const mockConfig = {
 ```
 
 #### 4.3.2 TanStack Query Mock Implementation
+
 ```typescript
 // mocks/queryClient.mock.ts
 import { QueryClient } from '@tanstack/react-query';
@@ -357,6 +396,7 @@ export const createMockQueryClient = () => {
 ```
 
 #### 4.3.3 Mock Data Stores
+
 ```typescript
 // mocks/data/websites.mock.ts
 export const mockWebsites: Website[] = [
@@ -421,6 +461,7 @@ export const mockNavigationLinks: NavigationLink[] = [
 ```
 
 #### 4.3.4 Mock API Service
+
 ```typescript
 // mocks/api/mockApi.ts
 import { mockWebsites, mockNavigationLinks } from '../data';
@@ -569,6 +610,7 @@ export const mockApi = new MockApiService();
 ```
 
 #### 4.3.5 Query Hooks with Mock Support
+
 ```typescript
 // hooks/queries/useWebsite.ts
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -664,6 +706,7 @@ export const useDeleteNavigationLink = () => {
 ```
 
 #### 4.3.6 Environment Configuration
+
 ```bash
 # .env.development
 REACT_APP_USE_MOCKS=true
@@ -675,6 +718,7 @@ REACT_APP_API_URL=https://api.convnav.com
 ```
 
 #### 4.3.7 Mock Toggle Component (Dev Only)
+
 ```typescript
 // components/dev/MockToggle.tsx
 import { useState, useEffect } from 'react';
@@ -709,6 +753,7 @@ export const MockToggle = () => {
 ### 4.4 Data Models
 
 #### Website Model
+
 ```typescript
 interface Website {
   id: string;
@@ -737,6 +782,7 @@ interface Website {
 ```
 
 #### Navigation Link Model
+
 ```typescript
 interface NavigationLink {
   id: string;
@@ -754,6 +800,7 @@ interface NavigationLink {
 ```
 
 #### Widget Config Model
+
 ```typescript
 interface WidgetConfig {
   appKey: string;
@@ -765,6 +812,7 @@ interface WidgetConfig {
 ```
 
 ### 4.5 Security Requirements
+
 - App keys must be encrypted at rest
 - HTTPS required for all API communications
 - CORS configuration for widget domains
@@ -776,6 +824,7 @@ interface WidgetConfig {
 ## 5. User Experience Requirements
 
 ### 5.1 Design Principles
+
 - **Clarity:** Clear labeling and intuitive navigation
 - **Efficiency:** Minimal steps to complete tasks
 - **Feedback:** Clear success/error messages
@@ -784,6 +833,7 @@ interface WidgetConfig {
 ### 5.2 Design System & Tokens
 
 #### 5.2.1 Color Palette (Tailwind Extended)
+
 ```css
 /* Primary Brand Colors */
 --color-primary-50: #eff6ff;   /* Lightest blue */
@@ -817,6 +867,7 @@ interface WidgetConfig {
 ```
 
 #### 5.2.2 Spacing Scale (Consistent Padding/Margin)
+
 ```css
 /* Base unit: 4px = 0.25rem */
 --spacing-0: 0;           /* 0px */
@@ -835,6 +886,7 @@ interface WidgetConfig {
 ```
 
 #### 5.2.3 Component Spacing Guidelines
+
 ```css
 /* Page Layout */
 --page-padding: var(--spacing-6);          /* 24px */
@@ -869,6 +921,7 @@ interface WidgetConfig {
 ```
 
 #### 5.2.4 Typography Scale
+
 ```css
 /* Font Sizes */
 --text-xs: 0.75rem;      /* 12px */
@@ -893,6 +946,7 @@ interface WidgetConfig {
 ```
 
 #### 5.2.5 Border Radius Tokens
+
 ```css
 --radius-none: 0;
 --radius-sm: 0.125rem;    /* 2px */
@@ -905,6 +959,7 @@ interface WidgetConfig {
 ```
 
 #### 5.2.6 Shadow Tokens
+
 ```css
 --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
 --shadow-default: 0 1px 3px 0 rgb(0 0 0 / 0.1);
@@ -914,6 +969,7 @@ interface WidgetConfig {
 ```
 
 #### 5.2.7 Implementation Classes (Tailwind Utilities)
+
 ```css
 /* Consistent Padding Classes */
 .p-page { padding: var(--page-padding); }
@@ -935,6 +991,7 @@ interface WidgetConfig {
 ```
 
 ### 5.3 Interaction Patterns
+
 - Form validation on blur (not on type)
 - Loading states for all async operations
 - Confirmation dialogs for destructive actions
@@ -942,6 +999,7 @@ interface WidgetConfig {
 - Toast notifications for success/error feedback
 
 ### 5.4 Error Handling
+
 - Inline validation errors below form fields
 - Network error recovery with retry options
 - Graceful degradation if services unavailable
@@ -952,6 +1010,7 @@ interface WidgetConfig {
 ## 6. MVP Scope Boundaries
 
 ### 6.1 Included in MVP
+
 ✅ Single website registration and management  
 ✅ Basic link management (CRUD operations)  
 ✅ Widget code generation with script tag  
@@ -960,6 +1019,7 @@ interface WidgetConfig {
 ✅ Copy-to-clipboard functionality
 
 ### 6.2 Excluded from MVP (Future Enhancements)
+
 ❌ Multi-tenant/multi-website management  
 ❌ User authentication and authorization  
 ❌ Analytics dashboard  
@@ -976,6 +1036,7 @@ interface WidgetConfig {
 ## 7. Acceptance Criteria
 
 ### 7.1 Registration Flow
+
 - [ ] User can successfully register a website in under 3 minutes
 - [ ] All required fields are validated before submission
 - [ ] Unique app-key is generated upon registration
@@ -983,6 +1044,7 @@ interface WidgetConfig {
 - [ ] User is redirected to Overview page after registration
 
 ### 7.2 Link Management
+
 - [ ] User can add at least 10 navigation links
 - [ ] Each link can be edited inline or via modal
 - [ ] Delete action requires confirmation
@@ -990,6 +1052,7 @@ interface WidgetConfig {
 - [ ] Changes are persisted immediately
 
 ### 7.3 Widget Integration
+
 - [ ] Widget code includes correct app-key
 - [ ] Code can be copied with single click
 - [ ] Configuration changes update code in real-time
@@ -1000,30 +1063,35 @@ interface WidgetConfig {
 ## 8. Development Phases
 
 ### Phase 1: Foundation (Week 1)
+
 - Project setup with React and Webpack
 - Basic routing structure
 - MUI theme configuration
 - API service layer setup
 
 ### Phase 2: Registration (Week 2)
+
 - Landing page implementation
 - Registration form with validations
 - API integration for website creation
 - Success/error handling
 
 ### Phase 3: Management Interface (Week 3)
+
 - Overview page with website details
 - Link management table
 - CRUD operations for links
 - Search and filter functionality
 
 ### Phase 4: Widget Integration (Week 4)
+
 - Code generation logic
 - Configuration options UI
 - Copy functionality
 - Preview capability
 
 ### Phase 5: Polish & Testing (Week 5)
+
 - Error handling improvements
 - Loading states
 - Responsive design adjustments
@@ -1034,11 +1102,13 @@ interface WidgetConfig {
 ## 9. Dependencies
 
 ### 9.1 External Dependencies
+
 - Management Service API must be operational
 - Widget SDK must be hosted and accessible
 - PostgreSQL database for data persistence
 
 ### 9.2 Internal Dependencies
+
 - Design system/component library specifications
 - API contracts finalized
 - Widget SDK documentation completed
@@ -1048,16 +1118,19 @@ interface WidgetConfig {
 ## 10. Release Criteria
 
 ### 10.1 Functional Completeness
+
 - All MVP features implemented and tested
 - No critical bugs in core workflows
 - API integration stable
 
 ### 10.2 Performance
+
 - Page load time < 2 seconds
 - API response time < 500ms for standard operations
 - Smooth UI interactions without lag
 
 ### 10.3 Documentation
+
 - User guide for website registration
 - Developer guide for widget integration
 - Troubleshooting documentation
@@ -1065,6 +1138,7 @@ interface WidgetConfig {
 ---
 
 ## Appendix A: Mockup References
+
 - Image 1: Landing page with service metrics
 - Image 2: Registration form interface
 - Image 3: Website overview with tabs
