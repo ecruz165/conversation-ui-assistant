@@ -3,9 +3,9 @@
 export interface Message {
   id: string;
   content: string;
-  sender: 'user' | 'assistant';
+  sender: "user" | "assistant";
   timestamp: Date;
-  type?: 'text' | 'navigation' | 'error';
+  type?: "text" | "navigation" | "error";
   messageCount?: number;
   metadata?: {
     navigationTarget?: string;
@@ -15,7 +15,7 @@ export interface Message {
 }
 
 export interface NavigationAction {
-  type: 'navigate' | 'scroll' | 'highlight' | 'focus';
+  type: "navigate" | "scroll" | "highlight" | "focus";
   target: string;
   data?: any;
 }
@@ -29,8 +29,8 @@ export interface ConversationState {
 }
 
 export interface ChatWidgetProps {
-  position?: 'bottom-right' | 'bottom-left' | 'top-right' | 'top-left';
-  theme?: 'light' | 'dark' | 'auto';
+  position?: "bottom-right" | "bottom-left" | "top-right" | "top-left";
+  theme?: "light" | "dark" | "auto";
   apiEndpoint?: string;
   websocketUrl?: string;
   showWelcomeMessage?: boolean;
@@ -145,7 +145,7 @@ export interface SendMessageResponse {
 }
 
 export interface WebSocketMessage {
-  type: 'message' | 'navigation' | 'error' | 'connected' | 'disconnected';
+  type: "message" | "navigation" | "error" | "connected" | "disconnected";
   data: any;
   timestamp: string;
 }

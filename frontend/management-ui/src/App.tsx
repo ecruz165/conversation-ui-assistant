@@ -1,14 +1,22 @@
-import React from 'react'
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { useSystemMetrics } from './hooks/useSystemMetrics'
-import { useWebsites } from './hooks/useWebsites'
-import { Layout } from './components/Layout'
-import { RegisterWebsite } from './pages/RegisterWebsite'
-import { NotFound } from './pages/NotFound'
-import { WebsiteOverview } from './pages/website/Overview'
-import { LinkManagement } from './pages/website/LinkManagement'
-import { WidgetCode } from './pages/website/WidgetCode'
+import { Accessibility, IntegrationInstructions, Navigation } from "@mui/icons-material";
+import { CssBaseline } from "@mui/material";
+import { ThemeProvider } from "@mui/material/styles";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import React from "react";
+import { Link, Route, BrowserRouter as Router, Routes } from "react-router-dom";
+import { Layout } from "./components/Layout";
+import { MetricCard } from "./components/MetricCard";
+import { SkeletonCard } from "./components/SkeletonCard";
+import { useSystemMetrics } from "./hooks/useSystemMetrics";
+import { useWebsites } from "./hooks/useWebsites";
+import { NotFound } from "./pages/NotFound";
+import { RegisterWebsite } from "./pages/RegisterWebsite";
+import { CrawlManagement } from "./pages/website/CrawlManagement";
+import { EmbeddingTest } from "./pages/website/EmbeddingTest";
+import { LinkManagement } from "./pages/website/LinkManagement";
+import { WebsiteOverview } from "./pages/website/Overview";
+import { WidgetCode } from "./pages/website/WidgetCode";
+import { theme } from "./theme";
 
 // Create QueryClient instance
 const queryClient = new QueryClient({
@@ -18,53 +26,65 @@ const queryClient = new QueryClient({
       retry: 1,
     },
   },
-})
+});
 
 function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <Router>
-        <Routes>
-          <Route path="/" element={<LandingPage />} />
-          <Route path="/register" element={<RegisterWebsite />} />
-          <Route path="/website/overview" element={<WebsiteOverview />} />
-          <Route path="/website/links" element={<LinkManagement />} />
-          <Route path="/website/code" element={<WidgetCode />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </Router>
-    </QueryClientProvider>
-  )
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <QueryClientProvider client={queryClient}>
+        <Router>
+          <Routes>
+            <Route path="/" element={<LandingPage />} />
+            <Route path="/register" element={<RegisterWebsite />} />
+            <Route path="/website/overview" element={<WebsiteOverview />} />
+            <Route path="/website/links" element={<LinkManagement />} />
+            <Route path="/website/code" element={<WidgetCode />} />
+            <Route path="/website/embedding-test" element={<EmbeddingTest />} />
+            <Route path="/website/crawl-management" element={<CrawlManagement />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </Router>
+      </QueryClientProvider>
+    </ThemeProvider>
+  );
 }
 
 function LandingPage() {
-  const { data: metrics, isLoading: metricsLoading } = useSystemMetrics()
-  const { data: websites, isLoading: websitesLoading } = useWebsites()
+  const { data: metrics, isLoading: metricsLoading } = useSystemMetrics();
+  const { data: websites, isLoading: websitesLoading } = useWebsites();
 
   return (
     <Layout>
       {/* Hero Section */}
       <section className="bg-gradient-to-r from-primary-700 to-primary-900 px-page-mobile md:px-page lg:px-8 py-16 md:py-20">
-        <div className="max-w-7xl mx-auto">
+        <div className="max-w-7xl mx-auto text-center md:text-left">
           <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4">
             Make Your Website More Accessible
           </h1>
           <p className="text-lg md:text-xl text-white/90 mb-6">
             Navigate users where they want to be with our intelligent chat widget
           </p>
-          <div className="flex flex-wrap gap-4 text-sm md:text-base text-white/90">
-            <span>Easy Integration</span>
-            <span>•</span>
-            <span>Smart Navigation</span>
-            <span>•</span>
-            <span>Optimized for Accessibility</span>
+          <div className="flex flex-col md:flex-row md:flex-wrap gap-3 md:gap-x-6 text-sm md:text-base text-white/90 items-center md:items-start">
+            <span className="flex items-center gap-2 whitespace-nowrap">
+              <Navigation fontSize="small" />
+              Smart Navigation
+            </span>
+            <span className="flex items-center gap-2 whitespace-nowrap">
+              <Accessibility fontSize="small" />
+              Optimized for Accessibility
+            </span>
+            <span className="flex items-center gap-2 whitespace-nowrap">
+              <IntegrationInstructions fontSize="small" />
+              Easy Integration
+            </span>
           </div>
         </div>
       </section>
 
       {/* Metrics Dashboard */}
       <section className="px-page-mobile md:px-page lg:px-8 py-section-mobile md:py-12 -mt-8">
-        <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+        <div className="max-w-7xl mx-auto grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
           {metricsLoading ? (
             <>
               <SkeletonCard />
@@ -75,9 +95,11 @@ function LandingPage() {
           ) : metrics ? (
             <>
               <MetricCard label="Service Health" value={`${metrics.serviceHealth}%`} />
-              <MetricCard label="Total Applications" value={metrics.totalApplications.toString()} />
-              <MetricCard label="Active Users" value={metrics.activeUsers.toLocaleString()} />
-              <MetricCard label="Intent Match Rate" value={`${metrics.intentMatchRate}%`} />
+              <MetricCard label="Total Applications" value={(websites?.length || 0).toString()} />
+              {/* TODO: Connect to SSE endpoint for real-time active users count */}
+              <MetricCard label="Active Users" value="2" />
+              {/* TODO: Connect to SSE endpoint or Zustand store updated by SSE for real-time intent match rate */}
+              <MetricCard label="Intent Match Rate" value="87.3%" />
             </>
           ) : null}
         </div>
@@ -92,20 +114,15 @@ function LandingPage() {
                 Ready to Get Started?
               </h2>
               <p className="text-base md:text-lg text-gray-600">
-                Register your application and boost usability with a modern hands free form
-                of navigation on your website today.
+                Register your application and boost usability with a modern hands free form of
+                navigation on your website today.
               </p>
             </div>
             <div className="flex flex-col gap-4">
-              <Link
-                to="/register"
-                className="w-full bg-primary-600 hover:bg-primary-700 text-white font-semibold p-button rounded-lg transition-colors text-center"
-              >
+              <Link to="/register" className="btn-primary w-full text-center">
                 Register New Website
               </Link>
-              <button className="w-full bg-white hover:bg-gray-50 text-primary-600 font-semibold p-button rounded-lg border-2 border-primary-600 transition-colors">
-                View Documentation
-              </button>
+              <button className="btn-secondary w-full">View Documentation</button>
             </div>
           </div>
         </div>
@@ -147,30 +164,7 @@ function LandingPage() {
         </div>
       </section>
     </Layout>
-  )
+  );
 }
 
-interface MetricCardProps {
-  label: string
-  value: string
-}
-
-function MetricCard({ label, value }: MetricCardProps) {
-  return (
-    <div className="bg-white rounded-lg shadow-md p-card hover:shadow-lg transition-shadow">
-      <div className="text-sm md:text-base text-gray-600 mb-2">{label}</div>
-      <div className="text-3xl md:text-4xl font-bold text-gray-900">{value}</div>
-    </div>
-  )
-}
-
-function SkeletonCard() {
-  return (
-    <div className="bg-white rounded-lg shadow-md p-card animate-pulse">
-      <div className="h-4 bg-gray-200 rounded w-2/3 mb-2"></div>
-      <div className="h-10 bg-gray-200 rounded w-1/2"></div>
-    </div>
-  )
-}
-
-export default App
+export default App;

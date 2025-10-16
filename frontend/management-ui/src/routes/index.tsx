@@ -1,4 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { SkeletonCard } from "~/components/SkeletonCard";
+import { externalLinks } from "~/config";
 import { useSystemMetrics } from "~/hooks/useSystemMetrics";
 import { useWebsites } from "~/hooks/useWebsites";
 
@@ -69,15 +71,20 @@ function LandingPage() {
                 Ready to Get Started?
               </h2>
               <p className="text-base md:text-lg text-gray-600">
-                Register your application and boost usability with a modern hands free form
-                of navigation on your website today.
+                Register your application and boost usability with a modern hands free form of
+                navigation on your website today.
               </p>
             </div>
             <div className="flex flex-col gap-4">
               <button className="w-full bg-primary-600 hover:bg-primary-700 text-white font-semibold p-button rounded-lg transition-colors">
                 Register New Website
               </button>
-              <button className="w-full bg-white hover:bg-gray-50 text-primary-600 font-semibold p-button rounded-lg border-2 border-primary-600 transition-colors">
+              <button
+                onClick={() =>
+                  window.open(externalLinks.documentation, "_blank", "noopener,noreferrer")
+                }
+                className="w-full bg-white hover:bg-gray-50 text-primary-600 font-semibold p-button rounded-lg border-2 border-primary-600 transition-colors"
+              >
                 View Documentation
               </button>
             </div>
@@ -130,18 +137,9 @@ interface MetricCardProps {
 
 function MetricCard({ label, value }: MetricCardProps) {
   return (
-    <div className="bg-white rounded-lg shadow-md p-card hover:shadow-lg transition-shadow">
-      <div className="text-sm md:text-base text-gray-600 mb-2">{label}</div>
-      <div className="text-3xl md:text-4xl font-bold text-gray-900">{value}</div>
-    </div>
-  );
-}
-
-function SkeletonCard() {
-  return (
-    <div className="bg-white rounded-lg shadow-md p-card animate-pulse">
-      <div className="h-4 bg-gray-200 rounded w-2/3 mb-2"></div>
-      <div className="h-10 bg-gray-200 rounded w-1/2"></div>
+    <div className="bg-white rounded-lg shadow-md p-card hover:shadow-lg transition-shadow h-[128px] flex flex-col justify-center text-center">
+      <div className="text-sm text-gray-600 mb-1">{label}</div>
+      <div className="text-2xl md:text-3xl font-bold text-gray-900">{value}</div>
     </div>
   );
 }

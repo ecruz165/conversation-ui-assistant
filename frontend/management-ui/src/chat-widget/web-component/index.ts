@@ -9,25 +9,27 @@
  */
 
 // Import the web component class
-import ChatWidgetElement from './ChatWidgetElement';
-
-// Re-export for module usage
-export { default as ChatWidgetElement } from './ChatWidgetElement';
+import ChatWidgetElement from "./ChatWidgetElement";
 
 // Also export types for TypeScript consumers
-export type * from '../types';
+export type * from "../types";
+// Re-export for module usage
+export { default as ChatWidgetElement } from "./ChatWidgetElement";
 
 // The web component is automatically registered when this module loads
 // due to the customElements.define() call in ChatWidgetElement.ts
 
 // For debugging and introspection
-if (typeof window !== 'undefined') {
+if (typeof window !== "undefined") {
   // Make the component class available globally for debugging
   (window as any).ChatWidgetElement = ChatWidgetElement;
 
   // Add a simple API to create widgets programmatically
-  (window as any).createChatWidget = (container: HTMLElement, props: Record<string, string> = {}) => {
-    const widget = document.createElement('chat-widget');
+  (window as any).createChatWidget = (
+    container: HTMLElement,
+    props: Record<string, string> = {}
+  ) => {
+    const widget = document.createElement("chat-widget");
 
     // Set attributes from props
     Object.entries(props).forEach(([key, value]) => {
@@ -38,7 +40,7 @@ if (typeof window !== 'undefined') {
     return widget;
   };
 
-  console.log('Chat Widget Web Component loaded successfully');
-  console.log('Available element: <chat-widget>');
-  console.log('Global helper: window.createChatWidget(container, props)');
+  console.log("Chat Widget Web Component loaded successfully");
+  console.log("Available element: <chat-widget>");
+  console.log("Global helper: window.createChatWidget(container, props)");
 }

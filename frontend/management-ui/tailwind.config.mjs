@@ -3,19 +3,19 @@ export default {
   content: ["./src/**/*.{js,jsx,ts,tsx}"],
   theme: {
     extend: {
-      // Color Palette from PRD Section 5.2.1
+      // Color Palette - Capital Group Brand Blues
       colors: {
         primary: {
-          50: '#dbeafe',
-          100: '#bfdbfe',
-          200: '#93c5fd',
-          300: '#60a5fa',
-          400: '#2563eb',
-          500: '#1d4ed8', // Main brand - darker pure blue
-          600: '#1e40af',
-          700: '#1e3a8a',
-          800: '#1e3a8a',
-          900: '#172554',
+          50: '#E6F4F9',   // Lightest - backgrounds, hover states
+          100: '#CCE9F3',  // Very light - subtle backgrounds
+          200: '#99D3E7',  // Light - borders, dividers
+          300: '#66BDDB',  // Light-medium - secondary elements
+          400: '#33A7CF',  // Medium - interactive elements
+          500: '#0099D8',  // Main brand - buttons, links, primary actions
+          600: '#007AB0',  // Medium-dark - hover states
+          700: '#006BA6',  // Dark - headers, primary text
+          800: '#00558C',  // Darker - emphasis
+          900: '#003F72',  // Darkest - high contrast text
         },
         gray: {
           50: '#f9fafb',
@@ -34,25 +34,54 @@ export default {
         error: '#ef4444',
         info: '#3b82f6',
       },
-      // Spacing Scale - Base 4px unit (PRD Section 5.2.2)
+      // Spacing Scale - Based on Capital Group mockups
       spacing: {
-        'page': '1.5rem',        // 24px
-        'page-mobile': '1rem',   // 16px
-        'section': '3rem',       // 48px
-        'section-mobile': '2rem', // 32px
-        'card': '1.5rem',        // 24px
-        'card-mobile': '1rem',   // 16px
+        // Page horizontal padding
+        'page': '2rem',           // 32px - Desktop
+        'page-tablet': '1.5rem',  // 24px - Tablet
+        'page-mobile': '1rem',    // 16px - Mobile
+
+        // Section vertical padding
+        'section': '5rem',        // 80px - Desktop sections
+        'section-tablet': '4rem', // 64px - Tablet sections
+        'section-mobile': '2.5rem', // 40px - Mobile sections
+
+        // Hero section padding
+        'hero': '6rem',           // 96px - Desktop hero
+        'hero-tablet': '5rem',    // 80px - Tablet hero
+        'hero-mobile': '3rem',    // 48px - Mobile hero
+
+        // Card/Component padding
+        'card': '2rem',           // 32px - Desktop cards
+        'card-tablet': '1.5rem',  // 24px - Tablet cards
+        'card-mobile': '1rem',    // 16px - Mobile cards
+
+        // Element spacing
+        'element': '2.5rem',      // 40px - Between major elements
+        'element-sm': '1.5rem',   // 24px - Between related elements
+        'element-xs': '1rem',     // 16px - Between small elements
       },
-      // Typography Scale (PRD Section 5.2.4)
+      // Typography Scale - Based on Capital Group mockups
       fontSize: {
-        xs: ['0.75rem', { lineHeight: '1.25' }],     // 12px
-        sm: ['0.875rem', { lineHeight: '1.5' }],     // 14px
-        base: ['1rem', { lineHeight: '1.5' }],       // 16px - body
-        lg: ['1.125rem', { lineHeight: '1.5' }],     // 18px
-        xl: ['1.25rem', { lineHeight: '1.5' }],      // 20px
-        '2xl': ['1.5rem', { lineHeight: '1.25' }],   // 24px
-        '3xl': ['1.875rem', { lineHeight: '1.25' }], // 30px
-        '4xl': ['2.25rem', { lineHeight: '1.25' }],  // 36px
+        // Small text and labels
+        'label': ['0.6875rem', { lineHeight: '1.2', letterSpacing: '0.05em', textTransform: 'uppercase' }], // 11px - "SERVICE & SUPPORT", "WHO WE ARE"
+        'xs': ['0.75rem', { lineHeight: '1.5' }],     // 12px
+        'sm': ['0.875rem', { lineHeight: '1.5' }],    // 14px
+
+        // Body text
+        'base': ['1rem', { lineHeight: '1.7' }],      // 16px - Main body text
+        'lg': ['1.125rem', { lineHeight: '1.7' }],    // 18px - Large body
+
+        // Headlines and titles
+        'xl': ['1.25rem', { lineHeight: '1.4' }],     // 20px - Small headlines
+        '2xl': ['1.5rem', { lineHeight: '1.3' }],     // 24px - Card titles
+        '3xl': ['2rem', { lineHeight: '1.2' }],       // 32px - Section headlines (mobile)
+        '4xl': ['2.5rem', { lineHeight: '1.2' }],     // 40px - Section headlines (tablet)
+        '5xl': ['3rem', { lineHeight: '1.1' }],       // 48px - Hero headlines (desktop)
+        '6xl': ['3.5rem', { lineHeight: '1.1' }],     // 56px - Large hero headlines
+      },
+      fontFamily: {
+        sans: ['"Nunito Sans"', 'ui-sans-serif', 'system-ui', 'sans-serif'],
       },
       fontWeight: {
         normal: '400',
@@ -89,5 +118,17 @@ export default {
       },
     },
   },
-  plugins: [],
+  plugins: [
+    // Add custom button utilities
+    function({ addComponents }) {
+      addComponents({
+        '.btn-primary': {
+          '@apply bg-primary-600 hover:bg-primary-700 text-white font-semibold px-8 py-4 rounded-lg transition-all duration-200 hover:shadow-md': {},
+        },
+        '.btn-secondary': {
+          '@apply bg-white hover:bg-gray-50 text-primary-600 font-semibold px-8 py-4 rounded-lg border-2 border-primary-600 transition-all duration-200': {},
+        },
+      })
+    }
+  ],
 };

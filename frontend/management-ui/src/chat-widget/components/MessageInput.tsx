@@ -1,7 +1,6 @@
-import React from 'react';
-import { useState, useRef, useEffect, type KeyboardEvent } from 'react';
-import { Send, Mic, MicOff } from 'lucide-react';
-import type { Theme } from '../types';
+import { Mic, MicOff, Send } from "lucide-react";
+import React, { type KeyboardEvent, useEffect, useRef, useState } from "react";
+import type { Theme } from "../types";
 
 interface MessageInputProps {
   onSendMessage: (message: string, audioBlob?: Blob) => void;
@@ -21,9 +20,9 @@ const MessageInput: React.FC<MessageInputProps> = ({
   theme,
   maxLength = 1000,
 }) => {
-  const [message, setMessage] = useState('');
+  const [message, setMessage] = useState("");
   const [isListening, setIsListening] = useState(false);
-  const [transcript, setTranscript] = useState('');
+  const [transcript, setTranscript] = useState("");
   const [isTranscribing, setIsTranscribing] = useState(false);
   const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -38,19 +37,19 @@ const MessageInput: React.FC<MessageInputProps> = ({
     if (trimmedMessage && !disabled) {
       const audioToSend = providedAudioBlob || audioBlob;
       onSendMessage(trimmedMessage, audioToSend ? audioToSend : undefined);
-      setMessage('');
+      setMessage("");
       setAudioBlob(null); // Clear the stored audio blob
 
       // Reset textarea height
       if (textareaRef.current) {
-        textareaRef.current.style.height = 'auto';
+        textareaRef.current.style.height = "auto";
       }
     }
   };
 
   // Handle Enter key press
   const handleKeyPress = (e: KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
+    if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       handleSend();
     }
@@ -64,7 +63,7 @@ const MessageInput: React.FC<MessageInputProps> = ({
 
       // Auto-resize
       const textarea = e.target;
-      textarea.style.height = 'auto';
+      textarea.style.height = "auto";
       textarea.style.height = `${Math.min(textarea.scrollHeight, 120)}px`;
     }
   };
@@ -76,7 +75,7 @@ const MessageInput: React.FC<MessageInputProps> = ({
       streamRef.current = stream;
 
       const mediaRecorder = new MediaRecorder(stream, {
-        mimeType: 'audio/webm;codecs=opus'
+        mimeType: "audio/webm;codecs=opus",
       });
       mediaRecorderRef.current = mediaRecorder;
       audioChunksRef.current = [];
@@ -88,27 +87,27 @@ const MessageInput: React.FC<MessageInputProps> = ({
       };
 
       mediaRecorder.onstop = () => {
-        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm;codecs=opus' });
-        console.log('🎵 Audio recording completed, size:', audioBlob.size, 'bytes');
+        const audioBlob = new Blob(audioChunksRef.current, { type: "audio/webm;codecs=opus" });
+        console.log("🎵 Audio recording completed, size:", audioBlob.size, "bytes");
 
         // Store the audio blob for later use
         setAudioBlob(audioBlob);
       };
 
       mediaRecorder.start();
-      console.log('🎙️ Audio recording started');
+      console.log("🎙️ Audio recording started");
     } catch (error) {
-      console.error('❌ Error starting audio recording:', error);
+      console.error("❌ Error starting audio recording:", error);
     }
   };
 
   const stopAudioRecording = () => {
-    if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state === "recording") {
       mediaRecorderRef.current.stop();
     }
     if (streamRef.current) {
       for (const track of streamRef.current.getTracks()) {
-          track.stop();
+        track.stop();
       }
       streamRef.current = null;
     }
@@ -116,23 +115,24 @@ const MessageInput: React.FC<MessageInputProps> = ({
 
   // Initialize speech recognition
   useEffect(() => {
-    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-      const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if ("webkitSpeechRecognition" in window || "SpeechRecognition" in window) {
+      const SpeechRecognition =
+        (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
       recognitionRef.current = new SpeechRecognition();
 
       const recognition = recognitionRef.current;
       recognition.continuous = true;
       recognition.interimResults = true;
-      recognition.lang = 'en-US';
+      recognition.lang = "en-US";
 
       recognition.onstart = () => {
-        console.log('🎤 Speech recognition started');
+        console.log("🎤 Speech recognition started");
         setIsTranscribing(true);
       };
 
       recognition.onresult = (event: any) => {
-        let interimTranscript = '';
-        let finalTranscript = '';
+        let interimTranscript = "";
+        let finalTranscript = "";
 
         for (let i = event.resultIndex; i < event.results.length; i++) {
           const transcript = event.results[i][0].transcript;
@@ -148,33 +148,33 @@ const MessageInput: React.FC<MessageInputProps> = ({
 
         // If we have final results, add them to the message
         if (finalTranscript) {
-          setMessage(prev => {
+          setMessage((prev) => {
             const newMessage = prev + finalTranscript;
             // Auto-resize textarea
             setTimeout(() => {
               if (textareaRef.current) {
-                textareaRef.current.style.height = 'auto';
+                textareaRef.current.style.height = "auto";
                 textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 120)}px`;
               }
             }, 0);
             return newMessage;
           });
-          setTranscript(''); // Clear interim transcript after adding to message
+          setTranscript(""); // Clear interim transcript after adding to message
         }
       };
 
       recognition.onerror = (event: any) => {
-        console.error('🚫 Speech recognition error:', event.error);
+        console.error("🚫 Speech recognition error:", event.error);
         setIsListening(false);
         setIsTranscribing(false);
-        setTranscript('');
+        setTranscript("");
       };
 
       recognition.onend = () => {
-        console.log('🔚 Speech recognition ended');
+        console.log("🔚 Speech recognition ended");
         setIsListening(false);
         setIsTranscribing(false);
-        setTranscript('');
+        setTranscript("");
 
         // Stop audio recording when speech recognition ends
         stopAudioRecording();
@@ -192,7 +192,7 @@ const MessageInput: React.FC<MessageInputProps> = ({
   // Demo mode for testing transcription display
   const simulateTranscription = () => {
     const demoText = "Hello, this is a test of the voice recognition feature";
-    const words = demoText.split(' ');
+    const words = demoText.split(" ");
     let currentIndex = 0;
 
     setIsListening(true);
@@ -200,13 +200,13 @@ const MessageInput: React.FC<MessageInputProps> = ({
 
     const interval = setInterval(() => {
       if (currentIndex < words.length) {
-        const currentTranscript = words.slice(0, currentIndex + 1).join(' ');
+        const currentTranscript = words.slice(0, currentIndex + 1).join(" ");
         setTranscript(currentTranscript);
         currentIndex++;
       } else {
         // Finalize the transcription
-        setMessage(prev => prev + demoText);
-        setTranscript('');
+        setMessage((prev) => prev + demoText);
+        setTranscript("");
         setIsListening(false);
         setIsTranscribing(false);
         clearInterval(interval);
@@ -214,7 +214,7 @@ const MessageInput: React.FC<MessageInputProps> = ({
         // Auto-resize textarea
         setTimeout(() => {
           if (textareaRef.current) {
-            textareaRef.current.style.height = 'auto';
+            textareaRef.current.style.height = "auto";
             textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 120)}px`;
           }
         }, 0);
@@ -225,7 +225,7 @@ const MessageInput: React.FC<MessageInputProps> = ({
   // Voice input implementation
   const toggleVoiceInput = async () => {
     if (!recognitionRef.current) {
-      console.warn('Speech recognition not supported in this browser');
+      console.warn("Speech recognition not supported in this browser");
       // Use demo mode for testing
       simulateTranscription();
       return;
@@ -248,7 +248,7 @@ const MessageInput: React.FC<MessageInputProps> = ({
   // Auto-send when audio recording is complete and we have a message
   useEffect(() => {
     if (audioBlob && message.trim() && !isListening) {
-      console.log('🚀 Auto-sending voice message with audio');
+      console.log("🚀 Auto-sending voice message with audio");
       // Use setTimeout to avoid race conditions
       const timer = setTimeout(() => {
         const trimmedMessage = message.trim();
@@ -256,14 +256,14 @@ const MessageInput: React.FC<MessageInputProps> = ({
           // Check audio size and skip if too large (>50KB)
           const audioToSend = audioBlob.size > 50000 ? undefined : audioBlob;
           if (audioBlob.size > 50000) {
-            console.warn('⚠️ Audio file too large, sending text only');
+            console.warn("⚠️ Audio file too large, sending text only");
           }
           onSendMessage(trimmedMessage, audioToSend);
-          setMessage('');
+          setMessage("");
           setAudioBlob(null);
           // Reset textarea height
           if (textareaRef.current) {
-            textareaRef.current.style.height = 'auto';
+            textareaRef.current.style.height = "auto";
           }
         }
       }, 100);
@@ -273,15 +273,15 @@ const MessageInput: React.FC<MessageInputProps> = ({
 
   // Add CSS animation for pulse effect
   React.useEffect(() => {
-      const style = document.createElement('style');
-      style.textContent = `
+    const style = document.createElement("style");
+    style.textContent = `
       @keyframes pulse {
         0%, 100% { opacity: 1; transform: scale(1); }
         50% { opacity: 0.7; transform: scale(1.1); }
       }
     `;
-      document.head.appendChild(style);
-      return () => document.head.removeChild(style);
+    document.head.appendChild(style);
+    return () => document.head.removeChild(style);
   }, []);
 
   return (
@@ -293,8 +293,8 @@ const MessageInput: React.FC<MessageInputProps> = ({
     >
       <div
         style={{
-          display: 'flex',
-          alignItems: 'flex-end',
+          display: "flex",
+          alignItems: "flex-end",
           gap: theme.spacing.sm,
           backgroundColor: theme.colors.surface,
           borderRadius: theme.borderRadius,
@@ -305,28 +305,28 @@ const MessageInput: React.FC<MessageInputProps> = ({
         }}
       >
         {/* Text Input Container */}
-        <div style={{ flex: 1, position: 'relative' }}>
+        <div style={{ flex: 1, position: "relative" }}>
           <textarea
             ref={textareaRef}
-            value={message + (transcript ? transcript : '')}
+            value={message + (transcript ? transcript : "")}
             onChange={handleInputChange}
             onKeyPress={handleKeyPress}
             placeholder={disabled ? "Connecting..." : isListening ? "Listening..." : placeholder}
             disabled={disabled || isListening}
             rows={1}
             style={{
-              width: '100%',
-              border: 'none',
-              outline: 'none',
-              resize: 'none',
-              backgroundColor: 'transparent',
+              width: "100%",
+              border: "none",
+              outline: "none",
+              resize: "none",
+              backgroundColor: "transparent",
               color: theme.colors.text,
               fontSize: theme.typography.fontSize.sm,
               fontFamily: theme.typography.fontFamily,
-              lineHeight: '1.4',
-              minHeight: '20px',
-              maxHeight: '120px',
-              overflow: 'hidden',
+              lineHeight: "1.4",
+              minHeight: "20px",
+              maxHeight: "120px",
+              overflow: "hidden",
             }}
           />
 
@@ -334,25 +334,25 @@ const MessageInput: React.FC<MessageInputProps> = ({
           {transcript && (
             <div
               style={{
-                position: 'absolute',
+                position: "absolute",
                 top: 0,
                 left: 0,
                 right: 0,
                 bottom: 0,
-                pointerEvents: 'none',
-                padding: '0',
+                pointerEvents: "none",
+                padding: "0",
                 fontSize: theme.typography.fontSize.sm,
                 fontFamily: theme.typography.fontFamily,
-                lineHeight: '1.4',
+                lineHeight: "1.4",
                 color: theme.colors.primary,
                 opacity: 0.7,
-                fontStyle: 'italic',
-                whiteSpace: 'pre-wrap',
-                overflow: 'hidden',
+                fontStyle: "italic",
+                whiteSpace: "pre-wrap",
+                overflow: "hidden",
               }}
             >
               {message}
-              <span style={{ backgroundColor: 'rgba(59, 130, 246, 0.1)', padding: '0 2px' }}>
+              <span style={{ backgroundColor: "rgba(59, 130, 246, 0.1)", padding: "0 2px" }}>
                 {transcript}
               </span>
             </div>
@@ -362,16 +362,16 @@ const MessageInput: React.FC<MessageInputProps> = ({
           {isListening && (
             <div
               style={{
-                position: 'absolute',
-                top: '-8px',
-                right: '-8px',
-                width: '16px',
-                height: '16px',
-                backgroundColor: '#ef4444',
-                borderRadius: '50%',
-                animation: 'pulse 1.5s ease-in-out infinite',
-                border: '2px solid white',
-                boxShadow: '0 0 0 2px rgba(239, 68, 68, 0.3)',
+                position: "absolute",
+                top: "-8px",
+                right: "-8px",
+                width: "16px",
+                height: "16px",
+                backgroundColor: "#ef4444",
+                borderRadius: "50%",
+                animation: "pulse 1.5s ease-in-out infinite",
+                border: "2px solid white",
+                boxShadow: "0 0 0 2px rgba(239, 68, 68, 0.3)",
               }}
             />
           )}
@@ -383,8 +383,8 @@ const MessageInput: React.FC<MessageInputProps> = ({
             style={{
               fontSize: theme.typography.fontSize.xs,
               color: message.length >= maxLength ? theme.colors.error : theme.colors.textSecondary,
-              alignSelf: 'flex-end',
-              marginBottom: '2px',
+              alignSelf: "flex-end",
+              marginBottom: "2px",
             }}
           >
             {message.length}/{maxLength}
@@ -397,19 +397,19 @@ const MessageInput: React.FC<MessageInputProps> = ({
           onClick={toggleVoiceInput}
           disabled={disabled}
           style={{
-            padding: '8px',
-            border: 'none',
-            borderRadius: '6px',
-            backgroundColor: isListening ? theme.colors.error : 'transparent',
-            color: isListening ? 'white' : theme.colors.textSecondary,
-            cursor: disabled ? 'not-allowed' : 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
+            padding: "8px",
+            border: "none",
+            borderRadius: "6px",
+            backgroundColor: isListening ? theme.colors.error : "transparent",
+            color: isListening ? "white" : theme.colors.textSecondary,
+            cursor: disabled ? "not-allowed" : "pointer",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
             transition: theme.transitions.normal,
             opacity: disabled ? 0.5 : 1,
           }}
-          title={isListening ? 'Stop listening' : 'Start voice input'}
+          title={isListening ? "Stop listening" : "Start voice input"}
         >
           {isListening ? <MicOff size={16} /> : <Mic size={16} />}
         </button>
@@ -420,17 +420,17 @@ const MessageInput: React.FC<MessageInputProps> = ({
           onClick={handleSend}
           disabled={!canSend}
           style={{
-            padding: '8px',
-            border: 'none',
-            borderRadius: '6px',
+            padding: "8px",
+            border: "none",
+            borderRadius: "6px",
             backgroundColor: canSend ? theme.colors.primary : theme.colors.border,
-            color: 'white',
-            cursor: canSend ? 'pointer' : 'not-allowed',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
+            color: "white",
+            cursor: canSend ? "pointer" : "not-allowed",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
             transition: theme.transitions.normal,
-            transform: canSend ? 'scale(1)' : 'scale(0.95)',
+            transform: canSend ? "scale(1)" : "scale(0.95)",
           }}
           title="Send message (Enter)"
         >
@@ -445,7 +445,7 @@ const MessageInput: React.FC<MessageInputProps> = ({
             marginTop: theme.spacing.xs,
             fontSize: theme.typography.fontSize.xs,
             color: theme.colors.textSecondary,
-            textAlign: 'center',
+            textAlign: "center",
           }}
         >
           Connecting to chat service...
@@ -456,14 +456,14 @@ const MessageInput: React.FC<MessageInputProps> = ({
       <div
         style={{
           marginTop: theme.spacing.sm,
-          display: 'flex',
+          display: "flex",
           gap: theme.spacing.xs,
-          flexWrap: 'wrap',
+          flexWrap: "wrap",
         }}
       >
-        {['Help', 'Navigation', 'Search'].map((suggestion) => (
+        {["Help", "Navigation", "Search"].map((suggestion) => (
           // biome-ignore lint/a11y/useButtonType: <explanation>
-<button
+          <button
             key={suggestion}
             onClick={() => {
               if (!disabled) {
@@ -477,18 +477,18 @@ const MessageInput: React.FC<MessageInputProps> = ({
             style={{
               padding: `${theme.spacing.xs} ${theme.spacing.sm}`,
               border: `1px solid ${theme.colors.border}`,
-              borderRadius: '12px',
+              borderRadius: "12px",
               backgroundColor: theme.colors.surface,
               color: theme.colors.textSecondary,
               fontSize: theme.typography.fontSize.xs,
-              cursor: disabled ? 'not-allowed' : 'pointer',
+              cursor: disabled ? "not-allowed" : "pointer",
               transition: theme.transitions.fast,
               opacity: disabled ? 0.5 : 1,
             }}
             onMouseEnter={(e) => {
               if (!disabled) {
                 e.currentTarget.style.backgroundColor = theme.colors.primary;
-                e.currentTarget.style.color = 'white';
+                e.currentTarget.style.color = "white";
               }
             }}
             onMouseLeave={(e) => {

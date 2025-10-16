@@ -1,9 +1,9 @@
-import React, { ReactNode } from 'react'
-import { Box, Toolbar } from '@mui/material'
-import { Header } from './Header'
+import { Box, Toolbar } from "@mui/material";
+import React, { type ReactNode } from "react";
+import { Header } from "./Header";
 
 interface LayoutProps {
-  children: ReactNode
+  children: ReactNode;
 }
 
 export function Layout({ children }: LayoutProps) {
@@ -17,5 +17,5 @@ export function Layout({ children }: LayoutProps) {
         {children}
       </main>
     </Box>
-  )
+  );
 }

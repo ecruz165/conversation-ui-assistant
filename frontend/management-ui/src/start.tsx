@@ -1,6 +1,6 @@
-import { createMiddleware, createStart } from "@tanstack/react-start";
-import { createSerializationAdapter } from "@tanstack/react-router";
 import type { Register } from "@tanstack/react-router";
+import { createSerializationAdapter } from "@tanstack/react-router";
+import { createMiddleware, createStart } from "@tanstack/react-start";
 
 declare module "@tanstack/react-start" {
   interface Register {

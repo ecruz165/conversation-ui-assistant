@@ -1,28 +1,27 @@
-import React from 'react';
-
-import { AnimatePresence, motion } from 'framer-motion';
-import { MessageCircle, Minimize2, Send, X } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
-import { useConversation } from '../hooks/useConversation';
-import type { ChatWidgetProps, Message } from '../types';
-import { getTheme } from '../utils/theme';
-import MessageInput from './MessageInput';
-import MessageList from './MessageList';
+import { AnimatePresence, motion } from "framer-motion";
+import { MessageCircle, Minimize2, Send, X } from "lucide-react";
+import type React from "react";
+import { useEffect, useRef, useState } from "react";
+import { useConversation } from "../hooks/useConversation";
+import type { ChatWidgetProps, Message } from "../types";
+import { getTheme } from "../utils/theme";
+import MessageInput from "./MessageInput";
+import MessageList from "./MessageList";
 
 /**
  * Main chat widget component for conversational navigation
  * Designed to be embedded as a floating widget in any application
  */
 const ChatWidget: React.FC<ChatWidgetProps> = ({
-  position = 'bottom-right',
-  theme = 'light',
+  position = "bottom-right",
+  theme = "light",
   showWelcomeMessage = true,
   welcomeMessage = "Hi! I'm here to help you navigate. What are you looking for?",
   placeholder = "Ask me anything...",
   maxHeight = 500,
   width = 350,
   zIndex = 1000,
-  className = '',
+  className = "",
   style = {},
   onNavigationAction,
   onMessageSent,
@@ -31,30 +30,28 @@ const ChatWidget: React.FC<ChatWidgetProps> = ({
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
-  const { state, sendMessage } = useConversation(
-    'ws://localhost:8081/ws/chat'
-  );
+  const { state, sendMessage } = useConversation("ws://localhost:8081/ws/chat");
   const widgetRef = useRef<HTMLDivElement>(null);
   const currentTheme = getTheme(theme);
 
   // Position styles
   const getPositionStyles = () => {
     const baseStyles = {
-      position: 'fixed' as const,
+      position: "fixed" as const,
       zIndex,
     };
 
     switch (position) {
-      case 'bottom-right':
-        return { ...baseStyles, bottom: '20px', right: '20px' };
-      case 'bottom-left':
-        return { ...baseStyles, bottom: '20px', left: '20px' };
-      case 'top-right':
-        return { ...baseStyles, top: '20px', right: '20px' };
-      case 'top-left':
-        return { ...baseStyles, top: '20px', left: '20px' };
+      case "bottom-right":
+        return { ...baseStyles, bottom: "20px", right: "20px" };
+      case "bottom-left":
+        return { ...baseStyles, bottom: "20px", left: "20px" };
+      case "top-right":
+        return { ...baseStyles, top: "20px", right: "20px" };
+      case "top-left":
+        return { ...baseStyles, top: "20px", left: "20px" };
       default:
-        return { ...baseStyles, bottom: '20px', right: '20px' };
+        return { ...baseStyles, bottom: "20px", right: "20px" };
     }
   };
 
@@ -64,7 +61,7 @@ const ChatWidget: React.FC<ChatWidgetProps> = ({
       await sendMessage(content, audioBlob);
       onMessageSent?.(content);
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Failed to send message';
+      const errorMessage = error instanceof Error ? error.message : "Failed to send message";
       onError?.(errorMessage);
     }
   };
@@ -73,13 +70,13 @@ const ChatWidget: React.FC<ChatWidgetProps> = ({
   useEffect(() => {
     if (state.messages.length > 0) {
       const lastMessage = state.messages[state.messages.length - 1];
-      if (lastMessage.sender === 'assistant') {
+      if (lastMessage.sender === "assistant") {
         onMessageReceived?.(lastMessage);
 
         // Handle navigation actions
         if (lastMessage.metadata?.navigationTarget && onNavigationAction) {
           onNavigationAction({
-            type: 'navigate',
+            type: "navigate",
             target: lastMessage.metadata.navigationTarget,
             data: lastMessage.metadata,
           });
@@ -93,11 +90,11 @@ const ChatWidget: React.FC<ChatWidgetProps> = ({
     if (isOpen && showWelcomeMessage && state.messages.length === 0) {
       // Add welcome message to state (this would typically come from the conversation provider)
       const welcomeMsg: Message = {
-        id: 'welcome',
+        id: "welcome",
         content: welcomeMessage,
-        sender: 'assistant',
+        sender: "assistant",
         timestamp: new Date(),
-        type: 'text',
+        type: "text",
       };
       // This would be handled by the conversation provider in a real implementation
     }
@@ -123,16 +120,16 @@ const ChatWidget: React.FC<ChatWidgetProps> = ({
             whileTap={{ scale: 0.95 }}
             onClick={() => setIsOpen(true)}
             style={{
-              width: '60px',
-              height: '60px',
-              borderRadius: '50%',
-              border: 'none',
+              width: "60px",
+              height: "60px",
+              borderRadius: "50%",
+              border: "none",
               backgroundColor: currentTheme.colors.primary,
-              color: 'white',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
+              color: "white",
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
               boxShadow: currentTheme.shadows.lg,
               transition: currentTheme.transitions.normal,
             }}
@@ -157,11 +154,11 @@ const ChatWidget: React.FC<ChatWidgetProps> = ({
               borderRadius: currentTheme.borderRadius,
               boxShadow: currentTheme.shadows.lg,
               border: `1px solid ${currentTheme.colors.border}`,
-              display: 'flex',
-              flexDirection: 'column',
-              overflow: 'hidden',
-              marginBottom: isMinimized ? '0' : '10px',
-              height: isMinimized ? 'auto' : `${maxHeight}px`,
+              display: "flex",
+              flexDirection: "column",
+              overflow: "hidden",
+              marginBottom: isMinimized ? "0" : "10px",
+              height: isMinimized ? "auto" : `${maxHeight}px`,
             }}
           >
             {/* Header */}
@@ -169,13 +166,13 @@ const ChatWidget: React.FC<ChatWidgetProps> = ({
               style={{
                 padding: currentTheme.spacing.md,
                 backgroundColor: currentTheme.colors.primary,
-                color: 'white',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
+                color: "white",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
               }}
             >
-              <div style={{ display: 'flex', alignItems: 'center', gap: currentTheme.spacing.sm }}>
+              <div style={{ display: "flex", alignItems: "center", gap: currentTheme.spacing.sm }}>
                 <MessageCircle size={20} />
                 <span style={{ fontWeight: currentTheme.typography.fontWeight.medium }}>
                   Navigation Assistant
@@ -183,31 +180,31 @@ const ChatWidget: React.FC<ChatWidgetProps> = ({
                 {state.isConnected && (
                   <div
                     style={{
-                      width: '8px',
-                      height: '8px',
-                      borderRadius: '50%',
+                      width: "8px",
+                      height: "8px",
+                      borderRadius: "50%",
                       backgroundColor: currentTheme.colors.success,
                     }}
                     title="Connected"
                   />
                 )}
               </div>
-              <div style={{ display: 'flex', gap: currentTheme.spacing.xs }}>
+              <div style={{ display: "flex", gap: currentTheme.spacing.xs }}>
                 {/** biome-ignore lint/a11y/useButtonType: <explanation> */}
                 <button
                   onClick={() => setIsMinimized(!isMinimized)}
                   style={{
-                    background: 'none',
-                    border: 'none',
-                    color: 'white',
-                    cursor: 'pointer',
-                    padding: '4px',
-                    borderRadius: '4px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
+                    background: "none",
+                    border: "none",
+                    color: "white",
+                    cursor: "pointer",
+                    padding: "4px",
+                    borderRadius: "4px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
                   }}
-                  aria-label={isMinimized ? 'Expand' : 'Minimize'}
+                  aria-label={isMinimized ? "Expand" : "Minimize"}
                 >
                   <Minimize2 size={16} />
                 </button>
@@ -215,15 +212,15 @@ const ChatWidget: React.FC<ChatWidgetProps> = ({
                 <button
                   onClick={() => setIsOpen(false)}
                   style={{
-                    background: 'none',
-                    border: 'none',
-                    color: 'white',
-                    cursor: 'pointer',
-                    padding: '4px',
-                    borderRadius: '4px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
+                    background: "none",
+                    border: "none",
+                    color: "white",
+                    cursor: "pointer",
+                    padding: "4px",
+                    borderRadius: "4px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
                   }}
                   aria-label="Close chat"
                 >
@@ -236,7 +233,7 @@ const ChatWidget: React.FC<ChatWidgetProps> = ({
             {!isMinimized && (
               <>
                 {/* Messages */}
-                <div style={{ flex: 1, overflow: 'hidden' }}>
+                <div style={{ flex: 1, overflow: "hidden" }}>
                   <MessageList
                     messages={state.messages}
                     isLoading={state.isLoading}

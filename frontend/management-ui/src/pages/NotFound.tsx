@@ -1,8 +1,8 @@
-import React from 'react'
-import { Link } from 'react-router-dom'
-import { Button, Box, Typography } from '@mui/material'
-import { Home as HomeIcon } from '@mui/icons-material'
-import { Layout } from '~/components/Layout'
+import { Home as HomeIcon } from "@mui/icons-material";
+import { Box, Button, Typography } from "@mui/material";
+import React from "react";
+import { Link } from "react-router-dom";
+import { Layout } from "~/components/Layout";
 
 export function NotFound() {
   return (
@@ -29,5 +29,5 @@ export function NotFound() {
         </Link>
       </Box>
     </Layout>
-  )
+  );
 }

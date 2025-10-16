@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { getRequestHeaders } from "@tanstack/react-start/server";
 import { createMiddleware, json } from "@tanstack/react-start";
+import { getRequestHeaders } from "@tanstack/react-start/server";
 import type { User } from "~/utils/users";
 
 const userLoggerMiddleware = createMiddleware().server(async ({ next, request }) => {

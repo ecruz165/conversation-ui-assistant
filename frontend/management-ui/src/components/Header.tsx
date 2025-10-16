@@ -1,11 +1,11 @@
-import React from 'react'
-import { Link } from 'react-router-dom'
-import { AppBar, Toolbar, Typography, Box, IconButton } from '@mui/material'
-import { Menu as MenuIcon } from '@mui/icons-material'
+import { Menu as MenuIcon } from "@mui/icons-material";
+import { AppBar, Box, IconButton, Toolbar, Typography } from "@mui/material";
+import React from "react";
+import { Link } from "react-router-dom";
 
 interface HeaderProps {
-  onMenuClick?: () => void
-  showMenuButton?: boolean
+  onMenuClick?: () => void;
+  showMenuButton?: boolean;
 }
 
 export function Header({ onMenuClick, showMenuButton = false }: HeaderProps) {
@@ -14,8 +14,8 @@ export function Header({ onMenuClick, showMenuButton = false }: HeaderProps) {
       position="fixed"
       elevation={0}
       sx={{
-        backgroundColor: 'white',
-        borderBottom: '1px solid rgb(229, 231, 235)', // border-gray-200
+        backgroundColor: "white",
+        borderBottom: "1px solid rgb(229, 231, 235)", // border-gray-200
       }}
     >
       <Toolbar>
@@ -49,5 +49,5 @@ export function Header({ onMenuClick, showMenuButton = false }: HeaderProps) {
         </Link>
       </Toolbar>
     </AppBar>
-  )
+  );
 }

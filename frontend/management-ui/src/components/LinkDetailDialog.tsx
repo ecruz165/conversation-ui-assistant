@@ -1,59 +1,59 @@
-import React from 'react'
+import { CheckCircle, Error, HourglassEmpty, Pending } from "@mui/icons-material";
 import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Button,
   Box,
-  Typography,
+  Button,
   Chip,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Divider,
   LinearProgress,
   Paper,
-  Divider,
-} from '@mui/material'
-import { CheckCircle, Error, HourglassEmpty, Pending } from '@mui/icons-material'
-import type { NavigationLink } from '~/types'
+  Typography,
+} from "@mui/material";
+import React from "react";
+import type { NavigationLink } from "~/types";
 
 interface LinkDetailDialogProps {
-  open: boolean
-  onClose: () => void
-  link: NavigationLink | null
-  onEdit?: (link: NavigationLink) => void
+  open: boolean;
+  onClose: () => void;
+  link: NavigationLink | null;
+  onEdit?: (link: NavigationLink) => void;
 }
 
 export function LinkDetailDialog({ open, onClose, link, onEdit }: LinkDetailDialogProps) {
-  if (!link) return null
+  if (!link) return null;
 
   const getStatusIcon = (status?: string) => {
     switch (status) {
-      case 'completed':
-        return <CheckCircle color="success" fontSize="small" />
-      case 'processing':
-        return <HourglassEmpty color="warning" fontSize="small" />
-      case 'pending':
-        return <Pending color="info" fontSize="small" />
-      case 'failed':
-        return <Error color="error" fontSize="small" />
+      case "completed":
+        return <CheckCircle color="success" fontSize="small" />;
+      case "processing":
+        return <HourglassEmpty color="warning" fontSize="small" />;
+      case "pending":
+        return <Pending color="info" fontSize="small" />;
+      case "failed":
+        return <Error color="error" fontSize="small" />;
       default:
-        return null
+        return null;
     }
-  }
+  };
 
   const getStatusLabel = (status?: string) => {
     switch (status) {
-      case 'completed':
-        return 'Completed'
-      case 'processing':
-        return 'Processing'
-      case 'pending':
-        return 'Pending'
-      case 'failed':
-        return 'Failed'
+      case "completed":
+        return "Completed";
+      case "processing":
+        return "Processing";
+      case "pending":
+        return "Pending";
+      case "failed":
+        return "Failed";
       default:
-        return 'Not Started'
+        return "Not Started";
     }
-  }
+  };
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
@@ -61,8 +61,8 @@ export function LinkDetailDialog({ open, onClose, link, onEdit }: LinkDetailDial
         <Box className="flex items-center justify-between">
           <Typography variant="h6">{link.displayName}</Typography>
           <Chip
-            label={link.isActive ? 'Active' : 'Inactive'}
-            color={link.isActive ? 'success' : 'default'}
+            label={link.isActive ? "Active" : "Inactive"}
+            color={link.isActive ? "success" : "default"}
             size="small"
           />
         </Box>
@@ -147,9 +147,7 @@ export function LinkDetailDialog({ open, onClose, link, onEdit }: LinkDetailDial
                           </Typography>
                           <Chip label={field.slot} size="small" variant="outlined" />
                           <Chip label={field.type} size="small" color="primary" />
-                          {field.required && (
-                            <Chip label="Required" size="small" color="error" />
-                          )}
+                          {field.required && <Chip label="Required" size="small" color="error" />}
                         </Box>
                         {field.placeholder && (
                           <Typography variant="caption" className="text-gray-500">
@@ -187,9 +185,7 @@ export function LinkDetailDialog({ open, onClose, link, onEdit }: LinkDetailDial
                 <Typography variant="body2">{getStatusLabel(link.embeddingStatus)}</Typography>
               </Box>
             </Box>
-            {link.embeddingStatus === 'processing' && (
-              <LinearProgress className="mt-2" />
-            )}
+            {link.embeddingStatus === "processing" && <LinearProgress className="mt-2" />}
           </Paper>
 
           {/* AI Summary */}
@@ -255,5 +251,5 @@ export function LinkDetailDialog({ open, onClose, link, onEdit }: LinkDetailDial
         )}
       </DialogActions>
     </Dialog>
-  )
+  );
 }

@@ -1,8 +1,8 @@
-import React from 'react';
-import { createRoot, type Root } from 'react-dom/client';
-import ChatWidget from '../components/ChatWidget';
-import ConversationProvider from '../providers/ConversationProvider';
-import type { ChatWidgetProps } from '../types';
+import React from "react";
+import { createRoot, type Root } from "react-dom/client";
+import ChatWidget from "../components/ChatWidget";
+import ConversationProvider from "../providers/ConversationProvider";
+import type { ChatWidgetProps } from "../types";
 
 /**
  * Web Component wrapper for the React ChatWidget
@@ -24,23 +24,23 @@ class ChatWidgetElement extends HTMLElement {
   // Define which attributes to observe for changes
   static get observedAttributes(): string[] {
     return [
-      'api-endpoint',
-      'websocket-url',
-      'theme',
-      'position',
-      'welcome-message',
-      'placeholder',
-      'max-height',
-      'width',
-      'z-index',
-      'show-welcome-message'
+      "api-endpoint",
+      "websocket-url",
+      "theme",
+      "position",
+      "welcome-message",
+      "placeholder",
+      "max-height",
+      "width",
+      "z-index",
+      "show-welcome-message",
     ];
   }
 
   constructor() {
     super();
     // Create shadow DOM for style encapsulation
-    this.attachShadow({ mode: 'open' });
+    this.attachShadow({ mode: "open" });
   }
 
   connectedCallback(): void {
@@ -62,42 +62,52 @@ class ChatWidgetElement extends HTMLElement {
 
   private getProps(): ChatWidgetProps {
     return {
-      position: (this.getAttribute('position') as ChatWidgetProps['position']) || 'bottom-right',
-      theme: (this.getAttribute('theme') as ChatWidgetProps['theme']) || 'light',
-      showWelcomeMessage: this.getAttribute('show-welcome-message') !== 'false',
-      welcomeMessage: this.getAttribute('welcome-message') || "Hi! I'm here to help you navigate. What are you looking for?",
-      placeholder: this.getAttribute('placeholder') || "Ask me anything...",
-      maxHeight: Number.parseInt(this.getAttribute('max-height') || '500'),
-      width: Number.parseInt(this.getAttribute('width') || '350'),
-      zIndex: Number.parseInt(this.getAttribute('z-index') || '1000'),
+      position: (this.getAttribute("position") as ChatWidgetProps["position"]) || "bottom-right",
+      theme: (this.getAttribute("theme") as ChatWidgetProps["theme"]) || "light",
+      showWelcomeMessage: this.getAttribute("show-welcome-message") !== "false",
+      welcomeMessage:
+        this.getAttribute("welcome-message") ||
+        "Hi! I'm here to help you navigate. What are you looking for?",
+      placeholder: this.getAttribute("placeholder") || "Ask me anything...",
+      maxHeight: Number.parseInt(this.getAttribute("max-height") || "500"),
+      width: Number.parseInt(this.getAttribute("width") || "350"),
+      zIndex: Number.parseInt(this.getAttribute("z-index") || "1000"),
       onNavigationAction: (action) => {
         // Dispatch custom event for navigation actions
-        this.dispatchEvent(new CustomEvent('navigation-action', {
-          detail: action,
-          bubbles: true
-        }));
+        this.dispatchEvent(
+          new CustomEvent("navigation-action", {
+            detail: action,
+            bubbles: true,
+          })
+        );
       },
       onMessageSent: (message) => {
         // Dispatch custom event for sent messages
-        this.dispatchEvent(new CustomEvent('message-sent', {
-          detail: { message },
-          bubbles: true
-        }));
+        this.dispatchEvent(
+          new CustomEvent("message-sent", {
+            detail: { message },
+            bubbles: true,
+          })
+        );
       },
       onMessageReceived: (message) => {
         // Dispatch custom event for received messages
-        this.dispatchEvent(new CustomEvent('message-received', {
-          detail: { message },
-          bubbles: true
-        }));
+        this.dispatchEvent(
+          new CustomEvent("message-received", {
+            detail: { message },
+            bubbles: true,
+          })
+        );
       },
       onError: (error) => {
         // Dispatch custom event for errors
-        this.dispatchEvent(new CustomEvent('error', {
-          detail: { error },
-          bubbles: true
-        }));
-      }
+        this.dispatchEvent(
+          new CustomEvent("error", {
+            detail: { error },
+            bubbles: true,
+          })
+        );
+      },
     };
   }
 
@@ -106,7 +116,7 @@ class ChatWidgetElement extends HTMLElement {
 
     // Create mount point if it doesn't exist
     if (!this.mountPoint) {
-      this.mountPoint = document.createElement('div');
+      this.mountPoint = document.createElement("div");
       this.mountPoint.style.cssText = `
         position: relative;
         width: 100%;
@@ -121,8 +131,8 @@ class ChatWidgetElement extends HTMLElement {
       this.root = createRoot(this.mountPoint);
     }
 
-    const apiEndpoint = this.getAttribute('api-endpoint') || 'http://localhost:8080';
-    const websocketUrl = this.getAttribute('websocket-url');
+    const apiEndpoint = this.getAttribute("api-endpoint") || "http://localhost:8080";
+    const websocketUrl = this.getAttribute("websocket-url");
     const props = this.getProps();
 
     // Render React component inside web component
@@ -132,7 +142,7 @@ class ChatWidgetElement extends HTMLElement {
         {
           apiEndpoint,
           websocketUrl,
-          onError: props.onError
+          onError: props.onError,
         },
         React.createElement(ChatWidget, props)
       )
@@ -141,8 +151,8 @@ class ChatWidgetElement extends HTMLElement {
 }
 
 // Register the custom element
-if (!customElements.get('chat-widget')) {
-  customElements.define('chat-widget', ChatWidgetElement);
+if (!customElements.get("chat-widget")) {
+  customElements.define("chat-widget", ChatWidgetElement);
 }
 
 export default ChatWidgetElement;

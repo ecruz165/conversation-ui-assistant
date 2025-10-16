@@ -1,27 +1,27 @@
-import React from 'react'
-import { useNavigate } from 'react-router-dom'
-import { Layout } from '~/components/Layout'
-import { WebsiteRegistrationForm } from '~/components/WebsiteRegistrationForm'
-import { mockApi } from '~/mocks/api'
-import type { Website } from '~/types'
+import React from "react";
+import { useNavigate } from "react-router-dom";
+import { Layout } from "~/components/Layout";
+import { WebsiteRegistrationForm } from "~/components/WebsiteRegistrationForm";
+import { mockApi } from "~/mocks/api";
+import type { Website } from "~/types";
 
 export function RegisterWebsite() {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   const handleSubmit = async (data: Partial<Website>) => {
-    console.log('Submitting website registration:', data)
+    console.log("Submitting website registration:", data);
 
     // In a real app, this would call the API
     // For now, just simulate success
-    await new Promise(resolve => setTimeout(resolve, 1500))
+    await new Promise((resolve) => setTimeout(resolve, 1500));
 
-    alert('Website registered successfully!')
-    navigate('/')
-  }
+    alert("Website registered successfully!");
+    navigate("/");
+  };
 
   const handleCancel = () => {
-    navigate('/')
-  }
+    navigate("/");
+  };
 
   return (
     <Layout>
@@ -40,5 +40,5 @@ export function RegisterWebsite() {
         <WebsiteRegistrationForm onSubmit={handleSubmit} onCancel={handleCancel} />
       </div>
     </Layout>
-  )
+  );
 }
