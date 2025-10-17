@@ -26,11 +26,14 @@ type IntegrationMethod = "script" | "npm" | "webcomponent";
 
 const tabs = [
   { label: "Overview", value: "overview", path: "/website/overview" },
-  { label: "Link Management", value: "links", path: "/website/links" },
-  { label: "Widget Code", value: "code", path: "/website/code" },
-  { label: "Embeddings Tester", value: "embedding-test", path: "/website/embedding-test" },
   { label: "Crawl Management", value: "crawl-management", path: "/website/crawl-management" },
+  { label: "Link Management", value: "links", path: "/website/links" },
+  { label: "Embeddings Tester", value: "embedding-test", path: "/website/embedding-test" },
+  { label: "Widget Code", value: "code", path: "/website/code" },
 ];
+
+const SECTION_TITLE_CLASS = "mb-2 font-semibold text-gray-900";
+const SECTION_DESCRIPTION_CLASS = "text-gray-600 mb-4 pb-2";
 
 // Code generation functions for Web Component
 function generateScriptTagCode(websiteId: string, apiKey: string): string {
@@ -70,21 +73,19 @@ document.body.appendChild(widget);
 // </access360-chat-widget>`;
 }
 
-function generateWebComponentCode(websiteId: string, apiKey: string): string {
-  return `<!-- Web Component Usage in Any Framework -->
-
-<!-- Vue.js -->
-<template>
+function generateVueCode(websiteId: string, apiKey: string): string {
+  return `<template>
   <access360-chat-widget
     website-id="${websiteId}"
     api-key="${apiKey}"
     position="bottom-right"
     theme="auto">
   </access360-chat-widget>
-</template>
+</template>`;
+}
 
-<!-- React -->
-function App() {
+function generateReactCode(websiteId: string, apiKey: string): string {
+  return `function App() {
   return (
     <access360-chat-widget
       website-id="${websiteId}"
@@ -93,10 +94,11 @@ function App() {
       theme="auto">
     </access360-chat-widget>
   );
+}`;
 }
 
-<!-- Angular -->
-<access360-chat-widget
+function generateAngularCode(websiteId: string, apiKey: string): string {
+  return `<access360-chat-widget
   website-id="${websiteId}"
   api-key="${apiKey}"
   position="bottom-right"
@@ -139,8 +141,6 @@ export function WidgetCode() {
         return generateScriptTagCode(websiteId, apiKey);
       case "npm":
         return generateNpmCode(websiteId, apiKey);
-      case "webcomponent":
-        return generateWebComponentCode(websiteId, apiKey);
       default:
         return generateScriptTagCode(websiteId, apiKey);
     }
@@ -232,7 +232,7 @@ export function WidgetCode() {
       <Box className="max-w-7xl mx-auto px-page md:px-6 lg:px-8 py-8 space-y-6">
         {/* Configuration Panel */}
         <Paper elevation={2} className="p-6">
-          <Typography variant="h6" className="mb-4">
+          <Typography variant="h6" className={SECTION_TITLE_CLASS}>
             Integration Method
           </Typography>
           <FormControl component="fieldset">
@@ -287,44 +287,214 @@ export function WidgetCode() {
         </Paper>
 
         {/* Code Display Panel */}
-        <Paper elevation={2} className="p-6">
-          <Box className="flex justify-between items-center mb-4">
-            <Typography variant="h6">Integration Code</Typography>
-            <Button
-              variant="outlined"
-              startIcon={<CopyIcon />}
-              onClick={handleCopyCode}
-              size="small"
-            >
-              Copy Code
-            </Button>
+        {integrationMethod === "webcomponent" ? (
+          // Framework Examples - Multiple Code Boxes
+          <Box className="space-y-6">
+            {/* Vue.js */}
+            <Paper elevation={2} className="p-6">
+              <Box className="flex justify-between items-center mb-2">
+                <Typography variant="h6" className="font-semibold text-gray-900">
+                  Vue.js
+                </Typography>
+                <Button
+                  variant="outlined"
+                  startIcon={<CopyIcon />}
+                  onClick={async () => {
+                    try {
+                      await navigator.clipboard.writeText(
+                        generateVueCode(websiteId, website?.appKey || "your-api-key")
+                      );
+                      setSnackbar({
+                        open: true,
+                        message: "Vue.js code copied!",
+                        severity: "success",
+                      });
+                    } catch {
+                      setSnackbar({
+                        open: true,
+                        message: "Failed to copy code",
+                        severity: "error",
+                      });
+                    }
+                  }}
+                  size="small"
+                >
+                  Copy Code
+                </Button>
+              </Box>
+              <Typography variant="body2" className={SECTION_DESCRIPTION_CLASS}>
+                Use the widget in your Vue.js template:
+              </Typography>
+              <Box
+                sx={{
+                  maxHeight: "500px",
+                  overflowY: "auto",
+                  borderRadius: 1,
+                  "& pre": { margin: 0 },
+                }}
+              >
+                <SyntaxHighlighter
+                  language="html"
+                  style={vscDarkPlus}
+                  customStyle={{ borderRadius: "4px", fontSize: "0.875rem" }}
+                  showLineNumbers
+                >
+                  {generateVueCode(websiteId, website?.appKey || "your-api-key")}
+                </SyntaxHighlighter>
+              </Box>
+            </Paper>
+
+            {/* React */}
+            <Paper elevation={2} className="p-6">
+              <Box className="flex justify-between items-center mb-2">
+                <Typography variant="h6" className="font-semibold text-gray-900">
+                  React
+                </Typography>
+                <Button
+                  variant="outlined"
+                  startIcon={<CopyIcon />}
+                  onClick={async () => {
+                    try {
+                      await navigator.clipboard.writeText(
+                        generateReactCode(websiteId, website?.appKey || "your-api-key")
+                      );
+                      setSnackbar({
+                        open: true,
+                        message: "React code copied!",
+                        severity: "success",
+                      });
+                    } catch {
+                      setSnackbar({
+                        open: true,
+                        message: "Failed to copy code",
+                        severity: "error",
+                      });
+                    }
+                  }}
+                  size="small"
+                >
+                  Copy Code
+                </Button>
+              </Box>
+              <Typography variant="body2" className={SECTION_DESCRIPTION_CLASS}>
+                Use the widget in your React component:
+              </Typography>
+              <Box
+                sx={{
+                  maxHeight: "500px",
+                  overflowY: "auto",
+                  borderRadius: 1,
+                  "& pre": { margin: 0 },
+                }}
+              >
+                <SyntaxHighlighter
+                  language="javascript"
+                  style={vscDarkPlus}
+                  customStyle={{ borderRadius: "4px", fontSize: "0.875rem" }}
+                  showLineNumbers
+                >
+                  {generateReactCode(websiteId, website?.appKey || "your-api-key")}
+                </SyntaxHighlighter>
+              </Box>
+            </Paper>
+
+            {/* Angular */}
+            <Paper elevation={2} className="p-6">
+              <Box className="flex justify-between items-center mb-2">
+                <Typography variant="h6" className="font-semibold text-gray-900">
+                  Angular
+                </Typography>
+                <Button
+                  variant="outlined"
+                  startIcon={<CopyIcon />}
+                  onClick={async () => {
+                    try {
+                      await navigator.clipboard.writeText(
+                        generateAngularCode(websiteId, website?.appKey || "your-api-key")
+                      );
+                      setSnackbar({
+                        open: true,
+                        message: "Angular code copied!",
+                        severity: "success",
+                      });
+                    } catch {
+                      setSnackbar({
+                        open: true,
+                        message: "Failed to copy code",
+                        severity: "error",
+                      });
+                    }
+                  }}
+                  size="small"
+                >
+                  Copy Code
+                </Button>
+              </Box>
+              <Typography variant="body2" className={SECTION_DESCRIPTION_CLASS}>
+                Use the widget in your Angular template:
+              </Typography>
+              <Box
+                sx={{
+                  maxHeight: "500px",
+                  overflowY: "auto",
+                  borderRadius: 1,
+                  "& pre": { margin: 0 },
+                }}
+              >
+                <SyntaxHighlighter
+                  language="html"
+                  style={vscDarkPlus}
+                  customStyle={{ borderRadius: "4px", fontSize: "0.875rem" }}
+                  showLineNumbers
+                >
+                  {generateAngularCode(websiteId, website?.appKey || "your-api-key")}
+                </SyntaxHighlighter>
+              </Box>
+            </Paper>
           </Box>
-          <Typography variant="body2" className="text-gray-600 mb-4">
-            Copy and paste this code into your project:
-          </Typography>
-          <Box
-            sx={{
-              maxHeight: "500px",
-              overflowY: "auto",
-              borderRadius: 1,
-              "& pre": {
-                margin: 0,
-              },
-            }}
-          >
-            <SyntaxHighlighter
-              language={getLanguage()}
-              style={vscDarkPlus}
-              customStyle={{
-                borderRadius: "4px",
-                fontSize: "0.875rem",
+        ) : (
+          // Single Code Box for Script Tag and NPM
+          <Paper elevation={2} className="p-6">
+            <Box className="flex justify-between items-center mb-2">
+              <Typography variant="h6" className="font-semibold text-gray-900">
+                Integration Code
+              </Typography>
+              <Button
+                variant="outlined"
+                startIcon={<CopyIcon />}
+                onClick={handleCopyCode}
+                size="small"
+              >
+                Copy Code
+              </Button>
+            </Box>
+            <Typography variant="body2" className={SECTION_DESCRIPTION_CLASS}>
+              Copy and paste this code into your project:
+            </Typography>
+            <Box
+              sx={{
+                maxHeight: "500px",
+                overflowY: "auto",
+                borderRadius: 1,
+                "& pre": {
+                  margin: 0,
+                },
               }}
-              showLineNumbers
             >
-              {getGeneratedCode()}
-            </SyntaxHighlighter>
-          </Box>
-        </Paper>
+              <SyntaxHighlighter
+                language={getLanguage()}
+                style={vscDarkPlus}
+                customStyle={{
+                  borderRadius: "4px",
+                  fontSize: "0.875rem",
+                }}
+                showLineNumbers
+              >
+                {getGeneratedCode()}
+              </SyntaxHighlighter>
+            </Box>
+          </Paper>
+        )}
       </Box>
 
       {/* Snackbar for copy feedback */}

@@ -39,11 +39,11 @@ export function PageTabs({ tabs }: PageTabsProps) {
               fontWeight: 500,
               color: "rgb(107, 114, 128)", // text-gray-500
               "&.Mui-selected": {
-                color: "rgb(29, 78, 216)", // primary-600
+                color: "#006BA6", // primary-700 - dark navy blue
               },
             },
             "& .MuiTabs-indicator": {
-              backgroundColor: "rgb(29, 78, 216)", // primary-600
+              backgroundColor: "#006BA6", // primary-700 - dark navy blue
               height: "3px",
             },
           }}

@@ -8,7 +8,7 @@ interface LayoutProps {
 
 export function Layout({ children }: LayoutProps) {
   return (
-    <Box className="min-h-screen bg-gray-100">
+    <Box className="min-h-screen bg-gray-100" sx={{ overflowY: "scroll" }}>
       <Header />
       {/* Toolbar spacer to push content below fixed AppBar */}
       <Toolbar />

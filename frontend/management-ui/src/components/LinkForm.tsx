@@ -236,6 +236,122 @@ export function LinkForm({ open, onClose, onSubmit, initialData, mode = "create"
       <DialogTitle>{mode === "edit" ? "Edit Navigation Link" : "Add Navigation Link"}</DialogTitle>
       <DialogContent>
         <Stack spacing={3} sx={{ mt: 2 }}>
+          {/* Display Name */}
+          <Controller
+            name="displayName"
+            control={control}
+            rules={{ required: "Display name is required" }}
+            render={({ field }) => (
+              <TextField
+                {...field}
+                label="Display Name"
+                required
+                fullWidth
+                error={!!errors.displayName}
+                helperText={errors.displayName?.message || "Name shown to users"}
+              />
+            )}
+          />
+
+          {/* Description */}
+          <Controller
+            name="description"
+            control={control}
+            render={({ field }) => (
+              <TextField
+                {...field}
+                label="Description"
+                fullWidth
+                multiline
+                rows={2}
+                helperText="Brief description of what this link does"
+              />
+            )}
+          />
+
+          {/* Target URL */}
+          <Controller
+            name="targetUrl"
+            control={control}
+            rules={{
+              required: "Target URL is required",
+              pattern: {
+                value: /^[/].*|^https?:\/\/.+/,
+                message: "Must be a valid path (e.g., /dashboard) or URL (e.g., https://...)",
+              },
+            }}
+            render={({ field }) => (
+              <TextField
+                {...field}
+                label="Target URL / Path"
+                required
+                fullWidth
+                placeholder="/dashboard or /portfolios/{account}"
+                error={!!errors.targetUrl}
+                helperText={
+                  errors.targetUrl?.message ||
+                  "Use {paramName} for dynamic segments (e.g., /users/{id})"
+                }
+              />
+            )}
+          />
+
+          {/* Detected Parameters */}
+          {detectedParameters.length > 0 && (
+            <Alert severity="info" icon={<CodeIcon />}>
+              <Typography variant="subtitle2" className="font-semibold mb-1">
+                Detected Path Parameters
+              </Typography>
+              <Typography variant="body2" className="mb-2">
+                These parameters will be collected from the user before navigation:
+              </Typography>
+              <Box className="flex flex-wrap gap-1">
+                {detectedParameters.map((param, index) => (
+                  <Chip
+                    key={index}
+                    label={`{${param}}`}
+                    size="small"
+                    color="primary"
+                    variant="outlined"
+                  />
+                ))}
+              </Box>
+            </Alert>
+          )}
+
+          {/* Keywords */}
+          <Box>
+            <FormLabel>Keywords</FormLabel>
+            <Box className="flex gap-2 mt-2 mb-2">
+              <TextField
+                value={keywordInput}
+                onChange={(e) => setKeywordInput(e.target.value)}
+                onKeyPress={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    handleAddKeyword();
+                  }
+                }}
+                placeholder="Add keyword"
+                size="small"
+                fullWidth
+              />
+              <Button onClick={handleAddKeyword} variant="outlined">
+                Add
+              </Button>
+            </Box>
+            <Box className="flex flex-wrap gap-2">
+              {keywords.map((keyword, index) => (
+                <Chip
+                  key={index}
+                  label={keyword}
+                  onDelete={() => handleRemoveKeyword(index)}
+                  size="small"
+                />
+              ))}
+            </Box>
+          </Box>
+
           {/* Intent/Action */}
           <Controller
             name="intent"
@@ -273,50 +389,6 @@ export function LinkForm({ open, onClose, onSubmit, initialData, mode = "create"
             )}
           />
 
-          {/* Display Name */}
-          <Controller
-            name="displayName"
-            control={control}
-            rules={{ required: "Display name is required" }}
-            render={({ field }) => (
-              <TextField
-                {...field}
-                label="Display Name"
-                required
-                fullWidth
-                error={!!errors.displayName}
-                helperText={errors.displayName?.message || "Name shown to users"}
-              />
-            )}
-          />
-
-          {/* Target URL */}
-          <Controller
-            name="targetUrl"
-            control={control}
-            rules={{
-              required: "Target URL is required",
-              pattern: {
-                value: /^[/].*|^https?:\/\/.+/,
-                message: "Must be a valid path (e.g., /dashboard) or URL (e.g., https://...)",
-              },
-            }}
-            render={({ field }) => (
-              <TextField
-                {...field}
-                label="Target URL / Path"
-                required
-                fullWidth
-                placeholder="/dashboard or /portfolios/{account}"
-                error={!!errors.targetUrl}
-                helperText={
-                  errors.targetUrl?.message ||
-                  "Use {paramName} for dynamic segments (e.g., /users/{id})"
-                }
-              />
-            )}
-          />
-
           {/* Is Bookmarkable */}
           <Controller
             name="isBookmarkable"
@@ -338,45 +410,6 @@ export function LinkForm({ open, onClose, onSubmit, initialData, mode = "create"
             )}
           />
 
-          {/* Detected Parameters */}
-          {detectedParameters.length > 0 && (
-            <Alert severity="info" icon={<CodeIcon />}>
-              <Typography variant="subtitle2" className="font-semibold mb-1">
-                Detected Path Parameters
-              </Typography>
-              <Typography variant="body2" className="mb-2">
-                These parameters will be collected from the user before navigation:
-              </Typography>
-              <Box className="flex flex-wrap gap-1">
-                {detectedParameters.map((param, index) => (
-                  <Chip
-                    key={index}
-                    label={`{${param}}`}
-                    size="small"
-                    color="primary"
-                    variant="outlined"
-                  />
-                ))}
-              </Box>
-            </Alert>
-          )}
-
-          {/* Description */}
-          <Controller
-            name="description"
-            control={control}
-            render={({ field }) => (
-              <TextField
-                {...field}
-                label="Description"
-                fullWidth
-                multiline
-                rows={2}
-                helperText="Brief description of what this link does"
-              />
-            )}
-          />
-
           {/* AI Guidance */}
           <Controller
             name="aiGuidance"
@@ -393,39 +426,6 @@ export function LinkForm({ open, onClose, onSubmit, initialData, mode = "create"
               />
             )}
           />
-
-          {/* Keywords */}
-          <Box>
-            <FormLabel>Keywords</FormLabel>
-            <Box className="flex gap-2 mt-2 mb-2">
-              <TextField
-                value={keywordInput}
-                onChange={(e) => setKeywordInput(e.target.value)}
-                onKeyPress={(e) => {
-                  if (e.key === "Enter") {
-                    e.preventDefault();
-                    handleAddKeyword();
-                  }
-                }}
-                placeholder="Add keyword"
-                size="small"
-                fullWidth
-              />
-              <Button onClick={handleAddKeyword} variant="outlined">
-                Add
-              </Button>
-            </Box>
-            <Box className="flex flex-wrap gap-2">
-              {keywords.map((keyword, index) => (
-                <Chip
-                  key={index}
-                  label={keyword}
-                  onDelete={() => handleRemoveKeyword(index)}
-                  size="small"
-                />
-              ))}
-            </Box>
-          </Box>
 
           {/* Page Has Form */}
           <Controller

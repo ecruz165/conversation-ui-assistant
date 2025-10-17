@@ -75,6 +75,14 @@ export function LinkDetailDialog({ open, onClose, link, onEdit }: LinkDetailDial
               Basic Information
             </Typography>
             <Box className="space-y-2">
+              {link.description && (
+                <Box>
+                  <Typography variant="caption" className="text-gray-600">
+                    Description
+                  </Typography>
+                  <Typography variant="body2">{link.description}</Typography>
+                </Box>
+              )}
               <Box>
                 <Typography variant="caption" className="text-gray-600">
                   Target URL
@@ -107,14 +115,6 @@ export function LinkDetailDialog({ open, onClose, link, onEdit }: LinkDetailDial
                   </Box>
                 </Box>
               )}
-              {link.description && (
-                <Box>
-                  <Typography variant="caption" className="text-gray-600">
-                    Description
-                  </Typography>
-                  <Typography variant="body2">{link.description}</Typography>
-                </Box>
-              )}
               {link.keywords && link.keywords.length > 0 && (
                 <Box>
                   <Typography variant="caption" className="text-gray-600">
@@ -127,6 +127,14 @@ export function LinkDetailDialog({ open, onClose, link, onEdit }: LinkDetailDial
                   </Box>
                 </Box>
               )}
+              <Box>
+                <Typography variant="caption" className="text-gray-600">
+                  Intent/Action
+                </Typography>
+                <Box className="mt-1">
+                  <Chip label={link.intent} size="small" color="primary" className="font-mono" />
+                </Box>
+              </Box>
             </Box>
           </Paper>
 

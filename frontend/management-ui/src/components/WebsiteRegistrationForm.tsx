@@ -2,14 +2,15 @@ import {
   Add as AddIcon,
   Delete as DeleteIcon,
   ExpandMore as ExpandMoreIcon,
+  Info as InfoIcon,
 } from "@mui/icons-material";
 import {
   Accordion,
   AccordionDetails,
   AccordionSummary,
+  Alert,
   Box,
   Button,
-  Checkbox,
   CircularProgress,
   FormControl,
   FormControlLabel,
@@ -40,6 +41,7 @@ interface WebsiteFormData {
   name: string;
   type: "website" | "internal_app" | "mobile_app";
   description: string;
+  containsPII: boolean;
   contact: {
     name: string;
     email: string;
@@ -60,6 +62,7 @@ interface WebsiteRegistrationFormProps {
 }
 
 const FORM_STORAGE_KEY = "website-registration-form";
+const SECTION_TITLE_CLASS = "display-block pb-2 font-semibold text-gray-900";
 
 export function WebsiteRegistrationForm({
   onSubmit,
@@ -73,13 +76,13 @@ export function WebsiteRegistrationForm({
     control,
     handleSubmit,
     watch,
-    setValue,
     formState: { errors },
   } = useForm<WebsiteFormData>({
     defaultValues: initialData || {
       name: "",
       type: "website",
       description: "",
+      containsPII: false,
       contact: {
         name: "",
         email: "",
@@ -98,13 +101,19 @@ export function WebsiteRegistrationForm({
     name: "domains.scannableDomains",
   });
 
-  // Handler to set active domain for scanning (only one can be active)
-  const handleSetActiveDomain = (selectedIndex: number) => {
-    const domains = watch("domains.scannableDomains");
-    domains.forEach((_, index) => {
-      setValue(`domains.scannableDomains.${index}.isActiveForScanning`, index === selectedIndex);
-    });
-  };
+  // Watch for PII changes and auto-add domain field when PII = Yes
+  const containsPII = watch("containsPII");
+  useEffect(() => {
+    if (containsPII && fields.length === 0) {
+      // Automatically add one domain field when PII is selected
+      append({
+        url: "",
+        isActiveForScanning: true,
+        requiresCredentials: true,
+        credentials: { username: "", password: "" },
+      });
+    }
+  }, [containsPII, fields.length, append]);
 
   // Auto-save to localStorage
   const formValues = watch();
@@ -131,10 +140,20 @@ export function WebsiteRegistrationForm({
   }, [initialData]);
 
   const onSubmitForm = async (data: WebsiteFormData) => {
-    // Validate at least one scannable domain
-    if (!data.domains.scannableDomains || data.domains.scannableDomains.length === 0) {
-      alert("At least one domain to scan is required");
-      return;
+    // Validate PII-related requirements
+    if (data.containsPII) {
+      if (!data.domains.scannableDomains || data.domains.scannableDomains.length === 0) {
+        alert("At least one non-production domain is required when handling PII");
+        return;
+      }
+      // Validate that all domains have credentials (required by default)
+      const allHaveCredentials = data.domains.scannableDomains.every(
+        (domain) => domain.credentials?.username && domain.credentials?.password
+      );
+      if (!allHaveCredentials) {
+        alert("All non-production domains must have test credentials");
+        return;
+      }
     }
 
     setIsSubmitting(true);
@@ -185,7 +204,7 @@ export function WebsiteRegistrationForm({
       <Stack spacing={4}>
         {/* Website Information Section */}
         <Paper elevation={2} className="p-6">
-          <Typography variant="h6" className="mb-4 font-semibold text-gray-900">
+          <Typography variant="h6" className={SECTION_TITLE_CLASS}>
             Website Information
           </Typography>
           <Stack spacing={3}>
@@ -244,9 +263,62 @@ export function WebsiteRegistrationForm({
           </Stack>
         </Paper>
 
+        {/* Data Privacy & Security Section */}
+        <Paper elevation={2} className="p-6">
+          <Typography variant="h6" className={SECTION_TITLE_CLASS}>
+            Data Privacy & Security
+          </Typography>
+          <Stack spacing={3}>
+            <FormControl component="fieldset">
+              <FormLabel component="legend" required>
+                Does this application contain Personal Identifiable Information (PII) or sensitive
+                user data?
+              </FormLabel>
+              <Typography variant="caption" className="text-gray-600 mt-1 mb-2">
+                PII includes: names, email addresses, phone numbers, social security numbers,
+                financial data, health records, or any other personal user information.
+              </Typography>
+              <Controller
+                name="containsPII"
+                control={control}
+                render={({ field }) => (
+                  <RadioGroup
+                    {...field}
+                    value={field.value ? "yes" : "no"}
+                    onChange={(e) => field.onChange(e.target.value === "yes")}
+                    row
+                  >
+                    <FormControlLabel value="yes" control={<Radio />} label="Yes" />
+                    <FormControlLabel value="no" control={<Radio />} label="No" />
+                  </RadioGroup>
+                )}
+              />
+            </FormControl>
+
+            {watch("containsPII") && (
+              <Alert severity="warning" icon={<InfoIcon />} sx={{ backgroundColor: "#fef3c7" }}>
+                <Typography variant="subtitle2" className="font-semibold mb-2">
+                  Protected Data Requirements
+                </Typography>
+                <Typography variant="body2" className="mb-2">
+                  To protect end-user privacy and sensitive information, you must provide:
+                </Typography>
+                <ul className="ml-4 space-y-1 text-sm">
+                  <li>At least one non-production environment domain (dev, staging, QA, etc.)</li>
+                  <li>Test user credentials for scanning the non-production environment</li>
+                </ul>
+                <Typography variant="caption" className="text-gray-700 mt-2 block">
+                  This ensures our scanning tools do not expose real user data during security
+                  assessments.
+                </Typography>
+              </Alert>
+            )}
+          </Stack>
+        </Paper>
+
         {/* Contact Information Section */}
         <Paper elevation={2} className="p-6">
-          <Typography variant="h6" className="mb-4 font-semibold text-gray-900">
+          <Typography variant="h6" className={SECTION_TITLE_CLASS}>
             Contact Information
           </Typography>
           <Stack spacing={3}>
@@ -260,6 +332,7 @@ export function WebsiteRegistrationForm({
                   label="Contact Name"
                   required
                   fullWidth
+                  autoComplete="off"
                   error={!!errors.contact?.name}
                   helperText={errors.contact?.name?.message}
                 />
@@ -283,8 +356,15 @@ export function WebsiteRegistrationForm({
                   type="email"
                   required
                   fullWidth
+                  autoComplete="off"
                   error={!!errors.contact?.email}
                   helperText={errors.contact?.email?.message}
+                  sx={{
+                    "& input:-webkit-autofill": {
+                      WebkitBoxShadow: "0 0 0 1000px white inset",
+                      WebkitTextFillColor: "inherit",
+                    },
+                  }}
                 />
               )}
             />
@@ -299,6 +379,7 @@ export function WebsiteRegistrationForm({
                   label="Department"
                   required
                   fullWidth
+                  autoComplete="off"
                   error={!!errors.contact?.department}
                   helperText={errors.contact?.department?.message}
                 />
@@ -321,6 +402,7 @@ export function WebsiteRegistrationForm({
                   label="Phone"
                   required
                   fullWidth
+                  autoComplete="off"
                   placeholder="(555) 555-0123"
                   error={!!errors.contact?.phone}
                   helperText={errors.contact?.phone?.message}
@@ -344,7 +426,7 @@ export function WebsiteRegistrationForm({
 
         {/* Domain Configuration Section */}
         <Paper elevation={2} className="p-6">
-          <Typography variant="h6" className="mb-4 font-semibold text-gray-900">
+          <Typography variant="h6" className={SECTION_TITLE_CLASS}>
             Domain Configuration
           </Typography>
           <Stack spacing={3}>
@@ -371,211 +453,169 @@ export function WebsiteRegistrationForm({
               )}
             />
 
-            <Box>
-              <Box className="flex items-center justify-between mb-2">
-                <Box>
-                  <Typography variant="subtitle1" className="font-medium text-gray-700">
-                    Domain to Scan <span className="text-red-600">*</span>
-                  </Typography>
-                  <Typography variant="caption" className="text-gray-500">
-                    At least one non-production environment required
-                  </Typography>
+            {/* Non-Production Domain Section - Only show when containsPII = true */}
+            {watch("containsPII") && (
+              <Box>
+                <Box className="flex items-center justify-between mb-3">
+                  <Box>
+                    <Typography variant="subtitle1" className="font-medium text-gray-700">
+                      Non-Production Domain to Scan <span className="text-red-600">*</span>
+                    </Typography>
+                    <Typography variant="caption" className="text-gray-500">
+                      Provide test/dev/staging environment URLs with credentials for each domain
+                    </Typography>
+                  </Box>
+                  <Button
+                    type="button"
+                    variant="outlined"
+                    size="small"
+                    startIcon={<AddIcon />}
+                    onClick={() =>
+                      append({
+                        url: "",
+                        isActiveForScanning: true,
+                        requiresCredentials: true,
+                        credentials: { username: "", password: "" },
+                      })
+                    }
+                  >
+                    Add Domain
+                  </Button>
                 </Box>
-                <Button
-                  type="button"
-                  variant="outlined"
-                  size="small"
-                  startIcon={<AddIcon />}
-                  onClick={() =>
-                    append({
-                      url: "",
-                      isActiveForScanning: false,
-                      requiresCredentials: false,
-                      credentials: { username: "", password: "" },
-                    })
-                  }
-                >
-                  Add Domain
-                </Button>
-              </Box>
 
-              <Stack spacing={2}>
-                {fields.map((field, index) => {
-                  const isActive = watch(`domains.scannableDomains.${index}.isActiveForScanning`);
-                  const domainUrl = watch(`domains.scannableDomains.${index}.url`) || "New Domain";
+                <Stack spacing={2}>
+                  {fields.map((field, index) => {
+                    const domainUrl =
+                      watch(`domains.scannableDomains.${index}.url`) || "New Domain";
 
-                  return (
-                    <Accordion
-                      key={field.id}
-                      expanded={isActive}
-                      className={!isActive ? "bg-gray-100" : ""}
-                    >
-                      <AccordionSummary
-                        expandIcon={<ExpandMoreIcon />}
-                        className={`min-h-[56px] ${isActive ? "bg-white" : "bg-gray-100"}`}
-                        sx={{
-                          "& .MuiAccordionSummary-content": {
-                            margin: "12px 0",
-                          },
-                        }}
-                      >
-                        <Box className="flex items-center justify-between w-full pr-2">
-                          <Box className="flex items-center gap-3">
+                    return (
+                      <Accordion key={field.id} defaultExpanded>
+                        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                          <Box className="flex items-center justify-between w-full pr-2">
+                            <Typography className="font-medium text-gray-900">
+                              {domainUrl}
+                            </Typography>
+                            <IconButton
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                remove(index);
+                              }}
+                              color="error"
+                              size="small"
+                            >
+                              <DeleteIcon />
+                            </IconButton>
+                          </Box>
+                        </AccordionSummary>
+
+                        <AccordionDetails>
+                          <Stack spacing={3}>
                             <Controller
-                              name={`domains.scannableDomains.${index}.isActiveForScanning`}
+                              name={`domains.scannableDomains.${index}.url`}
                               control={control}
+                              rules={{
+                                required: "Domain URL is required",
+                                pattern: {
+                                  value: /^https?:\/\/.+\..+/,
+                                  message:
+                                    "Invalid URL (must include protocol, e.g., https://dev.example.com)",
+                                },
+                              }}
                               render={({ field }) => (
-                                <Radio
+                                <TextField
                                   {...field}
-                                  checked={field.value}
-                                  onChange={(e) => {
-                                    e.stopPropagation();
-                                    handleSetActiveDomain(index);
-                                  }}
-                                  onClick={(e) => e.stopPropagation()}
+                                  fullWidth
+                                  placeholder="https://dev.example.com"
+                                  label="Domain URL"
+                                  required
+                                  error={!!errors.domains?.scannableDomains?.[index]?.url}
+                                  helperText={
+                                    errors.domains?.scannableDomains?.[index]?.url?.message
+                                  }
                                 />
                               )}
                             />
-                            <Box>
-                              <Typography
-                                className={
-                                  isActive ? "font-semibold text-gray-900" : "text-gray-600"
-                                }
-                              >
-                                {domainUrl}
+
+                            <Box className="pl-8 pt-2 pb-2 pr-4 bg-blue-50 rounded border border-blue-200">
+                              <Typography variant="subtitle2" className="mb-3 text-blue-900">
+                                Test User Credentials for {domainUrl}
                               </Typography>
-                              {!isActive && (
-                                <Typography variant="caption" className="text-gray-500">
-                                  (Not active)
-                                </Typography>
-                              )}
+                              <Stack spacing={2}>
+                                <Controller
+                                  name={`domains.scannableDomains.${index}.credentials.username`}
+                                  control={control}
+                                  rules={{
+                                    required:
+                                      "Username is required for non-production domain scanning",
+                                  }}
+                                  render={({ field }) => (
+                                    <TextField
+                                      {...field}
+                                      label="Username"
+                                      size="small"
+                                      required
+                                      fullWidth
+                                      autoComplete="off"
+                                      error={
+                                        !!errors.domains?.scannableDomains?.[index]?.credentials
+                                          ?.username
+                                      }
+                                      helperText={
+                                        errors.domains?.scannableDomains?.[index]?.credentials
+                                          ?.username?.message
+                                      }
+                                    />
+                                  )}
+                                />
+
+                                <Controller
+                                  name={`domains.scannableDomains.${index}.credentials.password`}
+                                  control={control}
+                                  rules={{
+                                    required:
+                                      "Password is required for non-production domain scanning",
+                                  }}
+                                  render={({ field }) => (
+                                    <TextField
+                                      {...field}
+                                      label="Password"
+                                      type="password"
+                                      size="small"
+                                      required
+                                      fullWidth
+                                      autoComplete="new-password"
+                                      error={
+                                        !!errors.domains?.scannableDomains?.[index]?.credentials
+                                          ?.password
+                                      }
+                                      helperText={
+                                        errors.domains?.scannableDomains?.[index]?.credentials
+                                          ?.password?.message
+                                      }
+                                      sx={{
+                                        "& input:-webkit-autofill": {
+                                          WebkitBoxShadow: "0 0 0 1000px #eff6ff inset",
+                                          WebkitTextFillColor: "inherit",
+                                        },
+                                      }}
+                                    />
+                                  )}
+                                />
+                              </Stack>
                             </Box>
-                          </Box>
-                          <IconButton
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              remove(index);
-                            }}
-                            color="error"
-                            size="small"
-                          >
-                            <DeleteIcon />
-                          </IconButton>
-                        </Box>
-                      </AccordionSummary>
-
-                      <AccordionDetails>
-                        <Stack spacing={3}>
-                          <Controller
-                            name={`domains.scannableDomains.${index}.url`}
-                            control={control}
-                            rules={{
-                              pattern: {
-                                value: /^https?:\/\/.+\..+/,
-                                message: "Invalid URL (must include protocol)",
-                              },
-                            }}
-                            render={({ field }) => (
-                              <TextField
-                                {...field}
-                                fullWidth
-                                placeholder="https://dev.example.com"
-                                label="Domain URL"
-                                error={!!errors.domains?.scannableDomains?.[index]?.url}
-                                helperText={errors.domains?.scannableDomains?.[index]?.url?.message}
-                              />
-                            )}
-                          />
-
-                          <Controller
-                            name={`domains.scannableDomains.${index}.requiresCredentials`}
-                            control={control}
-                            render={({ field }) => (
-                              <FormControlLabel
-                                control={<Checkbox {...field} checked={field.value} />}
-                                label="Credentials required to scan this domain"
-                              />
-                            )}
-                          />
-
-                          {watch(`domains.scannableDomains.${index}.requiresCredentials`) && (
-                            <Stack spacing={2} className="pl-8">
-                              <Controller
-                                name={`domains.scannableDomains.${index}.credentials.username`}
-                                control={control}
-                                rules={{
-                                  required: watch(
-                                    `domains.scannableDomains.${index}.requiresCredentials`
-                                  )
-                                    ? "Username is required when credentials are enabled"
-                                    : false,
-                                }}
-                                render={({ field }) => (
-                                  <TextField
-                                    {...field}
-                                    label="Username"
-                                    size="small"
-                                    required={watch(
-                                      `domains.scannableDomains.${index}.requiresCredentials`
-                                    )}
-                                    fullWidth
-                                    error={
-                                      !!errors.domains?.scannableDomains?.[index]?.credentials
-                                        ?.username
-                                    }
-                                    helperText={
-                                      errors.domains?.scannableDomains?.[index]?.credentials
-                                        ?.username?.message
-                                    }
-                                  />
-                                )}
-                              />
-
-                              <Controller
-                                name={`domains.scannableDomains.${index}.credentials.password`}
-                                control={control}
-                                rules={{
-                                  required: watch(
-                                    `domains.scannableDomains.${index}.requiresCredentials`
-                                  )
-                                    ? "Password is required when credentials are enabled"
-                                    : false,
-                                }}
-                                render={({ field }) => (
-                                  <TextField
-                                    {...field}
-                                    label="Password"
-                                    type="password"
-                                    size="small"
-                                    required={watch(
-                                      `domains.scannableDomains.${index}.requiresCredentials`
-                                    )}
-                                    fullWidth
-                                    error={
-                                      !!errors.domains?.scannableDomains?.[index]?.credentials
-                                        ?.password
-                                    }
-                                    helperText={
-                                      errors.domains?.scannableDomains?.[index]?.credentials
-                                        ?.password?.message
-                                    }
-                                  />
-                                )}
-                              />
-                            </Stack>
-                          )}
-                        </Stack>
-                      </AccordionDetails>
-                    </Accordion>
-                  );
-                })}
-                {fields.length === 0 && (
-                  <Typography variant="body2" className="text-gray-500 italic">
-                    No additional domains added
-                  </Typography>
-                )}
-              </Stack>
-            </Box>
+                          </Stack>
+                        </AccordionDetails>
+                      </Accordion>
+                    );
+                  })}
+                  {fields.length === 0 && (
+                    <Typography variant="body2" className="text-gray-500 italic">
+                      No non-production domains added yet. Click "Add Domain" to begin.
+                    </Typography>
+                  )}
+                </Stack>
+              </Box>
+            )}
           </Stack>
         </Paper>
 

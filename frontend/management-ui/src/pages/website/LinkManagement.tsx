@@ -72,10 +72,10 @@ import type { NavigationLink } from "~/types";
 
 const tabs = [
   { label: "Overview", value: "overview", path: "/website/overview" },
-  { label: "Link Management", value: "links", path: "/website/links" },
-  { label: "Widget Code", value: "code", path: "/website/code" },
-  { label: "Embeddings Tester", value: "embedding-test", path: "/website/embedding-test" },
   { label: "Crawl Management", value: "crawl-management", path: "/website/crawl-management" },
+  { label: "Link Management", value: "links", path: "/website/links" },
+  { label: "Embeddings Tester", value: "embedding-test", path: "/website/embedding-test" },
+  { label: "Widget Code", value: "code", path: "/website/code" },
 ];
 
 export function LinkManagement() {
@@ -280,19 +280,6 @@ export function LinkManagement() {
       },
     },
     {
-      accessorKey: "intent",
-      header: "Intent/Action",
-      cell: ({ getValue }) => (
-        <Chip
-          label={getValue<string>()}
-          size="small"
-          color="primary"
-          className="font-mono"
-          sx={{ fontSize: "0.6875rem", height: "20px" }}
-        />
-      ),
-    },
-    {
       accessorKey: "embeddingStatus",
       header: "Embedding",
       cell: ({ row }) => (
@@ -372,11 +359,7 @@ export function LinkManagement() {
     getGroupedRowModel: getGroupedRowModel(),
     getExpandedRowModel: getExpandedRowModel(),
     globalFilterFn: (row, columnId, filterValue) => {
-      const searchableFields = [
-        row.original.intent,
-        row.original.displayName,
-        row.original.targetUrl,
-      ];
+      const searchableFields = [row.original.displayName, row.original.targetUrl];
       return searchableFields.some((field) =>
         field?.toLowerCase().includes(filterValue.toLowerCase())
       );
@@ -588,10 +571,6 @@ export function LinkManagement() {
     setBulkDeleteDialogOpen(false);
   };
 
-  const handleClearSelection = () => {
-    setRowSelection({});
-  };
-
   const handleToggleBulkMode = () => {
     setBulkMode(!bulkMode);
     setRowSelection({}); // Clear selection when toggling bulk mode
@@ -752,24 +731,6 @@ export function LinkManagement() {
                     >
                       Delete
                     </Button>
-                    <AnimatePresence>
-                      {selectedCount > 0 && (
-                        <motion.div
-                          initial={{ scale: 0, opacity: 0 }}
-                          animate={{ scale: 1, opacity: 1 }}
-                          exit={{ scale: 0, opacity: 0 }}
-                          transition={{ duration: 0.15 }}
-                        >
-                          <IconButton
-                            size="small"
-                            onClick={handleClearSelection}
-                            title="Clear selection"
-                          >
-                            <CloseIcon fontSize="small" />
-                          </IconButton>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
                   </Box>
                 </Box>
               </motion.div>
@@ -782,7 +743,7 @@ export function LinkManagement() {
               {/* Search Input */}
               <TextField
                 fullWidth
-                placeholder="Search by intent, name, or link..."
+                placeholder="Search by name or link..."
                 value={globalFilter}
                 onChange={(e) => setGlobalFilter(e.target.value)}
                 sx={{
@@ -805,7 +766,7 @@ export function LinkManagement() {
                   variant={activeFilters.length === 0 ? "contained" : "outlined"}
                   size="small"
                   onClick={handleClearFilters}
-                  sx={{ py: 0.5, minHeight: "unset", fontSize: "0.8125rem" }}
+                  sx={{ py: 0.25, minHeight: "unset", fontSize: "0.8125rem" }}
                 >
                   All
                 </Button>
@@ -813,7 +774,7 @@ export function LinkManagement() {
                   variant={activeFilters.includes("bookmarkable") ? "contained" : "outlined"}
                   size="small"
                   onClick={() => handleFilterToggle("bookmarkable")}
-                  sx={{ py: 0.5, minHeight: "unset", fontSize: "0.8125rem" }}
+                  sx={{ py: 0.25, minHeight: "unset", fontSize: "0.8125rem" }}
                 >
                   Bookmarkable
                 </Button>
@@ -821,7 +782,7 @@ export function LinkManagement() {
                   variant={activeFilters.includes("journey") ? "contained" : "outlined"}
                   size="small"
                   onClick={() => handleFilterToggle("journey")}
-                  sx={{ py: 0.5, minHeight: "unset", fontSize: "0.8125rem" }}
+                  sx={{ py: 0.25, minHeight: "unset", fontSize: "0.8125rem" }}
                 >
                   Journey
                 </Button>
@@ -829,7 +790,7 @@ export function LinkManagement() {
                   variant={activeFilters.includes("has_embeddings") ? "contained" : "outlined"}
                   size="small"
                   onClick={() => handleFilterToggle("has_embeddings")}
-                  sx={{ py: 0.5, minHeight: "unset", fontSize: "0.8125rem" }}
+                  sx={{ py: 0.25, minHeight: "unset", fontSize: "0.8125rem" }}
                 >
                   Has Embeddings
                 </Button>
@@ -837,7 +798,7 @@ export function LinkManagement() {
                   variant={activeFilters.includes("no_embeddings") ? "contained" : "outlined"}
                   size="small"
                   onClick={() => handleFilterToggle("no_embeddings")}
-                  sx={{ py: 0.5, minHeight: "unset", fontSize: "0.8125rem" }}
+                  sx={{ py: 0.25, minHeight: "unset", fontSize: "0.8125rem" }}
                 >
                   No Embeddings
                 </Button>
@@ -845,7 +806,7 @@ export function LinkManagement() {
                   variant={activeFilters.includes("active") ? "contained" : "outlined"}
                   size="small"
                   onClick={() => handleFilterToggle("active")}
-                  sx={{ py: 0.5, minHeight: "unset", fontSize: "0.8125rem" }}
+                  sx={{ py: 0.25, minHeight: "unset", fontSize: "0.8125rem" }}
                 >
                   Active
                 </Button>
@@ -853,7 +814,7 @@ export function LinkManagement() {
                   variant={activeFilters.includes("inactive") ? "contained" : "outlined"}
                   size="small"
                   onClick={() => handleFilterToggle("inactive")}
-                  sx={{ py: 0.5, minHeight: "unset", fontSize: "0.8125rem" }}
+                  sx={{ py: 0.25, minHeight: "unset", fontSize: "0.8125rem" }}
                 >
                   Inactive
                 </Button>

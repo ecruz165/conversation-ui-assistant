@@ -60,10 +60,10 @@ export const theme = createTheme({
       contrastText: "#fff",
     },
     secondary: {
-      main: "#007AB0",
+      main: "#0067b0",
     },
     error: {
-      main: "#ef4444",
+      main: "#a60b0b",
     },
     warning: {
       main: "#f59e0b",
@@ -72,7 +72,7 @@ export const theme = createTheme({
       main: "#3b82f6",
     },
     success: {
-      main: "#10b981",
+      main: "#0ba60d",
     },
     background: {
       default: "#f9fafb",
@@ -149,7 +149,7 @@ export const theme = createTheme({
           color: "#007AB0",
           "&:hover": {
             borderColor: "#006BA6", // primary.700
-            backgroundColor: "rgba(0, 122, 176, 0.04)",
+            backgroundColor: "rgba(0,97,176,0.04)",
           },
         },
       },

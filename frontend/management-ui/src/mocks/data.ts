@@ -31,7 +31,7 @@ export const mockWebsites: Website[] = [
       ],
     },
     crawlStatus: {
-      lastCrawl: "2024-01-15T14:30:00Z",
+      lastCrawl: "2025-10-15T21:52:00Z",
       pagesIndexed: 127,
       status: "completed",
     },

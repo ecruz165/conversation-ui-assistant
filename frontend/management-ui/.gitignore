@@ -37,6 +37,7 @@ node_modules/
 *.njsproj
 *.sln
 *.sw?
+.docs
 # OS specific
 
 # Task files

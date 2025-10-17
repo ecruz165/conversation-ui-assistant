@@ -30,7 +30,7 @@ import {
   Typography,
 } from "@mui/material";
 import type React from "react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Layout } from "~/components/Layout";
 import { PageTabs } from "~/components/PageTabs";
@@ -101,11 +101,14 @@ const mockCrawlHistory: CrawlHistoryEntry[] = [
 
 const tabs = [
   { label: "Overview", value: "overview", path: "/website/overview" },
-  { label: "Link Management", value: "links", path: "/website/links" },
-  { label: "Widget Code", value: "code", path: "/website/code" },
-  { label: "Embeddings Tester", value: "embedding-test", path: "/website/embedding-test" },
   { label: "Crawl Management", value: "crawl-management", path: "/website/crawl-management" },
+  { label: "Link Management", value: "links", path: "/website/links" },
+  { label: "Embeddings Tester", value: "embedding-test", path: "/website/embedding-test" },
+  { label: "Widget Code", value: "code", path: "/website/code" },
 ];
+
+const ACTION_BUTTON_STYLE = { minWidth: 192 };
+const SECTION_DESCRIPTION_CLASS = "text-gray-600 mb-4 pb-2";
 
 export function CrawlManagement() {
   const websiteId = "mock-website-1";
@@ -120,6 +123,17 @@ export function CrawlManagement() {
   const [isSaving, setIsSaving] = useState(false);
   const [scheduleActive, setScheduleActive] = useState(false);
 
+  // Track initial schedule values
+  const [initialSchedule, setInitialSchedule] = useState({
+    frequency: "manual",
+    scheduledTime: "09:00",
+    dayOfWeek: 1,
+  });
+  const hasScheduleChanges =
+    frequency !== initialSchedule.frequency ||
+    scheduledTime !== initialSchedule.scheduledTime ||
+    dayOfWeek !== initialSchedule.dayOfWeek;
+
   // Configuration form state
   const [crawlDepth, setCrawlDepth] = useState<number>(3);
   const [maxPages, setMaxPages] = useState<number>(100);
@@ -127,6 +141,11 @@ export function CrawlManagement() {
   const [maxPagesError, setMaxPagesError] = useState<string>("");
   const [isSavingConfig, setIsSavingConfig] = useState(false);
   const [configSaved, setConfigSaved] = useState(false);
+
+  // Track initial config values
+  const [initialConfig, setInitialConfig] = useState({ crawlDepth: 3, maxPages: 100 });
+  const hasConfigChanges =
+    crawlDepth !== initialConfig.crawlDepth || maxPages !== initialConfig.maxPages;
 
   // Crawl history table state
   const [crawlHistory, setCrawlHistory] = useState<CrawlHistoryEntry[]>(mockCrawlHistory);
@@ -153,6 +172,8 @@ export function CrawlManagement() {
       await new Promise((resolve) => setTimeout(resolve, 1000));
       console.log("Saving schedule:", { frequency, scheduledTime, dayOfWeek, timezone });
       setScheduleActive(frequency !== "manual");
+      // Update initial values to match current values after successful save
+      setInitialSchedule({ frequency, scheduledTime, dayOfWeek });
     } catch (error) {
       console.error("Failed to save schedule:", error);
     } finally {
@@ -224,6 +245,8 @@ export function CrawlManagement() {
       await new Promise((resolve) => setTimeout(resolve, 1000));
       console.log("Saving configuration:", { crawlDepth, maxPages });
       setConfigSaved(true);
+      // Update initial values to match current values after successful save
+      setInitialConfig({ crawlDepth, maxPages });
     } catch (error) {
       console.error("Failed to save configuration:", error);
     } finally {
@@ -243,7 +266,14 @@ export function CrawlManagement() {
   const getStatusBadge = (status: CrawlStatus) => {
     switch (status) {
       case "completed":
-        return <Chip label="Completed" color="success" size="small" />;
+        return (
+          <Chip
+            label="Completed"
+            color="success"
+            size="small"
+            sx={{ color: "white", minWidth: 84 }}
+          />
+        );
       case "in-progress":
         return (
           <Chip
@@ -254,7 +284,7 @@ export function CrawlManagement() {
           />
         );
       case "failed":
-        return <Chip label="Failed" color="error" size="small" />;
+        return <Chip label="Failed" color="error" size="small" sx={{ minWidth: 84 }} />;
       case "cancelled":
         return <Chip label="Cancelled" color="default" size="small" />;
     }
@@ -378,7 +408,7 @@ export function CrawlManagement() {
               Crawl Schedule
             </Typography>
           </Box>
-          <Typography variant="body2" className="text-gray-600 mb-4">
+          <Typography variant="body2" className={SECTION_DESCRIPTION_CLASS}>
             Configure when and how often your website should be crawled to keep your content index
             and embeddings up to date.
           </Typography>
@@ -459,9 +489,10 @@ export function CrawlManagement() {
                 variant="contained"
                 color="primary"
                 onClick={handleSaveSchedule}
-                disabled={isSaving}
+                disabled={isSaving || !hasScheduleChanges}
+                sx={ACTION_BUTTON_STYLE}
               >
-                {isSaving ? "Saving..." : "Save Schedule"}
+                {isSaving ? "Saving..." : hasScheduleChanges ? "Save Changes" : "Save Schedule"}
               </Button>
             </Box>
           </Box>
@@ -475,7 +506,7 @@ export function CrawlManagement() {
               Crawl Configuration
             </Typography>
           </Box>
-          <Typography variant="body2" className="text-gray-600 mb-4">
+          <Typography variant="body2" className={SECTION_DESCRIPTION_CLASS}>
             Set crawl parameters including depth limits, URL patterns, and content filters to
             optimize your website indexing.
           </Typography>
@@ -539,9 +570,14 @@ export function CrawlManagement() {
                 variant="contained"
                 color="primary"
                 onClick={handleSaveConfiguration}
-                disabled={isSavingConfig || !!depthError || !!maxPagesError}
+                disabled={isSavingConfig || !hasConfigChanges || !!depthError || !!maxPagesError}
+                sx={ACTION_BUTTON_STYLE}
               >
-                {isSavingConfig ? "Saving..." : "Save Configuration"}
+                {isSavingConfig
+                  ? "Saving..."
+                  : hasConfigChanges
+                    ? "Save Changes"
+                    : "Save Configuration"}
               </Button>
             </Box>
           </Box>
@@ -562,11 +598,12 @@ export function CrawlManagement() {
               startIcon={<PlayArrowIcon />}
               onClick={handleStartCrawl}
               disabled={hasActiveCrawl || isStartingCrawl}
+              sx={ACTION_BUTTON_STYLE}
             >
               {isStartingCrawl ? "Starting..." : "Start Crawl"}
             </Button>
           </Box>
-          <Typography variant="body2" className="text-gray-600 mb-4">
+          <Typography variant="body2" className={SECTION_DESCRIPTION_CLASS}>
             View past crawl operations, their results, and any errors or warnings that occurred
             during indexing.
           </Typography>

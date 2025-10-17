@@ -31,10 +31,10 @@ import type { Website } from "~/types";
 
 const tabs = [
   { label: "Overview", value: "overview", path: "/website/overview" },
-  { label: "Link Management", value: "links", path: "/website/links" },
-  { label: "Widget Code", value: "code", path: "/website/code" },
-  { label: "Embeddings Tester", value: "embedding-test", path: "/website/embedding-test" },
   { label: "Crawl Management", value: "crawl-management", path: "/website/crawl-management" },
+  { label: "Link Management", value: "links", path: "/website/links" },
+  { label: "Embeddings Tester", value: "embedding-test", path: "/website/embedding-test" },
+  { label: "Widget Code", value: "code", path: "/website/code" },
 ];
 
 export function WebsiteOverview() {
@@ -181,14 +181,43 @@ export function WebsiteOverview() {
             ) : (
               <>
                 <MetricCard label="Links Indexed" value="4" />
-                <MetricCard
-                  label={`Crawl Status: ${website?.crawlStatus?.status === "completed" ? "Success" : website?.crawlStatus?.status || "Pending"}`}
-                  value={
+                <Tooltip
+                  title={
                     website?.crawlStatus?.lastCrawl
-                      ? new Date(website.crawlStatus.lastCrawl).toLocaleDateString()
-                      : "N/A"
+                      ? (() => {
+                          const date = new Date(website.crawlStatus.lastCrawl);
+                          const month = date
+                            .toLocaleString("en-US", { month: "short" })
+                            .toUpperCase();
+                          const day = date.getDate();
+                          const hours = date.getHours();
+                          const minutes = date.getMinutes().toString().padStart(2, "0");
+                          const period = hours >= 12 ? "PM" : "AM";
+                          const hour12 = hours % 12 || 12;
+                          return `${month} ${day}, ${date.getFullYear()} at ${hour12}:${minutes}${period}`;
+                        })()
+                      : ""
                   }
-                />
+                  arrow
+                >
+                  <Box>
+                    <MetricCard
+                      label={`Crawl Status: ${website?.crawlStatus?.status === "completed" ? "Success" : website?.crawlStatus?.status || "Pending"}`}
+                      value={
+                        website?.crawlStatus?.lastCrawl
+                          ? (() => {
+                              const date = new Date(website.crawlStatus.lastCrawl);
+                              const month = date
+                                .toLocaleString("en-US", { month: "short" })
+                                .toUpperCase();
+                              const day = date.getDate();
+                              return `${month} ${day}`;
+                            })()
+                          : "N/A"
+                      }
+                    />
+                  </Box>
+                </Tooltip>
                 <MetricCard label="Active Users" value="2" />
                 <MetricCard label="Intent Match Rate" value={`${metrics?.intentMatchRate || 0}%`} />
               </>
@@ -227,7 +256,7 @@ export function WebsiteOverview() {
                   {isLoading ? (
                     <div className="h-8 bg-gray-200 rounded w-24 animate-pulse"></div>
                   ) : (
-                    <Chip label={website?.type || "N/A"} className="mt-1" />
+                    <Chip label={website?.type || "N/A"} className="mt-0" />
                   )}
                 </Box>
                 <Box>

@@ -9,7 +9,6 @@ import {
   Box,
   Button,
   Chip,
-  Divider,
   IconButton,
   InputAdornment,
   LinearProgress,
@@ -25,7 +24,7 @@ import { PageTabs } from "~/components/PageTabs";
 import { PageTitle } from "~/components/PageTitle";
 import { useEmbeddingTest } from "~/hooks/useEmbeddingTest";
 import { useWebsite } from "~/hooks/useWebsite";
-import type { PageMatch, SlotInfo } from "~/types";
+import type { PageMatch } from "~/types";
 
 // Helper functions for match score visualization
 function getMatchScoreColor(score: number): string {
@@ -154,10 +153,10 @@ function ResultCard({ result, rank }: ResultCardProps) {
 
 const tabs = [
   { label: "Overview", value: "overview", path: "/website/overview" },
-  { label: "Link Management", value: "links", path: "/website/links" },
-  { label: "Widget Code", value: "code", path: "/website/code" },
-  { label: "Embeddings Tester", value: "embedding-test", path: "/website/embedding-test" },
   { label: "Crawl Management", value: "crawl-management", path: "/website/crawl-management" },
+  { label: "Link Management", value: "links", path: "/website/links" },
+  { label: "Embeddings Tester", value: "embedding-test", path: "/website/embedding-test" },
+  { label: "Widget Code", value: "code", path: "/website/code" },
 ];
 
 export function EmbeddingTest() {
