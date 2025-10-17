@@ -26,8 +26,8 @@ export default defineConfig({
       allow: ['..', './dist']
     }
   },
-  // Configure public directory to also serve web component files
-  publicDir: false,
+  // Configure public directory to serve static assets
+  publicDir: 'public',
   plugins: [
     tsConfigPaths({
       projects: ["./tsconfig.json"],

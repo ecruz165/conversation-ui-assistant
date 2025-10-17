@@ -37,6 +37,8 @@ const tabs = [
   { label: "Widget Code", value: "code", path: "/website/code" },
 ];
 
+const ACTION_BUTTON_STYLE = { minWidth: 192 };
+
 export function WebsiteOverview() {
   // For now, use the first mock website ID
   const websiteId = "mock-website-1";
@@ -230,7 +232,7 @@ export function WebsiteOverview() {
               <Typography variant="h6" className="font-semibold">
                 Website Information
               </Typography>
-              <Button variant="outlined" startIcon={<EditIcon />} onClick={handleEdit}>
+              <Button variant="outlined" startIcon={<EditIcon />} onClick={handleEdit} sx={ACTION_BUTTON_STYLE}>
                 Edit
               </Button>
             </Box>
@@ -417,6 +419,102 @@ export function WebsiteOverview() {
                 </Box>
               </Box>
             </Box>
+          </Paper>
+
+          {/* Search Configuration Section */}
+          <Paper elevation={2} className="p-6">
+            <Box className="flex justify-between items-center mb-6">
+              <Typography variant="h6" className="font-semibold">
+                Search Configuration
+              </Typography>
+              <Button
+                variant="outlined"
+                component={Link}
+                to="/website/embedding-test"
+                sx={ACTION_BUTTON_STYLE}
+              >
+                Test & Configure
+              </Button>
+            </Box>
+
+            {website?.searchConfiguration?.defaultModalityWeights ? (
+              <Box className="space-y-4">
+                <Typography variant="body2" className="text-gray-600 mb-3">
+                  Default modality weights for embedding searches
+                </Typography>
+                <Box className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <Box>
+                    <Typography variant="body2" className="text-gray-600 mb-2">
+                      Text Embeddings
+                    </Typography>
+                    <Box className="flex items-center gap-2">
+                      <Box className="flex-1 bg-gray-200 rounded-full h-2">
+                        <Box
+                          className="bg-primary-600 h-2 rounded-full"
+                          style={{
+                            width: `${Math.round(website.searchConfiguration.defaultModalityWeights.text * 100)}%`,
+                          }}
+                        />
+                      </Box>
+                      <Typography variant="body2" className="font-semibold min-w-[3ch]">
+                        {Math.round(website.searchConfiguration.defaultModalityWeights.text * 100)}%
+                      </Typography>
+                    </Box>
+                  </Box>
+                  <Box>
+                    <Typography variant="body2" className="text-gray-600 mb-2">
+                      Visual Embeddings
+                    </Typography>
+                    <Box className="flex items-center gap-2">
+                      <Box className="flex-1 bg-gray-200 rounded-full h-2">
+                        <Box
+                          className="bg-primary-600 h-2 rounded-full"
+                          style={{
+                            width: `${Math.round(website.searchConfiguration.defaultModalityWeights.visual * 100)}%`,
+                          }}
+                        />
+                      </Box>
+                      <Typography variant="body2" className="font-semibold min-w-[3ch]">
+                        {Math.round(website.searchConfiguration.defaultModalityWeights.visual * 100)}%
+                      </Typography>
+                    </Box>
+                  </Box>
+                  <Box>
+                    <Typography variant="body2" className="text-gray-600 mb-2">
+                      Metadata Embeddings
+                    </Typography>
+                    <Box className="flex items-center gap-2">
+                      <Box className="flex-1 bg-gray-200 rounded-full h-2">
+                        <Box
+                          className="bg-primary-600 h-2 rounded-full"
+                          style={{
+                            width: `${Math.round(website.searchConfiguration.defaultModalityWeights.metadata * 100)}%`,
+                          }}
+                        />
+                      </Box>
+                      <Typography variant="body2" className="font-semibold min-w-[3ch]">
+                        {Math.round(website.searchConfiguration.defaultModalityWeights.metadata * 100)}%
+                      </Typography>
+                    </Box>
+                  </Box>
+                </Box>
+                {website.searchConfiguration.description && (
+                  <Alert severity="info" sx={{ mt: 3 }}>
+                    {website.searchConfiguration.description}
+                  </Alert>
+                )}
+                {website.searchConfiguration.updatedAt && (
+                  <Typography variant="caption" className="text-gray-500 block mt-2">
+                    Last updated: {new Date(website.searchConfiguration.updatedAt).toLocaleString()}
+                  </Typography>
+                )}
+              </Box>
+            ) : (
+              <Alert severity="warning">
+                No default search weights configured. Visit the Embeddings Tester to set up optimized
+                weights for this website.
+              </Alert>
+            )}
           </Paper>
         </Box>
 

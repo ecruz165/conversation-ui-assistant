@@ -1,5 +1,73 @@
 // TypeScript models from PRD Section 4.4
 
+// Re-export screenshot analysis types
+export type {
+  PageRegion,
+  ScreenshotAnalysisRequest,
+  ScreenshotAnalysisResult,
+  BatchScreenshotAnalysisRequest,
+  BatchScreenshotAnalysisResult,
+} from "./screenshot-analysis";
+
+// Multi-modal embedding types
+export type EmbeddingModality = "text" | "visual" | "metadata" | "combined";
+
+export interface EmbeddingData {
+  vector: number[]; // Embedding vector
+  modality: EmbeddingModality; // Type of embedding
+  source: string; // Source of the embedding (e.g., "page-title", "screenshot", "meta-description")
+  confidence?: number; // Confidence score (0-1)
+  metadata?: Record<string, unknown>; // Additional metadata about the embedding
+}
+
+export interface MultiModalEmbedding {
+  id: string;
+  pageId: string;
+  embeddings: EmbeddingData[]; // Collection of embeddings from different modalities
+  combinedEmbedding?: number[]; // Optional combined/fused embedding vector
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface VisualElement {
+  type: "button" | "link" | "form" | "image" | "text" | "heading" | "navigation" | "other";
+  description: string;
+  location?: {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+  };
+  text?: string; // Associated text content
+}
+
+export interface PageAnalysis {
+  pageId: string;
+  visualElements: VisualElement[]; // Detected visual elements from screenshot
+  contentStructure: {
+    headings: string[];
+    paragraphs: number;
+    links: number;
+    forms: number;
+    images: number;
+  };
+  interactions: {
+    clickableElements: number;
+    inputFields: number;
+    buttons: number;
+  };
+  accessibility: {
+    hasAltText: boolean;
+    hasAriaLabels: boolean;
+    contrastRatio?: number;
+  };
+  performance?: {
+    loadTime: number; // in milliseconds
+    pageSize: number; // in bytes
+  };
+  analyzedAt: string;
+}
+
 export interface Website {
   id: string;
   appKey: string;
@@ -23,6 +91,15 @@ export interface Website {
     lastCrawl: string;
     pagesIndexed: number;
     status: "pending" | "in-progress" | "completed" | "failed";
+  };
+  searchConfiguration?: {
+    defaultModalityWeights?: {
+      text: number;
+      visual: number;
+      metadata: number;
+    };
+    description?: string;
+    updatedAt?: string;
   };
   createdAt: string;
   updatedAt: string;
@@ -54,12 +131,32 @@ export interface NavigationLink {
   description?: string;
   aiGuidance?: string; // Optional guidance for AI to understand the page
   screenshot?: string; // Screenshot URL or base64
+  screenshotMetadata?: {
+    // Metadata about how the screenshot was captured
+    captureType: "viewport" | "full-page" | "selection"; // Type of screenshot capture
+    dimensions: {
+      width: number; // Screenshot width in pixels
+      height: number; // Screenshot height in pixels
+      viewportHeight?: number; // Original viewport height (for full-page captures)
+    };
+    capturedAt: string; // ISO timestamp
+    fileSize?: number; // Size in bytes
+  };
   embeddingStatus?: "pending" | "processing" | "completed" | "failed"; // Status of embedding generation
   aiSummary?: {
     // AI-generated summary from screenshot analysis
-    whatUsersSee: string; // Description of visual elements
-    whatUsersCanDo: string; // Description of available actions
+    whatUsersSee: string[]; // Array of visual element descriptions (bullet points)
+    whatUsersCanDo: string[]; // Array of available actions (bullet points)
     generatedAt?: string;
+  };
+  // Multi-modal embedding support
+  multiModalEmbedding?: MultiModalEmbedding; // Rich multi-modal embeddings
+  pageAnalysis?: PageAnalysis; // Detailed page analysis results
+  embeddingMetadata?: {
+    textEmbeddingGenerated: boolean;
+    visualEmbeddingGenerated: boolean;
+    metadataEmbeddingGenerated: boolean;
+    lastEmbeddingUpdate?: string;
   };
   isActive: boolean;
   createdAt: string;
@@ -86,6 +183,13 @@ export interface EmbeddingTestQuery {
   query: string;
   maxResults?: number;
   minConfidence?: number;
+  useMultiModal?: boolean; // Whether to use multi-modal embeddings for search
+  modalityWeights?: {
+    // Custom weights for different modalities in search
+    text?: number; // 0-1, default 0.5
+    visual?: number; // 0-1, default 0.3
+    metadata?: number; // 0-1, default 0.2
+  };
 }
 
 export interface SlotInfo {
@@ -94,12 +198,19 @@ export interface SlotInfo {
   description?: string;
 }
 
+export interface ModalityMatchScore {
+  modality: EmbeddingModality;
+  score: number; // 0-1
+  contributionWeight: number; // How much this modality contributed to final score
+}
+
 export interface PageMatch {
   pageId: string;
   title: string;
   url: string;
   description?: string;
-  matchScore: number; // 0-1 decimal
+  matchScore: number; // 0-1 decimal (combined score across modalities)
+  modalityScores?: ModalityMatchScore[]; // Breakdown by modality
   matchedIntents: string[];
   slots: {
     matched: number;
@@ -107,12 +218,26 @@ export interface PageMatch {
     required: SlotInfo[];
   };
   isBestMatch: boolean;
+  visualPreview?: string; // Screenshot or visual preview URL
+  matchedVisualElements?: VisualElement[]; // Visual elements that contributed to match
+  analysisData?: {
+    // Simplified page analysis data for display
+    hasForm: boolean;
+    interactionComplexity: "low" | "medium" | "high";
+    contentDensity: "sparse" | "moderate" | "dense";
+  };
 }
 
 export interface EmbeddingTestResult {
   query: string;
   totalMatches: number;
   results: PageMatch[];
+  searchMetadata?: {
+    multiModalUsed: boolean;
+    averageConfidence: number;
+    modalitiesUsed: EmbeddingModality[];
+    searchDuration: number; // in milliseconds
+  };
 }
 
 // Crawl Management types
@@ -159,4 +284,53 @@ export interface StartCrawlResponse {
   crawlId: string;
   status: CrawlStatus;
   startTime: string;
+}
+
+// Synthetic Query types
+export type QueryType =
+  | "show_me"
+  | "i_want_to"
+  | "where_can_i"
+  | "navigate_to"
+  | "find_my"
+  | "how_do_i"
+  | "other";
+
+export interface SyntheticQuery {
+  id: string;
+  query: string;
+  queryType?: QueryType;
+  expectedPageId: string;
+  validated: boolean;
+  matchScore?: number;
+  createdAt?: string;
+  lastValidated?: string;
+}
+
+export interface GenerateSyntheticQueriesData {
+  pageId?: string;
+  count?: number;
+  queryTypes?: QueryType[];
+  useMultiModal?: boolean;
+}
+
+export interface GeneratedQuery {
+  query: string;
+  queryType: QueryType;
+  expectedPageId: string;
+  confidence: number;
+}
+
+export interface ValidateSyntheticQueryData {
+  query: string;
+  expectedPageId: string;
+}
+
+export interface ValidateSyntheticQueryResult {
+  query: string;
+  expectedPageId: string;
+  actualBestMatch: string;
+  matchScore: number;
+  isValid: boolean;
+  issues?: string[];
 }

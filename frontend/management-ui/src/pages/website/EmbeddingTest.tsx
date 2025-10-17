@@ -2,27 +2,41 @@ import {
   CheckCircle as CheckCircleIcon,
   Clear as ClearIcon,
   Close as CloseIcon,
+  Psychology as PsychologyIcon,
+  RestartAlt as RestartAltIcon,
+  Save as SaveIcon,
   Search as SearchIcon,
+  TrendingUp as TrendingUpIcon,
+  Visibility as VisibilityIcon,
 } from "@mui/icons-material";
 import {
   Alert,
   Box,
   Button,
+  Card,
+  CardContent,
   Chip,
+  Collapse,
+  FormControlLabel,
   IconButton,
   InputAdornment,
   LinearProgress,
   Paper,
+  Slider,
+  Snackbar,
+  Switch,
   TextField,
+  Tooltip,
   Typography,
 } from "@mui/material";
 import type React from "react";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Layout } from "~/components/Layout";
 import { PageTabs } from "~/components/PageTabs";
 import { PageTitle } from "~/components/PageTitle";
-import { useEmbeddingTest } from "~/hooks/useEmbeddingTest";
+import { useEnhancedEmbeddingTest } from "~/hooks/useEnhancedEmbeddingTest";
+import { useUpdateSearchConfiguration } from "~/hooks/useSearchConfiguration";
 import { useWebsite } from "~/hooks/useWebsite";
 import type { PageMatch } from "~/types";
 
@@ -39,6 +53,133 @@ function getMatchScoreLabel(score: number): string {
   if (score >= 0.7) return "Good Match";
   if (score >= 0.5) return "Fair Match";
   return "Poor Match";
+}
+
+// Multi-Modal Score Breakdown Component
+interface MultiModalScoreBreakdownProps {
+  result: PageMatch;
+}
+
+function MultiModalScoreBreakdown({ result }: MultiModalScoreBreakdownProps) {
+  if (!result.modalityScores || result.modalityScores.length === 0) {
+    return null;
+  }
+
+  return (
+    <Box className="mt-4">
+      <Typography variant="subtitle2" className="font-semibold mb-2 flex items-center gap-1">
+        <TrendingUpIcon fontSize="small" />
+        Multi-Modal Score Breakdown
+      </Typography>
+      <Box className="space-y-2">
+        {result.modalityScores.map((modalityScore) => {
+          const percentage = Math.round(modalityScore.score * 100);
+          const contribution = Math.round(modalityScore.contributionWeight * 100);
+
+          return (
+            <Box key={modalityScore.modality}>
+              <Box className="flex justify-between items-center mb-1">
+                <Box className="flex items-center gap-2">
+                  <Typography variant="caption" className="font-medium capitalize">
+                    {modalityScore.modality}
+                  </Typography>
+                  <Chip
+                    label={`${contribution}% weight`}
+                    size="small"
+                    variant="outlined"
+                    sx={{ height: 20, fontSize: "0.7rem" }}
+                  />
+                </Box>
+                <Typography variant="caption" className="font-bold">
+                  {percentage}%
+                </Typography>
+              </Box>
+              <LinearProgress
+                variant="determinate"
+                value={percentage}
+                sx={{
+                  height: 6,
+                  borderRadius: 3,
+                  backgroundColor: "#e0e0e0",
+                  "& .MuiLinearProgress-bar": {
+                    backgroundColor: getMatchScoreColor(modalityScore.score),
+                    borderRadius: 3,
+                  },
+                }}
+              />
+            </Box>
+          );
+        })}
+      </Box>
+    </Box>
+  );
+}
+
+// Match Explanation Card Component
+interface MatchExplanationCardProps {
+  result: PageMatch;
+}
+
+function MatchExplanationCard({ result }: MatchExplanationCardProps) {
+  const [expanded, setExpanded] = useState(false);
+
+  return (
+    <Box className="mt-4">
+      <Button
+        size="small"
+        onClick={() => setExpanded(!expanded)}
+        startIcon={<PsychologyIcon />}
+        sx={{ textTransform: "none" }}
+      >
+        {expanded ? "Hide" : "Show"} Match Explanation
+      </Button>
+      <Collapse in={expanded}>
+        <Card variant="outlined" sx={{ mt: 2, backgroundColor: "#f9fafb" }}>
+          <CardContent>
+            <Typography variant="subtitle2" className="font-semibold mb-2">
+              Why This Page Matched
+            </Typography>
+
+            {/* Matched Visual Elements */}
+            {result.matchedVisualElements && result.matchedVisualElements.length > 0 && (
+              <Box className="mb-3">
+                <Typography variant="caption" className="font-medium text-gray-700 block mb-1">
+                  <VisibilityIcon sx={{ fontSize: 14, verticalAlign: "middle", mr: 0.5 }} />
+                  Visual Elements Detected:
+                </Typography>
+                <Box className="flex flex-wrap gap-1">
+                  {result.matchedVisualElements.map((element, idx) => (
+                    <Chip
+                      key={idx}
+                      label={element.description}
+                      size="small"
+                      variant="outlined"
+                      color="primary"
+                    />
+                  ))}
+                </Box>
+              </Box>
+            )}
+
+            {/* Analysis Data */}
+            {result.analysisData && (
+              <Box className="space-y-1">
+                <Typography variant="caption" className="text-gray-600 block">
+                  • Page Complexity: {result.analysisData.interactionComplexity}
+                </Typography>
+                <Typography variant="caption" className="text-gray-600 block">
+                  • Content Density: {result.analysisData.contentDensity}
+                </Typography>
+                <Typography variant="caption" className="text-gray-600 block">
+                  • Contains Form: {result.analysisData.hasForm ? "Yes" : "No"}
+                </Typography>
+              </Box>
+            )}
+          </CardContent>
+        </Card>
+      </Collapse>
+    </Box>
+  );
 }
 
 // Result Card Component
@@ -147,6 +288,12 @@ function ResultCard({ result, rank }: ResultCardProps) {
           }}
         />
       </Box>
+
+      {/* Multi-Modal Score Breakdown */}
+      <MultiModalScoreBreakdown result={result} />
+
+      {/* Match Explanation */}
+      <MatchExplanationCard result={result} />
     </Paper>
   );
 }
@@ -164,13 +311,52 @@ export function EmbeddingTest() {
   const { data: website, isLoading } = useWebsite(websiteId);
   const navigate = useNavigate();
 
-  // Embedding test mutation
-  const embeddingTestMutation = useEmbeddingTest({ websiteId });
+  // Embedding test mutation - use enhanced version
+  const embeddingTestMutation = useEnhancedEmbeddingTest(websiteId);
+
+  // Search configuration mutation
+  const updateSearchConfigMutation = useUpdateSearchConfiguration(websiteId);
+
+  // Snackbar state for save confirmation
+  const [showSaveSnackbar, setShowSaveSnackbar] = useState(false);
 
   // Query input state
   const [query, setQuery] = useState("");
   const [debouncedQuery, setDebouncedQuery] = useState("");
   const [validationError, setValidationError] = useState<string | null>(null);
+
+  // Multi-modal settings
+  const [useMultiModal, setUseMultiModal] = useState(true);
+  const [showAdvancedControls, setShowAdvancedControls] = useState(false);
+  const [modalityWeights, setModalityWeights] = useState({
+    text: 0.5,
+    visual: 0.3,
+    metadata: 0.2,
+  });
+
+  // Helper function to adjust weights proportionally when one changes
+  const adjustWeights = (changedWeight: 'text' | 'visual' | 'metadata', newValue: number) => {
+    const clampedValue = Math.max(0, Math.min(1, newValue));
+    const remaining = 1 - clampedValue;
+
+    // Get the other two weights
+    const otherWeights = {
+      text: changedWeight !== 'text' ? modalityWeights.text : 0,
+      visual: changedWeight !== 'visual' ? modalityWeights.visual : 0,
+      metadata: changedWeight !== 'metadata' ? modalityWeights.metadata : 0,
+    };
+
+    const otherTotal = otherWeights.text + otherWeights.visual + otherWeights.metadata;
+
+    // Distribute remaining proportionally among other weights
+    const newWeights = {
+      text: changedWeight === 'text' ? clampedValue : (otherTotal > 0 ? (otherWeights.text / otherTotal) * remaining : remaining / 2),
+      visual: changedWeight === 'visual' ? clampedValue : (otherTotal > 0 ? (otherWeights.visual / otherTotal) * remaining : remaining / 2),
+      metadata: changedWeight === 'metadata' ? clampedValue : (otherTotal > 0 ? (otherWeights.metadata / otherTotal) * remaining : 0),
+    };
+
+    setModalityWeights(newWeights);
+  };
 
   // Recent queries state with localStorage
   const RECENT_QUERIES_KEY = `recent-queries-${websiteId}`;
@@ -187,6 +373,63 @@ export function EmbeddingTest() {
 
   const handleClose = () => {
     navigate("/");
+  };
+
+  // Load default weights from website configuration on mount
+  useEffect(() => {
+    if (website?.searchConfiguration?.defaultModalityWeights) {
+      setModalityWeights(website.searchConfiguration.defaultModalityWeights);
+    }
+  }, [website]);
+
+  // Check if current weights differ from saved defaults
+  const hasUnsavedChanges = useMemo(() => {
+    if (!website?.searchConfiguration?.defaultModalityWeights) {
+      // No saved defaults, so any non-standard weights are "unsaved"
+      return (
+        modalityWeights.text !== 0.5 ||
+        modalityWeights.visual !== 0.3 ||
+        modalityWeights.metadata !== 0.2
+      );
+    }
+
+    const saved = website.searchConfiguration.defaultModalityWeights;
+    const threshold = 0.001; // Account for floating point precision
+
+    return (
+      Math.abs(modalityWeights.text - saved.text) > threshold ||
+      Math.abs(modalityWeights.visual - saved.visual) > threshold ||
+      Math.abs(modalityWeights.metadata - saved.metadata) > threshold
+    );
+  }, [modalityWeights, website?.searchConfiguration?.defaultModalityWeights]);
+
+  // Handler for saving current weights as default
+  const handleSaveAsDefault = () => {
+    updateSearchConfigMutation.mutate(
+      {
+        defaultModalityWeights: modalityWeights,
+        description: `Custom weights for ${website?.type || 'website'}`,
+      },
+      {
+        onSuccess: () => {
+          setShowSaveSnackbar(true);
+        },
+      }
+    );
+  };
+
+  // Handler for resetting to default weights
+  const handleResetToDefault = () => {
+    if (website?.searchConfiguration?.defaultModalityWeights) {
+      setModalityWeights(website.searchConfiguration.defaultModalityWeights);
+    } else {
+      // Fallback to standard defaults
+      setModalityWeights({
+        text: 0.5,
+        visual: 0.3,
+        metadata: 0.2,
+      });
+    }
   };
 
   // Save recent queries to localStorage whenever they change
@@ -254,9 +497,13 @@ export function EmbeddingTest() {
       return;
     }
 
-    // Call the API using the mutation
+    // Call the API using the mutation with multi-modal parameters
     embeddingTestMutation.mutate(
-      { query: trimmed },
+      {
+        query: trimmed,
+        useMultiModal,
+        modalityWeights: useMultiModal ? modalityWeights : undefined,
+      },
       {
         onSuccess: () => {
           // Add to recent queries (limit to 5 most recent)
@@ -267,7 +514,7 @@ export function EmbeddingTest() {
         },
       }
     );
-  }, [query, validateQuery, embeddingTestMutation]);
+  }, [query, validateQuery, embeddingTestMutation, useMultiModal, modalityWeights]);
 
   // Handle Enter key
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
@@ -379,21 +626,152 @@ export function EmbeddingTest() {
             />
 
             <Box className="flex justify-between items-center">
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={handleSearch}
-                disabled={!isQueryValid || isSearching}
-                startIcon={<SearchIcon />}
-              >
-                {isSearching ? "Searching..." : "Test Query"}
-              </Button>
+              <Box className="flex items-center gap-2">
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={handleSearch}
+                  disabled={!isQueryValid || isSearching}
+                  startIcon={<SearchIcon />}
+                >
+                  {isSearching ? "Searching..." : "Test Query"}
+                </Button>
+                <Tooltip title="Enable multi-modal embedding search for better accuracy">
+                  <FormControlLabel
+                    control={
+                      <Switch
+                        checked={useMultiModal}
+                        onChange={(e) => setUseMultiModal(e.target.checked)}
+                        disabled={isSearching}
+                      />
+                    }
+                    label="Multi-Modal"
+                  />
+                </Tooltip>
+              </Box>
               {isSearching && (
                 <Typography variant="body2" color="text.secondary">
                   Analyzing embeddings...
                 </Typography>
               )}
             </Box>
+
+            {/* Advanced Controls */}
+            {useMultiModal && (
+              <Box className="mt-4">
+                <Button
+                  size="small"
+                  onClick={() => setShowAdvancedControls(!showAdvancedControls)}
+                  sx={{ textTransform: "none", mb: 2 }}
+                >
+                  {showAdvancedControls ? "Hide" : "Show"} Advanced Weight Controls
+                </Button>
+                <Collapse in={showAdvancedControls}>
+                  <Card variant="outlined" sx={{ p: 2, backgroundColor: "#f9fafb" }}>
+                    <Typography variant="subtitle2" className="mb-3">
+                      Adjust Embedding Modality Weights
+                    </Typography>
+                    <Box className="space-y-3">
+                      <Box>
+                        <Box className="flex justify-between items-center mb-1">
+                          <Typography variant="caption">Text Embeddings</Typography>
+                          <Typography variant="caption" className="font-bold">
+                            {Math.round(modalityWeights.text * 100)}%
+                          </Typography>
+                        </Box>
+                        <Slider
+                          value={modalityWeights.text}
+                          onChange={(_, value) => adjustWeights('text', value as number)}
+                          min={0}
+                          max={1}
+                          step={0.05}
+                          disabled={isSearching}
+                          marks={[
+                            { value: 0, label: "0%" },
+                            { value: 0.5, label: "50%" },
+                            { value: 1, label: "100%" },
+                          ]}
+                        />
+                      </Box>
+                      <Box>
+                        <Box className="flex justify-between items-center mb-1">
+                          <Typography variant="caption">Visual Embeddings</Typography>
+                          <Typography variant="caption" className="font-bold">
+                            {Math.round(modalityWeights.visual * 100)}%
+                          </Typography>
+                        </Box>
+                        <Slider
+                          value={modalityWeights.visual}
+                          onChange={(_, value) => adjustWeights('visual', value as number)}
+                          min={0}
+                          max={1}
+                          step={0.05}
+                          disabled={isSearching}
+                          marks={[
+                            { value: 0, label: "0%" },
+                            { value: 0.5, label: "50%" },
+                            { value: 1, label: "100%" },
+                          ]}
+                        />
+                      </Box>
+                      <Box>
+                        <Box className="flex justify-between items-center mb-1">
+                          <Typography variant="caption">Metadata Embeddings</Typography>
+                          <Typography variant="caption" className="font-bold">
+                            {Math.round(modalityWeights.metadata * 100)}%
+                          </Typography>
+                        </Box>
+                        <Slider
+                          value={modalityWeights.metadata}
+                          onChange={(_, value) => adjustWeights('metadata', value as number)}
+                          min={0}
+                          max={1}
+                          step={0.05}
+                          disabled={isSearching}
+                          marks={[
+                            { value: 0, label: "0%" },
+                            { value: 0.5, label: "50%" },
+                            { value: 1, label: "100%" },
+                          ]}
+                        />
+                      </Box>
+                      <Alert severity="info" sx={{ fontSize: "0.75rem" }}>
+                        Weights determine how much each modality contributes to the final match score.
+                        Higher weights emphasize that modality's importance.
+                      </Alert>
+                      {hasUnsavedChanges && (
+                        <Alert severity="warning" sx={{ fontSize: "0.75rem", mt: 2 }}>
+                          You have unsaved changes to the modality weights.
+                        </Alert>
+                      )}
+                      <Box className="flex gap-2 mt-3">
+                        <Button
+                          variant={hasUnsavedChanges ? "contained" : "outlined"}
+                          color={hasUnsavedChanges ? "primary" : "inherit"}
+                          size="small"
+                          startIcon={<SaveIcon />}
+                          onClick={handleSaveAsDefault}
+                          disabled={!hasUnsavedChanges || updateSearchConfigMutation.isPending || isSearching}
+                          fullWidth
+                        >
+                          {updateSearchConfigMutation.isPending ? "Saving..." : "Save as Default"}
+                        </Button>
+                        <Button
+                          variant="outlined"
+                          size="small"
+                          startIcon={<RestartAltIcon />}
+                          onClick={handleResetToDefault}
+                          disabled={!hasUnsavedChanges || isSearching}
+                          fullWidth
+                        >
+                          Reset to Default
+                        </Button>
+                      </Box>
+                    </Box>
+                  </Card>
+                </Collapse>
+              </Box>
+            )}
           </Box>
         </Paper>
 
@@ -471,10 +849,38 @@ export function EmbeddingTest() {
 
         {/* Info Alert */}
         <Alert severity="info">
-          This tool helps you validate that user queries correctly match your navigation pages.
-          Higher match scores indicate better semantic alignment between the query and page content.
+          {useMultiModal ? (
+            <>
+              Multi-modal search combines text, visual, and metadata embeddings for more accurate
+              matching. Adjust weights to emphasize different aspects of page content. Higher match
+              scores indicate better alignment across all modalities.
+            </>
+          ) : (
+            <>
+              This tool helps you validate that user queries correctly match your navigation pages.
+              Higher match scores indicate better semantic alignment. Enable multi-modal search for
+              enhanced accuracy.
+            </>
+          )}
         </Alert>
       </Box>
+
+      {/* Success Snackbar */}
+      <Snackbar
+        open={showSaveSnackbar}
+        autoHideDuration={3000}
+        onClose={() => setShowSaveSnackbar(false)}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      >
+        <Alert
+          onClose={() => setShowSaveSnackbar(false)}
+          severity="success"
+          variant="filled"
+          sx={{ width: "100%" }}
+        >
+          Default modality weights saved successfully!
+        </Alert>
+      </Snackbar>
     </Layout>
   );
 }

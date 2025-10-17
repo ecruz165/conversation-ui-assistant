@@ -34,6 +34,7 @@ const tabs = [
 
 const SECTION_TITLE_CLASS = "mb-2 font-semibold text-gray-900";
 const SECTION_DESCRIPTION_CLASS = "text-gray-600 mb-4 pb-2";
+const ACTION_BUTTON_STYLE = { minWidth: 192 };
 
 // Code generation functions for Web Component
 function generateScriptTagCode(websiteId: string, apiKey: string): string {
@@ -317,7 +318,7 @@ export function WidgetCode() {
                       });
                     }
                   }}
-                  size="small"
+                  sx={ACTION_BUTTON_STYLE}
                 >
                   Copy Code
                 </Button>
@@ -371,7 +372,7 @@ export function WidgetCode() {
                       });
                     }
                   }}
-                  size="small"
+                  sx={ACTION_BUTTON_STYLE}
                 >
                   Copy Code
                 </Button>
@@ -425,7 +426,7 @@ export function WidgetCode() {
                       });
                     }
                   }}
-                  size="small"
+                  sx={ACTION_BUTTON_STYLE}
                 >
                   Copy Code
                 </Button>
@@ -463,7 +464,7 @@ export function WidgetCode() {
                 variant="outlined"
                 startIcon={<CopyIcon />}
                 onClick={handleCopyCode}
-                size="small"
+                sx={ACTION_BUTTON_STYLE}
               >
                 Copy Code
               </Button>

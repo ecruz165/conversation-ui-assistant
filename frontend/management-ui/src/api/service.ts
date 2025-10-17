@@ -6,6 +6,8 @@ import type {
   EmbeddingTestQuery,
   EmbeddingTestResult,
   NavigationLink,
+  ScreenshotAnalysisRequest,
+  ScreenshotAnalysisResult,
   StartCrawlResponse,
   SystemMetrics,
   Website,
@@ -195,6 +197,145 @@ class ApiService {
     crawlId: string
   ): Promise<{ status: string; pagesIndexed: number }> {
     return this.fetchJson(`${this.baseUrl}/websites/${websiteId}/crawl/${crawlId}/status`);
+  }
+
+  // Screenshot Analysis endpoints
+  async uploadScreenshotForAnalysis(
+    websiteId: string,
+    request: ScreenshotAnalysisRequest
+  ): Promise<ScreenshotAnalysisResult> {
+    return this.fetchJson<ScreenshotAnalysisResult>(
+      `${this.baseUrl}/websites/${websiteId}/screenshot-analysis`,
+      {
+        method: "POST",
+        body: JSON.stringify(request),
+      }
+    );
+  }
+
+  async getAnalysisJobStatus(websiteId: string, analysisId: string): Promise<ScreenshotAnalysisResult> {
+    return this.fetchJson<ScreenshotAnalysisResult>(
+      `${this.baseUrl}/websites/${websiteId}/screenshot-analysis/${analysisId}`
+    );
+  }
+
+  async getAnalysisHistory(
+    websiteId: string,
+    page: number = 0,
+    pageSize: number = 10
+  ): Promise<{ entries: ScreenshotAnalysisResult[]; total: number; page: number; pageSize: number }> {
+    return this.fetchJson(
+      `${this.baseUrl}/websites/${websiteId}/screenshot-analysis/history?page=${page}&pageSize=${pageSize}`
+    );
+  }
+
+  async getAnalysisVersion(
+    websiteId: string,
+    pageId: string,
+    version: number
+  ): Promise<ScreenshotAnalysisResult> {
+    return this.fetchJson<ScreenshotAnalysisResult>(
+      `${this.baseUrl}/websites/${websiteId}/pages/${pageId}/analysis/versions/${version}`
+    );
+  }
+
+  // Enhanced Embedding Test endpoints
+  async testEnhancedEmbedding(
+    websiteId: string,
+    query: EmbeddingTestQuery
+  ): Promise<EmbeddingTestResult> {
+    return this.fetchJson<EmbeddingTestResult>(
+      `${this.baseUrl}/websites/${websiteId}/test-embedding/enhanced`,
+      {
+        method: "POST",
+        body: JSON.stringify(query),
+      }
+    );
+  }
+
+  async compareEmbeddings(
+    websiteId: string,
+    data: {
+      pageId: string;
+      comparisonType: "text-vs-visual" | "old-vs-new" | "multiple";
+      versions?: number[];
+    }
+  ): Promise<{
+    pageId: string;
+    comparisons: Array<{
+      type: string;
+      similarity: number;
+      differences: string[];
+    }>;
+  }> {
+    return this.fetchJson(
+      `${this.baseUrl}/websites/${websiteId}/embeddings/compare`,
+      {
+        method: "POST",
+        body: JSON.stringify(data),
+      }
+    );
+  }
+
+  // Synthetic Queries endpoints
+  async getSyntheticQueries(
+    websiteId: string,
+    pageId?: string
+  ): Promise<Array<{
+    id: string;
+    query: string;
+    expectedPageId: string;
+    validated: boolean;
+    matchScore?: number;
+  }>> {
+    const url = pageId
+      ? `${this.baseUrl}/websites/${websiteId}/synthetic-queries?pageId=${pageId}`
+      : `${this.baseUrl}/websites/${websiteId}/synthetic-queries`;
+    return this.fetchJson(url);
+  }
+
+  async generateSyntheticQueries(
+    websiteId: string,
+    data: {
+      pageId?: string;
+      count?: number;
+      useMultiModal?: boolean;
+    }
+  ): Promise<Array<{
+    query: string;
+    expectedPageId: string;
+    confidence: number;
+  }>> {
+    return this.fetchJson(
+      `${this.baseUrl}/websites/${websiteId}/synthetic-queries/generate`,
+      {
+        method: "POST",
+        body: JSON.stringify(data),
+      }
+    );
+  }
+
+  async validateSyntheticQuery(
+    websiteId: string,
+    data: {
+      query: string;
+      expectedPageId: string;
+    }
+  ): Promise<{
+    query: string;
+    expectedPageId: string;
+    actualBestMatch: string;
+    matchScore: number;
+    isValid: boolean;
+    issues?: string[];
+  }> {
+    return this.fetchJson(
+      `${this.baseUrl}/websites/${websiteId}/synthetic-queries/validate`,
+      {
+        method: "POST",
+        body: JSON.stringify(data),
+      }
+    );
   }
 }
 

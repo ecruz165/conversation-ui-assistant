@@ -35,6 +35,15 @@ export const mockWebsites: Website[] = [
       pagesIndexed: 127,
       status: "completed",
     },
+    searchConfiguration: {
+      defaultModalityWeights: {
+        text: 0.5,
+        visual: 0.3,
+        metadata: 0.2,
+      },
+      description: "Default weights optimized for financial applications",
+      updatedAt: "2024-01-15T14:30:00Z",
+    },
     createdAt: "2024-01-15T10:00:00Z",
     updatedAt: "2024-01-15T14:30:00Z",
   },
@@ -52,12 +61,67 @@ export const mockNavigationLinks: NavigationLink[] = [
     keywords: ["portfolio", "dashboard", "overview"],
     description: "Main portfolio overview page",
     embeddingStatus: "completed",
+    screenshot: "/screenshots/portfolio-dashboard.jpg",
+    screenshotMetadata: {
+      captureType: "full-page",
+      dimensions: {
+        width: 1200,
+        height: 3600, // Full scrollable page height
+        viewportHeight: 800,
+      },
+      capturedAt: "2024-01-15T10:05:00Z",
+      fileSize: 245000, // ~245KB
+    },
     aiSummary: {
-      whatUsersSee:
-        "A comprehensive dashboard showing portfolio value chart, asset allocation pie chart, recent transactions table, and market summary cards.",
-      whatUsersCanDo:
-        "View total portfolio value, see asset distribution, check recent transactions, and access detailed investment analysis.",
+      whatUsersSee: [
+        "Hero section with heading 'Your new online account experience is almost here'",
+        "Prominent 'FIND OUT MORE' call-to-action button",
+        "'Who We Are' section with tagline 'Your goals are what matter'",
+        "Informational text about Capital Group's 94-year history and $3 trillion in assets",
+        "LOGIN button in right sidebar",
+        "Announcements section featuring 2025 proxy vote details",
+        "Service & support links with phone icon",
+        "Warm image showing two people collaborating on a laptop in a contemporary kitchen",
+        "'ABOUT US' navigation button",
+      ],
+      whatUsersCanDo: [
+        "Log into their account via the LOGIN button",
+        "Learn more about upcoming online account changes",
+        "Read company announcements including 2025 proxy voting information",
+        "Access service and support resources",
+        "Contact support via phone",
+        "Explore information about Capital Group and American Funds",
+        "Navigate to the About Us section for company details",
+      ],
       generatedAt: "2024-01-15T10:05:00Z",
+    },
+    embeddingMetadata: {
+      textEmbeddingGenerated: true,
+      visualEmbeddingGenerated: true,
+      metadataEmbeddingGenerated: true,
+      lastEmbeddingUpdate: "2024-01-15T10:05:00Z",
+    },
+    multiModalEmbedding: {
+      embeddings: [
+        {
+          modality: "text",
+          vector: new Array(1536).fill(0).map(() => Math.random()),
+          source: "ai_summary",
+          confidence: 0.94,
+        },
+        {
+          modality: "visual",
+          vector: new Array(512).fill(0).map(() => Math.random()),
+          source: "screenshot",
+          confidence: 0.91,
+        },
+        {
+          modality: "metadata",
+          vector: new Array(768).fill(0).map(() => Math.random()),
+          source: "structured_data",
+          confidence: 0.96,
+        },
+      ],
     },
     isActive: true,
     createdAt: "2024-01-15T10:00:00Z",
@@ -73,10 +137,19 @@ export const mockNavigationLinks: NavigationLink[] = [
     keywords: ["balance", "account", "funds"],
     embeddingStatus: "completed",
     aiSummary: {
-      whatUsersSee:
-        "Account balance summary with available balance, pending transactions, and account history graph.",
-      whatUsersCanDo:
-        "Check current balance, view transaction history, download statements, and transfer funds.",
+      whatUsersSee: [
+        "Account balance summary displaying current available balance",
+        "Pending transactions list",
+        "Account history graph showing balance over time",
+        "Quick action buttons for common operations",
+      ],
+      whatUsersCanDo: [
+        "Check current account balance",
+        "View detailed transaction history",
+        "Download account statements",
+        "Transfer funds to other accounts",
+        "Set up balance alerts",
+      ],
       generatedAt: "2024-01-15T10:05:00Z",
     },
     isActive: true,
@@ -101,10 +174,21 @@ export const mockNavigationLinks: NavigationLink[] = [
     ],
     embeddingStatus: "completed",
     aiSummary: {
-      whatUsersSee:
-        "Detailed portfolio page showing account-specific holdings, performance metrics, allocation charts, and transaction history.",
-      whatUsersCanDo:
-        "View detailed portfolio performance, analyze individual holdings, review account transactions, and download portfolio reports.",
+      whatUsersSee: [
+        "Account-specific holdings table with current values",
+        "Performance metrics and returns over different time periods",
+        "Interactive allocation charts (pie/donut charts)",
+        "Transaction history for the specific portfolio",
+        "Gain/loss indicators with color coding",
+      ],
+      whatUsersCanDo: [
+        "View detailed portfolio performance metrics",
+        "Analyze individual holdings and positions",
+        "Review account transaction history",
+        "Download portfolio reports in PDF format",
+        "Compare performance against benchmarks",
+        "Drill down into specific investment details",
+      ],
       generatedAt: "2024-01-15T10:05:00Z",
     },
     isActive: true,
@@ -151,10 +235,23 @@ export const mockNavigationLinks: NavigationLink[] = [
     ],
     embeddingStatus: "completed",
     aiSummary: {
-      whatUsersSee:
-        "A transfer form with account selection dropdowns, amount input field, and optional description textarea.",
-      whatUsersCanDo:
-        "Transfer funds between their accounts by selecting source and destination accounts, entering the transfer amount, and optionally providing a description.",
+      whatUsersSee: [
+        "Account selection dropdown for source account (From Account)",
+        "Account selection dropdown for destination account (To Account)",
+        "Amount input field with currency formatting",
+        "Optional description textarea for transfer notes",
+        "Submit button to initiate transfer",
+        "Transfer confirmation summary",
+      ],
+      whatUsersCanDo: [
+        "Select source account from available accounts",
+        "Select destination account for the transfer",
+        "Enter transfer amount (with validation)",
+        "Add optional description or memo for the transfer",
+        "Review transfer details before confirming",
+        "Submit transfer request",
+        "Receive confirmation of transfer",
+      ],
       generatedAt: "2024-01-15T10:05:00Z",
     },
     isActive: true,

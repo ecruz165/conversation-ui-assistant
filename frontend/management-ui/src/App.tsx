@@ -11,10 +11,13 @@ import { useSystemMetrics } from "./hooks/useSystemMetrics";
 import { useWebsites } from "./hooks/useWebsites";
 import { NotFound } from "./pages/NotFound";
 import { RegisterWebsite } from "./pages/RegisterWebsite";
+import { AnalysisHistoryViewer } from "./pages/website/AnalysisHistoryViewer";
 import { CrawlManagement } from "./pages/website/CrawlManagement";
 import { EmbeddingTest } from "./pages/website/EmbeddingTest";
 import { LinkManagement } from "./pages/website/LinkManagement";
 import { WebsiteOverview } from "./pages/website/Overview";
+import { ScreenshotAnalysis } from "./pages/website/ScreenshotAnalysis";
+import { SyntheticQueryManager } from "./pages/website/SyntheticQueryManager";
 import { WidgetCode } from "./pages/website/WidgetCode";
 import { theme } from "./theme";
 
@@ -41,6 +44,9 @@ function App() {
             <Route path="/website/links" element={<LinkManagement />} />
             <Route path="/website/code" element={<WidgetCode />} />
             <Route path="/website/embedding-test" element={<EmbeddingTest />} />
+            <Route path="/website/screenshot-analysis" element={<ScreenshotAnalysis />} />
+            <Route path="/website/analysis-history" element={<AnalysisHistoryViewer />} />
+            <Route path="/website/synthetic-queries" element={<SyntheticQueryManager />} />
             <Route path="/website/crawl-management" element={<CrawlManagement />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
