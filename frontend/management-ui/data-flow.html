@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Navigation Service Data Flow</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            /* Capital Group brand gradient: Primary navy (900 to 700) */
+            background: linear-gradient(135deg, #003F72 0%, #006BA6 100%);
+            font-family: 'Nunito Sans', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 50px 60px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            /* 16:9 aspect ratio for presentation slides */
+            width: 90vw;
+            max-width: 1280px;
+            aspect-ratio: 16 / 9;
+            display: flex;
+            flex-direction: column;
+        }
+
+        h1 {
+            text-align: center;
+            color: #1f2937; /* Gray 800 - primary text */
+            margin-bottom: 30px;
+            font-size: 32px;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .flow-diagram {
+            position: relative;
+            flex: 1;
+            min-height: 0;
+        }
+
+        .component {
+            position: absolute;
+            background: white;
+            border-radius: 10px;
+            padding: 12px 16px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            text-align: center;
+            min-width: 120px;
+            border: 2px solid;
+            transition: transform 0.3s ease;
+        }
+
+        .component:hover {
+            transform: scale(1.05);
+        }
+
+        .component-title {
+            font-weight: 700;
+            font-size: 13px;
+            margin-bottom: 4px;
+            color: #1f2937; /* Gray 800 */
+        }
+
+        .component-subtitle {
+            font-size: 10px;
+            color: #6b7280; /* Gray 500 - secondary text */
+        }
+
+        #chat {
+            top: 50%;
+            left: 80px;
+            transform: translateY(-50%);
+            border-color: #10b981; /* Success green - user input */
+        }
+
+        #nav-service {
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border-color: #007AB0; /* Primary 600 - main service */
+            min-width: 160px;
+        }
+
+        #openai {
+            top: 20%;
+            right: 100px;
+            transform: translateY(-50%);
+            border-color: #f59e0b; /* Warning orange - external API */
+        }
+
+        #postgresql {
+            bottom: 20%;
+            right: 100px;
+            transform: translateY(50%);
+            border-color: #00558C; /* Primary 800 - database */
+        }
+
+
+
+        svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .arrow {
+            fill: none;
+            stroke: #9ca3af; /* Gray 400 - better contrast on dark bg */
+            stroke-width: 2.5;
+            marker-end: url(#arrowhead);
+        }
+
+        .arrow-return {
+            fill: none;
+            stroke: #9ca3af; /* Gray 400 */
+            stroke-width: 2.5;
+            stroke-dasharray: 8, 4;
+            marker-end: url(#arrowhead);
+        }
+
+        .data-packet {
+            fill: #33A7CF; /* Primary 400 - animated flow */
+            opacity: 0;
+        }
+
+        @keyframes flow1 {
+            0% { opacity: 0; offset-distance: 0%; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { opacity: 0; offset-distance: 100%; }
+        }
+
+        .data-packet.active {
+            animation: flow1 2s ease-in-out infinite;
+        }
+
+        .label {
+            font-size: 11px;
+            fill: #1f2937; /* Gray 800 */
+            font-weight: 700;
+        }
+
+        .label-bg {
+            fill: white;
+            rx: 4;
+            ry: 4;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>🔄 Navigation Service Data Flow</h1>
+    <div class="flow-diagram">
+        <svg id="svg">
+            <defs>
+                <marker id="arrowhead" markerWidth="4" markerHeight="4" refX="3.5" refY="2" orient="auto">
+                    <polygon points="0 0, 4 2, 0 4" fill="#9ca3af" />
+                </marker>
+            </defs>
+        </svg>
+
+        <div class="component" id="chat">
+            <div class="component-title">💬 Chat Widget</div>
+            <div class="component-subtitle">User Input</div>
+        </div>
+
+        <div class="component" id="nav-service">
+            <div class="component-title">🎯 Navigation Service</div>
+            <div class="component-subtitle">Core Logic</div>
+        </div>
+
+        <div class="component" id="openai">
+            <div class="component-title">🤖 OpenAI</div>
+            <div class="component-subtitle">Embeddings API</div>
+        </div>
+
+        <div class="component" id="postgresql">
+            <div class="component-title">🗄️ PostgreSQL</div>
+            <div class="component-subtitle">Vector Database</div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const svg = document.getElementById('svg');
+
+    function createPath(x1, y1, x2, y2, label, id, isReturn = false, labelPosition = 'top') {
+        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        const midX = (x1 + x2) / 2;
+        const midY = (y1 + y2) / 2;
+
+        const d = `M ${x1} ${y1} Q ${midX} ${midY} ${x2} ${y2}`;
+        path.setAttribute('d', d);
+        path.setAttribute('class', isReturn ? 'arrow-return' : 'arrow');
+        path.setAttribute('id', id);
+        svg.appendChild(path);
+
+        // Create text element first to measure it
+        const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        text.setAttribute('class', 'label');
+
+        let textX, textY;
+        if (labelPosition === 'left') {
+            textX = midX - 60;
+            textY = midY;
+        } else if (labelPosition === 'right') {
+            textX = midX + 80;
+            textY = midY;
+        } else if (labelPosition === 'top-right') {
+            textX = midX + 30;
+            textY = midY - 15;
+        } else if (labelPosition === 'bottom') {
+            textX = midX;
+            textY = midY + 20;
+        } else if (labelPosition === 'top-left') {
+            textX = midX - 30;
+            textY = midY - 15;
+        } else if (labelPosition === 'bottom-right') {
+            textX = midX;
+            textY = midY + 20;
+        } else {
+            textX = midX;
+            textY = midY - 15;
+        }
+
+        text.setAttribute('x', textX);
+        text.setAttribute('y', textY);
+        text.setAttribute('text-anchor', 'middle');
+        text.textContent = label;
+
+        // Append text temporarily to measure it
+        svg.appendChild(text);
+
+        // Create white background rectangle for label
+        const bbox = text.getBBox();
+        const padding = 6;
+        const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+        rect.setAttribute('class', 'label-bg');
+        rect.setAttribute('x', bbox.x - padding);
+        rect.setAttribute('y', bbox.y - padding);
+        rect.setAttribute('width', bbox.width + (padding * 2));
+        rect.setAttribute('height', bbox.height + (padding * 2));
+
+        // Insert rectangle before text so text appears on top
+        svg.insertBefore(rect, text);
+
+        return path;
+    }
+
+    function createDataPacket(pathId, delay) {
+        const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        circle.setAttribute('class', 'data-packet');
+        circle.setAttribute('r', '6');
+        svg.appendChild(circle);
+
+        setTimeout(() => {
+            circle.classList.add('active');
+            animateAlongPath(circle, pathId);
+        }, delay);
+    }
+
+    function animateAlongPath(element, pathId) {
+        const path = document.getElementById(pathId);
+        const length = path.getTotalLength();
+
+        function animate(timestamp) {
+            const duration = 2000;
+            const progress = (timestamp % duration) / duration;
+            const point = path.getPointAtLength(progress * length);
+
+            element.setAttribute('cx', point.x);
+            element.setAttribute('cy', point.y);
+
+            const opacity = progress < 0.1 ? progress * 10 :
+                progress > 0.9 ? (1 - progress) * 10 : 1;
+            element.setAttribute('opacity', opacity);
+
+            requestAnimationFrame(animate);
+        }
+
+        requestAnimationFrame(animate);
+    }
+
+    // Get dynamic positions based on viewport
+    const diagram = document.querySelector('.flow-diagram');
+    const rect = diagram.getBoundingClientRect();
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+
+    // Component positions (approximate centers)
+    const chatX = 200;
+    const chatY = centerY;
+    const navX = centerX;
+    const navY = centerY;
+    const openaiX = rect.width - 180;
+    const openaiY = centerY * 0.4;
+    const pgX = rect.width - 180;
+    const pgY = centerY * 1.6;
+
+    createPath(chatX, chatY + 10, navX - 80, navY + 10, '1. User Query', 'path1', false, 'bottom');
+    createPath(navX + 80, navY - 30, openaiX - 60, openaiY + 30, '2. Get Embeddings', 'path2', false, 'top');
+    createPath(openaiX - 60, openaiY + 50, navX + 80, navY - 10, '3. Vector Embeddings', 'path3', true, 'right');
+    createPath(navX + 60, navY + 40, pgX - 60, pgY - 20, '4. Query Vector DB', 'path4', false, 'bottom-right');
+    createPath(pgX - 60, pgY - 40, navX + 60, navY + 20, '5. Intent Match Results', 'path5', true, 'right');
+    createPath(navX - 80, navY - 10, chatX, chatY - 10, '6. Return URL', 'path6', true, 'top');
+
+    createDataPacket('path1', 0);
+    createDataPacket('path2', 400);
+    createDataPacket('path3', 800);
+    createDataPacket('path4', 1200);
+    createDataPacket('path5', 1600);
+    createDataPacket('path6', 2000);
+</script>
+</body>
+</html>
