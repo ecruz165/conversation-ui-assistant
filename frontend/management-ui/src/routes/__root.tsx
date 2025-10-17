@@ -10,11 +10,18 @@ import { startInstance, Test } from "~/start";
 import appCss from "~/styles/app.css?url";
 import { seo } from "~/utils/seo";
 
-// Create QueryClient instance
+// Create QueryClient instance with optimized caching strategies
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 1000 * 60 * 5, // 5 minutes
+      staleTime: 1000 * 60 * 5, // 5 minutes default
+      gcTime: 1000 * 60 * 30, // 30 minutes - data kept in cache for offline use
+      retry: 1,
+      refetchOnWindowFocus: false, // Prevent unnecessary refetches on tab focus
+      refetchOnReconnect: true, // Refetch on network reconnection
+      refetchOnMount: false, // Use cached data on component mount if available
+    },
+    mutations: {
       retry: 1,
     },
   },

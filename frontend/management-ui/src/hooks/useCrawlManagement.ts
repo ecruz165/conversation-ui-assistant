@@ -118,6 +118,7 @@ export const useCrawlStatus = (websiteId: string, crawlId: string, enabled: bool
       mockConfig.enabled
         ? mockApi.getCrawlStatus(websiteId, crawlId)
         : api.getCrawlStatus(websiteId, crawlId),
+    staleTime: 1000 * 60, // 1 minute for status checks
     // Poll every 5 seconds while enabled
     refetchInterval: enabled ? 5000 : false,
     enabled,

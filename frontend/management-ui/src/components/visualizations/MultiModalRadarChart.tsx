@@ -1,5 +1,5 @@
 import { Box, Paper, Typography } from "@mui/material";
-import React from "react";
+import React, { memo } from "react";
 
 interface RadarDataPoint {
   axis: string;
@@ -12,7 +12,7 @@ interface MultiModalRadarChartProps {
   colorScheme?: string; // Hex color for the chart
 }
 
-export function MultiModalRadarChart({
+export const MultiModalRadarChart = memo(function MultiModalRadarChart({
   data,
   size = 300,
   colorScheme = "#1976d2",
@@ -152,4 +152,4 @@ export function MultiModalRadarChart({
       </Typography>
     </Paper>
   );
-}
+});

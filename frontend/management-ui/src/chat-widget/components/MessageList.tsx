@@ -1,4 +1,4 @@
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion } from "motion/react";
 import { Bot, Loader2, User } from "lucide-react";
 import type React from "react";
 import { useEffect, useRef } from "react";

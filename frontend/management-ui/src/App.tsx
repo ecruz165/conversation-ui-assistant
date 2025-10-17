@@ -2,10 +2,12 @@ import { Accessibility, IntegrationInstructions, Navigation } from "@mui/icons-m
 import { CssBaseline } from "@mui/material";
 import { ThemeProvider } from "@mui/material/styles";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import React from "react";
+import React, { lazy, Suspense } from "react";
 import { Link, Route, BrowserRouter as Router, Routes } from "react-router-dom";
+import { ErrorBoundary } from "./components/ErrorBoundary";
 import { Layout } from "./components/Layout";
 import { MetricCard } from "./components/MetricCard";
+import { PageSkeleton } from "./components/PageSkeleton";
 import { SkeletonCard } from "./components/SkeletonCard";
 import { useSystemMetrics } from "./hooks/useSystemMetrics";
 import { useWebsites } from "./hooks/useWebsites";
@@ -16,10 +18,14 @@ import { CrawlManagement } from "./pages/website/CrawlManagement";
 import { EmbeddingTest } from "./pages/website/EmbeddingTest";
 import { LinkManagement } from "./pages/website/LinkManagement";
 import { WebsiteOverview } from "./pages/website/Overview";
-import { ScreenshotAnalysis } from "./pages/website/ScreenshotAnalysis";
 import { SyntheticQueryManager } from "./pages/website/SyntheticQueryManager";
 import { WidgetCode } from "./pages/website/WidgetCode";
 import { theme } from "./theme";
+
+// Lazy load heavy components for code splitting
+const ScreenshotAnalysis = lazy(() =>
+  import(/* webpackChunkName: "screenshot-analysis" */ "./pages/website/ScreenshotAnalysis")
+);
 
 // Create QueryClient instance
 const queryClient = new QueryClient({
@@ -44,7 +50,16 @@ function App() {
             <Route path="/website/links" element={<LinkManagement />} />
             <Route path="/website/code" element={<WidgetCode />} />
             <Route path="/website/embedding-test" element={<EmbeddingTest />} />
-            <Route path="/website/screenshot-analysis" element={<ScreenshotAnalysis />} />
+            <Route
+              path="/website/screenshot-analysis"
+              element={
+                <ErrorBoundary>
+                  <Suspense fallback={<PageSkeleton />}>
+                    <ScreenshotAnalysis />
+                  </Suspense>
+                </ErrorBoundary>
+              }
+            />
             <Route path="/website/analysis-history" element={<AnalysisHistoryViewer />} />
             <Route path="/website/synthetic-queries" element={<SyntheticQueryManager />} />
             <Route path="/website/crawl-management" element={<CrawlManagement />} />

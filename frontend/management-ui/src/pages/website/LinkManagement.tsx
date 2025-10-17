@@ -52,12 +52,13 @@ import {
   type SortingState,
   useReactTable,
 } from "@tanstack/react-table";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion } from "motion/react";
 import React, { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Layout } from "~/components/Layout";
 import { LinkDetailDialog } from "~/components/LinkDetailDialog";
 import { LinkForm } from "~/components/LinkForm";
+import { useDebounce } from "~/hooks";
 import { PageTabs } from "~/components/PageTabs";
 import {
   useBulkDelete,
@@ -91,7 +92,8 @@ export function LinkManagement() {
 
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
-  const [globalFilter, setGlobalFilter] = useState("");
+  const [searchInput, setSearchInput] = useState("");
+  const globalFilter = useDebounce(searchInput, 300); // Debounce search input
   const [grouping, setGrouping] = useState<GroupingState>([]);
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
 
@@ -137,7 +139,7 @@ export function LinkManagement() {
   // Clear all filters and search
   const handleClearFilters = () => {
     setActiveFilters([]);
-    setGlobalFilter("");
+    setSearchInput("");
   };
 
   // Filter links based on active filters (OR logic)
@@ -350,7 +352,6 @@ export function LinkManagement() {
     enableGrouping: true,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
-    onGlobalFilterChange: setGlobalFilter,
     onGroupingChange: setGrouping,
     onRowSelectionChange: setRowSelection,
     getCoreRowModel: getCoreRowModel(),
@@ -744,8 +745,8 @@ export function LinkManagement() {
               <TextField
                 fullWidth
                 placeholder="Search by name or link..."
-                value={globalFilter}
-                onChange={(e) => setGlobalFilter(e.target.value)}
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
                 sx={{
                   "& .MuiOutlinedInput-root": {
                     height: "48px",

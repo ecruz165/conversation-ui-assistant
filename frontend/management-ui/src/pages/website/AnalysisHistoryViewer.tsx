@@ -24,7 +24,8 @@ import {
   ToggleButtonGroup,
   Typography,
 } from "@mui/material";
-import { useState } from "react";
+import { useRef, useMemo, useState } from "react";
+import { useVirtualizer } from "@tanstack/react-virtual";
 import { useAnalysisHistory } from "~/hooks";
 import type { ScreenshotAnalysisResult } from "~/types";
 
@@ -250,15 +251,23 @@ function ComparisonView({
   entry1: ScreenshotAnalysisResult;
   entry2: ScreenshotAnalysisResult;
 }) {
-  const textDiff = calculateDiff(entry1.textContent.extracted, entry2.textContent.extracted);
-  const regionDiff = {
-    added: entry2.regions.length - entry1.regions.length,
-    removed: 0,
-  };
-  if (regionDiff.added < 0) {
-    regionDiff.removed = Math.abs(regionDiff.added);
-    regionDiff.added = 0;
-  }
+  // Memoize expensive diff calculation
+  const textDiff = useMemo(
+    () => calculateDiff(entry1.textContent.extracted, entry2.textContent.extracted),
+    [entry1.textContent.extracted, entry2.textContent.extracted]
+  );
+
+  const regionDiff = useMemo(() => {
+    const diff = {
+      added: entry2.regions.length - entry1.regions.length,
+      removed: 0,
+    };
+    if (diff.added < 0) {
+      diff.removed = Math.abs(diff.added);
+      diff.added = 0;
+    }
+    return diff;
+  }, [entry1.regions.length, entry2.regions.length]);
 
   const confidenceDiff = entry2.metadata.confidence - entry1.metadata.confidence;
 
@@ -425,6 +434,7 @@ export function AnalysisHistoryViewer() {
 
   // Hooks
   const { data, isLoading, refetch } = useAnalysisHistory(websiteId, page, pageSize);
+  const parentRef = useRef<HTMLDivElement>(null);
 
   const entries = data?.entries || [];
 
@@ -446,6 +456,14 @@ export function AnalysisHistoryViewer() {
 
   // Get unique models for filter
   const uniqueModels = Array.from(new Set(entries.map((e) => e.metadata.modelUsed)));
+
+  // Virtual scrolling setup
+  const rowVirtualizer = useVirtualizer({
+    count: filteredEntries.length,
+    getScrollElement: () => parentRef.current,
+    estimateSize: () => 152, // 140px + 12px padding
+    overscan: 3,
+  });
 
   const handleEntryClick = (entry: ScreenshotAnalysisResult) => {
     if (!selectedEntry1) {
@@ -551,15 +569,42 @@ export function AnalysisHistoryViewer() {
             <Typography variant="subtitle1" className="font-semibold mb-3">
               Analysis Timeline
             </Typography>
-            <Box className="space-y-3 max-h-[800px] overflow-y-auto pr-2">
-              {filteredEntries.map((entry) => (
-                <TimelineEntry
-                  key={entry.analysisId}
-                  entry={entry}
-                  isSelected={entry === selectedEntry1 || entry === selectedEntry2}
-                  onClick={() => handleEntryClick(entry)}
-                />
-              ))}
+            <Box
+              ref={parentRef}
+              className="h-[800px] pr-2 overflow-auto"
+            >
+              <div
+                style={{
+                  height: `${rowVirtualizer.getTotalSize()}px`,
+                  width: '100%',
+                  position: 'relative',
+                }}
+              >
+                {rowVirtualizer.getVirtualItems().map((virtualRow) => {
+                  const entry = filteredEntries[virtualRow.index];
+                  return (
+                    <div
+                      key={virtualRow.key}
+                      style={{
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        width: '100%',
+                        height: `${virtualRow.size}px`,
+                        transform: `translateY(${virtualRow.start}px)`,
+                      }}
+                    >
+                      <Box sx={{ pb: 1.5 }}>
+                        <TimelineEntry
+                          entry={entry}
+                          isSelected={entry === selectedEntry1 || entry === selectedEntry2}
+                          onClick={() => handleEntryClick(entry)}
+                        />
+                      </Box>
+                    </div>
+                  );
+                })}
+              </div>
             </Box>
           </Box>
 

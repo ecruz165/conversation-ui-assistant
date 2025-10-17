@@ -1,4 +1,6 @@
 // Shared React hooks
+export { useDebounce } from "./useDebounce";
+export { useIntersectionObserver } from "./useIntersectionObserver";
 
 // Website hooks
 export { useWebsite } from "./useWebsite";

@@ -16,8 +16,10 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
-import React, { useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { api } from "~/api/service";
 import { ErrorBoundary } from "~/components/ErrorBoundary";
 import { Layout } from "~/components/Layout";
 import { MetricCard } from "~/components/MetricCard";
@@ -25,8 +27,10 @@ import { PageTabs } from "~/components/PageTabs";
 import { PageTitle } from "~/components/PageTitle";
 import { SkeletonCard } from "~/components/SkeletonCard";
 import { WebsiteRegistrationForm } from "~/components/WebsiteRegistrationForm";
+import { mockConfig } from "~/config";
 import { useSystemMetrics } from "~/hooks/useSystemMetrics";
 import { useWebsite } from "~/hooks/useWebsite";
+import { mockApi } from "~/mocks/api";
 import type { Website } from "~/types";
 
 const tabs = [
@@ -48,6 +52,18 @@ export function WebsiteOverview() {
   const [showAppKey, setShowAppKey] = useState(false);
   const [copySuccess, setCopySuccess] = useState(false);
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
+
+  // Prefetch navigation links for faster navigation to Link Management tab
+  useEffect(() => {
+    if (website) {
+      queryClient.prefetchQuery({
+        queryKey: ["navigationLinks", websiteId],
+        queryFn: () =>
+          mockConfig.enabled ? mockApi.getNavigationLinks(websiteId) : api.getNavigationLinks(websiteId),
+      });
+    }
+  }, [website, websiteId, queryClient]);
 
   const handleEdit = () => {
     setIsEditing(true);

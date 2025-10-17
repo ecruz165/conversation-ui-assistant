@@ -136,6 +136,7 @@ export function useAnalysisJobStatus(websiteId: string, analysisId: string | nul
         ? mockApi.getAnalysisStatus(websiteId, analysisId!)
         : api.getAnalysisJobStatus(websiteId, analysisId!),
     enabled: !!analysisId, // Only run when analysisId is available
+    staleTime: 1000 * 60, // 1 minute for status checks
     refetchInterval: (query) => {
       // Poll every 2 seconds if status is "processing", otherwise stop
       const status = query.state.data?.status;

@@ -1,4 +1,5 @@
 import { Box, LinearProgress, Typography } from "@mui/material";
+import { memo } from "react";
 
 // Helper function for score color
 function getScoreColor(score: number): string {
@@ -20,7 +21,7 @@ interface ScoreBreakdownBarsProps {
   colorful?: boolean; // Use score-based colors
 }
 
-export function ScoreBreakdownBars({
+export const ScoreBreakdownBars = memo(function ScoreBreakdownBars({
   scores,
   showPercentages = true,
   colorful = true,
@@ -63,4 +64,4 @@ export function ScoreBreakdownBars({
       })}
     </Box>
   );
-}
+});

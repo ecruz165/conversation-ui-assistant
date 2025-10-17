@@ -35,6 +35,7 @@ import {
 } from "@mui/icons-material";
 import React, { useState } from "react";
 import { ConfidenceIndicator, MultiModalRadarChart, ScoreBreakdownBars } from "./visualizations";
+import { ImageWithPlaceholder } from "./ImageWithPlaceholder";
 import type { NavigationLink } from "~/types";
 
 interface LinkDetailDialogProps {
@@ -534,18 +535,21 @@ export function LinkDetailDialog({ open, onClose, link, onEdit }: LinkDetailDial
                             cursor: zoomLevel > 1 ? "move" : "default",
                           }}
                         >
-                          <img
-                            src={link.screenshot}
-                            alt={`Screenshot of ${link.displayName}`}
-                            style={{
-                              width: "100%",
-                              height: "auto",
-                              display: "block",
+                          <Box
+                            sx={{
                               transform: `scale(${zoomLevel})`,
                               transformOrigin: "top left",
                               transition: "transform 0.2s ease-in-out",
                             }}
-                          />
+                          >
+                            <ImageWithPlaceholder
+                              src={link.screenshot}
+                              alt={`Screenshot of ${link.displayName}`}
+                              width="100%"
+                              height="auto"
+                              objectFit="contain"
+                            />
+                          </Box>
                         </Box>
                       </Paper>
                     </Paper>
