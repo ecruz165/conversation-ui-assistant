@@ -20,11 +20,39 @@ export interface EmbeddingData {
   metadata?: Record<string, unknown>; // Additional metadata about the embedding
 }
 
+// Enhanced Multi-Modal Embedding Structure (6 embedding types)
+export interface EnhancedPageEmbedding {
+  // Core embeddings (original 3)
+  functionalityEmbedding: number[]; // "What you can do" - capabilities and features
+  contentEmbedding: number[]; // "What you can see" - visible content and layout
+  purposeEmbedding: number[]; // "Purpose of page" - intent and goal
+
+  // Additional valuable embeddings
+  actionEmbedding: number[]; // Extracted CTAs and buttons - specific actions
+  dataContextEmbedding: number[]; // Data/entities shown - domain objects
+  userTaskEmbedding: number[]; // Common user tasks - workflows and processes
+
+  // Metadata
+  path: string;
+  pageTitle: string;
+  primaryActions: string[]; // List of main CTAs/buttons
+  dataEntities: string[]; // List of data entities (e.g., "invoices", "accounts", "customers")
+
+  // Analysis metadata
+  extractedAt: string;
+  modelUsed: string;
+  confidence: number; // Overall confidence score (0-1)
+}
+
 export interface MultiModalEmbedding {
   id: string;
   pageId: string;
-  embeddings: EmbeddingData[]; // Collection of embeddings from different modalities
+  embeddings: EmbeddingData[]; // Collection of embeddings from different modalities (legacy)
   combinedEmbedding?: number[]; // Optional combined/fused embedding vector
+
+  // Enhanced embedding structure
+  enhanced?: EnhancedPageEmbedding; // New 6-embedding structure
+
   createdAt: string;
   updatedAt: string;
 }
@@ -112,6 +140,7 @@ export interface NavigationLink {
   displayName: string;
   targetUrl: string;
   isBookmarkable: boolean; // Whether user can be directly led to this page via URL
+  startingPath?: string; // For journey pages - the path where the journey begins (crawler-detected or manually set)
   parameters?: Array<{
     // Auto-detected parameters from dynamic URLs (e.g., {account}, {id})
     name: string; // Parameter name (e.g., "account")
@@ -185,11 +214,14 @@ export interface EmbeddingTestQuery {
   minConfidence?: number;
   useMultiModal?: boolean; // Whether to use multi-modal embeddings for search
   modalityWeights?: {
-    // Custom weights for different modalities in search
+    // Custom weights for different modalities in search (legacy)
     text?: number; // 0-1, default 0.5
     visual?: number; // 0-1, default 0.3
     metadata?: number; // 0-1, default 0.2
   };
+  // Enhanced weights (6 embedding types)
+  enhancedWeights?: Partial<EnhancedEmbeddingWeights>;
+  useEnhancedEmbeddings?: boolean; // Whether to use 6-embedding structure
 }
 
 export interface SlotInfo {
@@ -204,13 +236,40 @@ export interface ModalityMatchScore {
   contributionWeight: number; // How much this modality contributed to final score
 }
 
+// Enhanced Modality Scoring (6 embedding types)
+export type EnhancedEmbeddingType =
+  | "functionality"
+  | "content"
+  | "purpose"
+  | "action"
+  | "dataContext"
+  | "userTask";
+
+export interface EnhancedModalityScore {
+  type: EnhancedEmbeddingType;
+  score: number; // 0-1 similarity score
+  weight: number; // Weight applied (0-1)
+  contribution: number; // weight * score
+  label: string; // Display label
+}
+
+export interface EnhancedEmbeddingWeights {
+  functionality: number;
+  content: number;
+  purpose: number;
+  action: number;
+  dataContext: number;
+  userTask: number;
+}
+
 export interface PageMatch {
   pageId: string;
   title: string;
   url: string;
   description?: string;
   matchScore: number; // 0-1 decimal (combined score across modalities)
-  modalityScores?: ModalityMatchScore[]; // Breakdown by modality
+  modalityScores?: ModalityMatchScore[]; // Breakdown by modality (legacy)
+  enhancedScores?: EnhancedModalityScore[]; // Enhanced 6-embedding breakdown
   matchedIntents: string[];
   slots: {
     matched: number;
@@ -226,6 +285,9 @@ export interface PageMatch {
     interactionComplexity: "low" | "medium" | "high";
     contentDensity: "sparse" | "moderate" | "dense";
   };
+  // Enhanced embedding metadata
+  primaryActions?: string[]; // Main CTAs/buttons on this page
+  dataEntities?: string[]; // Data entities present on this page
 }
 
 export interface EmbeddingTestResult {

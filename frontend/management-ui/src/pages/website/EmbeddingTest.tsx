@@ -38,7 +38,7 @@ import { PageTitle } from "~/components/PageTitle";
 import { useEnhancedEmbeddingTest } from "~/hooks/useEnhancedEmbeddingTest";
 import { useUpdateSearchConfiguration } from "~/hooks/useSearchConfiguration";
 import { useWebsite } from "~/hooks/useWebsite";
-import type { PageMatch } from "~/types";
+import type { EnhancedEmbeddingWeights, PageMatch } from "~/types";
 
 // Helper functions for match score visualization
 function getMatchScoreColor(score: number): string {
@@ -61,7 +61,11 @@ interface MultiModalScoreBreakdownProps {
 }
 
 function MultiModalScoreBreakdown({ result }: MultiModalScoreBreakdownProps) {
-  if (!result.modalityScores || result.modalityScores.length === 0) {
+  // Prefer enhanced scores if available, fall back to legacy modalityScores
+  const hasEnhancedScores = result.enhancedScores && result.enhancedScores.length > 0;
+  const hasLegacyScores = result.modalityScores && result.modalityScores.length > 0;
+
+  if (!hasEnhancedScores && !hasLegacyScores) {
     return null;
   }
 
@@ -69,10 +73,52 @@ function MultiModalScoreBreakdown({ result }: MultiModalScoreBreakdownProps) {
     <Box className="mt-4">
       <Typography variant="subtitle2" className="font-semibold mb-2 flex items-center gap-1">
         <TrendingUpIcon fontSize="small" />
-        Multi-Modal Score Breakdown
+        {hasEnhancedScores ? "Enhanced 6-Embedding Breakdown" : "Multi-Modal Score Breakdown"}
       </Typography>
       <Box className="space-y-2">
-        {result.modalityScores.map((modalityScore) => {
+        {/* Enhanced 6-embedding scores */}
+        {hasEnhancedScores && result.enhancedScores!.map((enhancedScore) => {
+          const percentage = Math.round(enhancedScore.score * 100);
+          const weightPercentage = Math.round(enhancedScore.weight * 100);
+          const contributionPercentage = Math.round(enhancedScore.contribution * 100);
+
+          return (
+            <Box key={enhancedScore.type}>
+              <Box className="flex justify-between items-center mb-1">
+                <Box className="flex items-center gap-2">
+                  <Typography variant="caption" className="font-medium">
+                    {enhancedScore.label}
+                  </Typography>
+                  <Chip
+                    label={`${weightPercentage}% weight → ${contributionPercentage}% contrib.`}
+                    size="small"
+                    variant="outlined"
+                    sx={{ height: 20, fontSize: "0.7rem" }}
+                  />
+                </Box>
+                <Typography variant="caption" className="font-bold">
+                  {percentage}%
+                </Typography>
+              </Box>
+              <LinearProgress
+                variant="determinate"
+                value={percentage}
+                sx={{
+                  height: 6,
+                  borderRadius: 3,
+                  backgroundColor: "#e0e0e0",
+                  "& .MuiLinearProgress-bar": {
+                    backgroundColor: getMatchScoreColor(enhancedScore.score),
+                    borderRadius: 3,
+                  },
+                }}
+              />
+            </Box>
+          );
+        })}
+
+        {/* Legacy 3-modality scores */}
+        {!hasEnhancedScores && hasLegacyScores && result.modalityScores!.map((modalityScore) => {
           const percentage = Math.round(modalityScore.score * 100);
           const contribution = Math.round(modalityScore.contributionWeight * 100);
 
@@ -251,6 +297,46 @@ function ResultCard({ result, rank }: ResultCardProps) {
         )}
       </Box>
 
+      {/* Primary Actions (Enhanced Embedding) */}
+      {result.primaryActions && result.primaryActions.length > 0 && (
+        <Box className="mb-3">
+          <Typography variant="caption" className="font-semibold text-gray-700 block mb-1">
+            Primary Actions:
+          </Typography>
+          <Box className="flex flex-wrap gap-1">
+            {result.primaryActions.map((action, idx) => (
+              <Chip
+                key={idx}
+                label={action}
+                size="small"
+                color="secondary"
+                variant="outlined"
+              />
+            ))}
+          </Box>
+        </Box>
+      )}
+
+      {/* Data Entities (Enhanced Embedding) */}
+      {result.dataEntities && result.dataEntities.length > 0 && (
+        <Box className="mb-3">
+          <Typography variant="caption" className="font-semibold text-gray-700 block mb-1">
+            Data Entities:
+          </Typography>
+          <Box className="flex flex-wrap gap-1">
+            {result.dataEntities.map((entity, idx) => (
+              <Chip
+                key={idx}
+                label={entity}
+                size="small"
+                color="info"
+                variant="outlined"
+              />
+            ))}
+          </Box>
+        </Box>
+      )}
+
       {/* Required Slots */}
       {result.slots.required.length > 0 && (
         <Box className="mb-3">
@@ -327,14 +413,27 @@ export function EmbeddingTest() {
 
   // Multi-modal settings
   const [useMultiModal, setUseMultiModal] = useState(true);
+  const [useEnhancedEmbeddings, setUseEnhancedEmbeddings] = useState(true); // Use 6-embedding structure by default
   const [showAdvancedControls, setShowAdvancedControls] = useState(false);
+
+  // Legacy 3-modality weights
   const [modalityWeights, setModalityWeights] = useState({
     text: 0.5,
     visual: 0.3,
     metadata: 0.2,
   });
 
-  // Helper function to adjust weights proportionally when one changes
+  // Enhanced 6-embedding weights
+  const [enhancedWeights, setEnhancedWeights] = useState<EnhancedEmbeddingWeights>({
+    functionality: 0.20,
+    content: 0.15,
+    purpose: 0.25,
+    action: 0.10,
+    dataContext: 0.20,
+    userTask: 0.10,
+  });
+
+  // Helper function to adjust legacy weights proportionally when one changes
   const adjustWeights = (changedWeight: 'text' | 'visual' | 'metadata', newValue: number) => {
     const clampedValue = Math.max(0, Math.min(1, newValue));
     const remaining = 1 - clampedValue;
@@ -356,6 +455,50 @@ export function EmbeddingTest() {
     };
 
     setModalityWeights(newWeights);
+  };
+
+  // Helper function to adjust enhanced weights proportionally when one changes
+  const adjustEnhancedWeights = (
+    changedWeight: keyof EnhancedEmbeddingWeights,
+    newValue: number
+  ) => {
+    const clampedValue = Math.max(0, Math.min(1, newValue));
+    const remaining = 1 - clampedValue;
+
+    // Get the other five weights
+    const otherWeights: Partial<EnhancedEmbeddingWeights> = {};
+    let otherTotal = 0;
+
+    for (const key in enhancedWeights) {
+      if (key !== changedWeight) {
+        const weightKey = key as keyof EnhancedEmbeddingWeights;
+        otherWeights[weightKey] = enhancedWeights[weightKey];
+        otherTotal += enhancedWeights[weightKey];
+      }
+    }
+
+    // Distribute remaining proportionally among other weights
+    const newWeights: EnhancedEmbeddingWeights = {
+      functionality: 0,
+      content: 0,
+      purpose: 0,
+      action: 0,
+      dataContext: 0,
+      userTask: 0,
+    };
+
+    for (const key in enhancedWeights) {
+      const weightKey = key as keyof EnhancedEmbeddingWeights;
+      if (key === changedWeight) {
+        newWeights[weightKey] = clampedValue;
+      } else {
+        newWeights[weightKey] = otherTotal > 0
+          ? (enhancedWeights[weightKey] / otherTotal) * remaining
+          : remaining / 5; // Distribute equally among 5 other weights
+      }
+    }
+
+    setEnhancedWeights(newWeights);
   };
 
   // Recent queries state with localStorage
@@ -502,7 +645,9 @@ export function EmbeddingTest() {
       {
         query: trimmed,
         useMultiModal,
-        modalityWeights: useMultiModal ? modalityWeights : undefined,
+        useEnhancedEmbeddings,
+        modalityWeights: useMultiModal && !useEnhancedEmbeddings ? modalityWeights : undefined,
+        enhancedWeights: useMultiModal && useEnhancedEmbeddings ? enhancedWeights : undefined,
       },
       {
         onSuccess: () => {
@@ -514,7 +659,7 @@ export function EmbeddingTest() {
         },
       }
     );
-  }, [query, validateQuery, embeddingTestMutation, useMultiModal, modalityWeights]);
+  }, [query, validateQuery, embeddingTestMutation, useMultiModal, useEnhancedEmbeddings, modalityWeights, enhancedWeights]);
 
   // Handle Enter key
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
@@ -659,115 +804,273 @@ export function EmbeddingTest() {
             {/* Advanced Controls */}
             {useMultiModal && (
               <Box className="mt-4">
-                <Button
-                  size="small"
-                  onClick={() => setShowAdvancedControls(!showAdvancedControls)}
-                  sx={{ textTransform: "none", mb: 2 }}
-                >
-                  {showAdvancedControls ? "Hide" : "Show"} Advanced Weight Controls
-                </Button>
+                <Box className="flex items-center gap-2 mb-2">
+                  <Button
+                    size="small"
+                    onClick={() => setShowAdvancedControls(!showAdvancedControls)}
+                    sx={{ textTransform: "none" }}
+                  >
+                    {showAdvancedControls ? "Hide" : "Show"} Advanced Weight Controls
+                  </Button>
+                  <Tooltip title="Use enhanced 6-embedding structure for better semantic matching">
+                    <FormControlLabel
+                      control={
+                        <Switch
+                          checked={useEnhancedEmbeddings}
+                          onChange={(e) => setUseEnhancedEmbeddings(e.target.checked)}
+                          disabled={isSearching}
+                          size="small"
+                        />
+                      }
+                      label="Enhanced (6 embeddings)"
+                    />
+                  </Tooltip>
+                </Box>
                 <Collapse in={showAdvancedControls}>
                   <Card variant="outlined" sx={{ p: 2, backgroundColor: "#f9fafb" }}>
                     <Typography variant="subtitle2" className="mb-3">
-                      Adjust Embedding Modality Weights
+                      {useEnhancedEmbeddings
+                        ? "Adjust Enhanced 6-Embedding Weights"
+                        : "Adjust Legacy 3-Modality Weights"}
                     </Typography>
-                    <Box className="space-y-3">
-                      <Box>
-                        <Box className="flex justify-between items-center mb-1">
-                          <Typography variant="caption">Text Embeddings</Typography>
-                          <Typography variant="caption" className="font-bold">
-                            {Math.round(modalityWeights.text * 100)}%
-                          </Typography>
+
+                    {/* Enhanced 6-embedding controls */}
+                    {useEnhancedEmbeddings ? (
+                      <Box className="space-y-3">
+                        {/* Functionality Embedding */}
+                        <Box>
+                          <Box className="flex justify-between items-center mb-1">
+                            <Tooltip title="What users can do - page capabilities and features">
+                              <Typography variant="caption">Functionality</Typography>
+                            </Tooltip>
+                            <Typography variant="caption" className="font-bold">
+                              {Math.round(enhancedWeights.functionality * 100)}%
+                            </Typography>
+                          </Box>
+                          <Slider
+                            value={enhancedWeights.functionality}
+                            onChange={(_, value) => adjustEnhancedWeights("functionality", value as number)}
+                            min={0}
+                            max={1}
+                            step={0.05}
+                            disabled={isSearching}
+                            size="small"
+                          />
                         </Box>
-                        <Slider
-                          value={modalityWeights.text}
-                          onChange={(_, value) => adjustWeights('text', value as number)}
-                          min={0}
-                          max={1}
-                          step={0.05}
-                          disabled={isSearching}
-                          marks={[
-                            { value: 0, label: "0%" },
-                            { value: 0.5, label: "50%" },
-                            { value: 1, label: "100%" },
-                          ]}
-                        />
-                      </Box>
-                      <Box>
-                        <Box className="flex justify-between items-center mb-1">
-                          <Typography variant="caption">Visual Embeddings</Typography>
-                          <Typography variant="caption" className="font-bold">
-                            {Math.round(modalityWeights.visual * 100)}%
-                          </Typography>
+
+                        {/* Content Embedding */}
+                        <Box>
+                          <Box className="flex justify-between items-center mb-1">
+                            <Tooltip title="What users can see - visible content and layout">
+                              <Typography variant="caption">Content</Typography>
+                            </Tooltip>
+                            <Typography variant="caption" className="font-bold">
+                              {Math.round(enhancedWeights.content * 100)}%
+                            </Typography>
+                          </Box>
+                          <Slider
+                            value={enhancedWeights.content}
+                            onChange={(_, value) => adjustEnhancedWeights("content", value as number)}
+                            min={0}
+                            max={1}
+                            step={0.05}
+                            disabled={isSearching}
+                            size="small"
+                          />
                         </Box>
-                        <Slider
-                          value={modalityWeights.visual}
-                          onChange={(_, value) => adjustWeights('visual', value as number)}
-                          min={0}
-                          max={1}
-                          step={0.05}
-                          disabled={isSearching}
-                          marks={[
-                            { value: 0, label: "0%" },
-                            { value: 0.5, label: "50%" },
-                            { value: 1, label: "100%" },
-                          ]}
-                        />
-                      </Box>
-                      <Box>
-                        <Box className="flex justify-between items-center mb-1">
-                          <Typography variant="caption">Metadata Embeddings</Typography>
-                          <Typography variant="caption" className="font-bold">
-                            {Math.round(modalityWeights.metadata * 100)}%
-                          </Typography>
+
+                        {/* Purpose Embedding */}
+                        <Box>
+                          <Box className="flex justify-between items-center mb-1">
+                            <Tooltip title="Purpose and intent of the page">
+                              <Typography variant="caption">Purpose</Typography>
+                            </Tooltip>
+                            <Typography variant="caption" className="font-bold">
+                              {Math.round(enhancedWeights.purpose * 100)}%
+                            </Typography>
+                          </Box>
+                          <Slider
+                            value={enhancedWeights.purpose}
+                            onChange={(_, value) => adjustEnhancedWeights("purpose", value as number)}
+                            min={0}
+                            max={1}
+                            step={0.05}
+                            disabled={isSearching}
+                            size="small"
+                          />
                         </Box>
-                        <Slider
-                          value={modalityWeights.metadata}
-                          onChange={(_, value) => adjustWeights('metadata', value as number)}
-                          min={0}
-                          max={1}
-                          step={0.05}
-                          disabled={isSearching}
-                          marks={[
-                            { value: 0, label: "0%" },
-                            { value: 0.5, label: "50%" },
-                            { value: 1, label: "100%" },
-                          ]}
-                        />
-                      </Box>
-                      <Alert severity="info" sx={{ fontSize: "0.75rem" }}>
-                        Weights determine how much each modality contributes to the final match score.
-                        Higher weights emphasize that modality's importance.
-                      </Alert>
-                      {hasUnsavedChanges && (
-                        <Alert severity="warning" sx={{ fontSize: "0.75rem", mt: 2 }}>
-                          You have unsaved changes to the modality weights.
+
+                        {/* Action Embedding */}
+                        <Box>
+                          <Box className="flex justify-between items-center mb-1">
+                            <Tooltip title="Specific actions - CTAs and buttons">
+                              <Typography variant="caption">Actions</Typography>
+                            </Tooltip>
+                            <Typography variant="caption" className="font-bold">
+                              {Math.round(enhancedWeights.action * 100)}%
+                            </Typography>
+                          </Box>
+                          <Slider
+                            value={enhancedWeights.action}
+                            onChange={(_, value) => adjustEnhancedWeights("action", value as number)}
+                            min={0}
+                            max={1}
+                            step={0.05}
+                            disabled={isSearching}
+                            size="small"
+                          />
+                        </Box>
+
+                        {/* Data Context Embedding */}
+                        <Box>
+                          <Box className="flex justify-between items-center mb-1">
+                            <Tooltip title="Data entities and domain objects present">
+                              <Typography variant="caption">Data Context</Typography>
+                            </Tooltip>
+                            <Typography variant="caption" className="font-bold">
+                              {Math.round(enhancedWeights.dataContext * 100)}%
+                            </Typography>
+                          </Box>
+                          <Slider
+                            value={enhancedWeights.dataContext}
+                            onChange={(_, value) => adjustEnhancedWeights("dataContext", value as number)}
+                            min={0}
+                            max={1}
+                            step={0.05}
+                            disabled={isSearching}
+                            size="small"
+                          />
+                        </Box>
+
+                        {/* User Task Embedding */}
+                        <Box>
+                          <Box className="flex justify-between items-center mb-1">
+                            <Tooltip title="Common user tasks and workflows">
+                              <Typography variant="caption">User Tasks</Typography>
+                            </Tooltip>
+                            <Typography variant="caption" className="font-bold">
+                              {Math.round(enhancedWeights.userTask * 100)}%
+                            </Typography>
+                          </Box>
+                          <Slider
+                            value={enhancedWeights.userTask}
+                            onChange={(_, value) => adjustEnhancedWeights("userTask", value as number)}
+                            min={0}
+                            max={1}
+                            step={0.05}
+                            disabled={isSearching}
+                            size="small"
+                          />
+                        </Box>
+
+                        <Alert severity="info" sx={{ fontSize: "0.75rem" }}>
+                          Enhanced embeddings provide richer semantic understanding through 6 specialized
+                          dimensions: functionality, content, purpose, actions, data context, and user
+                          tasks.
                         </Alert>
-                      )}
-                      <Box className="flex gap-2 mt-3">
-                        <Button
-                          variant={hasUnsavedChanges ? "contained" : "outlined"}
-                          color={hasUnsavedChanges ? "primary" : "inherit"}
-                          size="small"
-                          startIcon={<SaveIcon />}
-                          onClick={handleSaveAsDefault}
-                          disabled={!hasUnsavedChanges || updateSearchConfigMutation.isPending || isSearching}
-                          fullWidth
-                        >
-                          {updateSearchConfigMutation.isPending ? "Saving..." : "Save as Default"}
-                        </Button>
-                        <Button
-                          variant="outlined"
-                          size="small"
-                          startIcon={<RestartAltIcon />}
-                          onClick={handleResetToDefault}
-                          disabled={!hasUnsavedChanges || isSearching}
-                          fullWidth
-                        >
-                          Reset to Default
-                        </Button>
                       </Box>
-                    </Box>
+                    ) : (
+                      /* Legacy 3-modality controls */
+                      <Box className="space-y-3">
+                        <Box>
+                          <Box className="flex justify-between items-center mb-1">
+                            <Typography variant="caption">Text Embeddings</Typography>
+                            <Typography variant="caption" className="font-bold">
+                              {Math.round(modalityWeights.text * 100)}%
+                            </Typography>
+                          </Box>
+                          <Slider
+                            value={modalityWeights.text}
+                            onChange={(_, value) => adjustWeights("text", value as number)}
+                            min={0}
+                            max={1}
+                            step={0.05}
+                            disabled={isSearching}
+                            marks={[
+                              { value: 0, label: "0%" },
+                              { value: 0.5, label: "50%" },
+                              { value: 1, label: "100%" },
+                            ]}
+                          />
+                        </Box>
+                        <Box>
+                          <Box className="flex justify-between items-center mb-1">
+                            <Typography variant="caption">Visual Embeddings</Typography>
+                            <Typography variant="caption" className="font-bold">
+                              {Math.round(modalityWeights.visual * 100)}%
+                            </Typography>
+                          </Box>
+                          <Slider
+                            value={modalityWeights.visual}
+                            onChange={(_, value) => adjustWeights("visual", value as number)}
+                            min={0}
+                            max={1}
+                            step={0.05}
+                            disabled={isSearching}
+                            marks={[
+                              { value: 0, label: "0%" },
+                              { value: 0.5, label: "50%" },
+                              { value: 1, label: "100%" },
+                            ]}
+                          />
+                        </Box>
+                        <Box>
+                          <Box className="flex justify-between items-center mb-1">
+                            <Typography variant="caption">Metadata Embeddings</Typography>
+                            <Typography variant="caption" className="font-bold">
+                              {Math.round(modalityWeights.metadata * 100)}%
+                            </Typography>
+                          </Box>
+                          <Slider
+                            value={modalityWeights.metadata}
+                            onChange={(_, value) => adjustWeights("metadata", value as number)}
+                            min={0}
+                            max={1}
+                            step={0.05}
+                            disabled={isSearching}
+                            marks={[
+                              { value: 0, label: "0%" },
+                              { value: 0.5, label: "50%" },
+                              { value: 1, label: "100%" },
+                            ]}
+                          />
+                        </Box>
+                        <Alert severity="info" sx={{ fontSize: "0.75rem" }}>
+                          Weights determine how much each modality contributes to the final match score.
+                          Higher weights emphasize that modality's importance.
+                        </Alert>
+                        {hasUnsavedChanges && (
+                          <Alert severity="warning" sx={{ fontSize: "0.75rem", mt: 2 }}>
+                            You have unsaved changes to the modality weights.
+                          </Alert>
+                        )}
+                        <Box className="flex gap-2 mt-3">
+                          <Button
+                            variant={hasUnsavedChanges ? "contained" : "outlined"}
+                            color={hasUnsavedChanges ? "primary" : "inherit"}
+                            size="small"
+                            startIcon={<SaveIcon />}
+                            onClick={handleSaveAsDefault}
+                            disabled={
+                              !hasUnsavedChanges || updateSearchConfigMutation.isPending || isSearching
+                            }
+                            fullWidth
+                          >
+                            {updateSearchConfigMutation.isPending ? "Saving..." : "Save as Default"}
+                          </Button>
+                          <Button
+                            variant="outlined"
+                            size="small"
+                            startIcon={<RestartAltIcon />}
+                            onClick={handleResetToDefault}
+                            disabled={!hasUnsavedChanges || isSearching}
+                            fullWidth
+                          >
+                            Reset to Default
+                          </Button>
+                        </Box>
+                      </Box>
+                    )}
                   </Card>
                 </Collapse>
               </Box>
@@ -851,9 +1154,19 @@ export function EmbeddingTest() {
         <Alert severity="info">
           {useMultiModal ? (
             <>
-              Multi-modal search combines text, visual, and metadata embeddings for more accurate
-              matching. Adjust weights to emphasize different aspects of page content. Higher match
-              scores indicate better alignment across all modalities.
+              {useEnhancedEmbeddings ? (
+                <>
+                  Enhanced 6-embedding search provides deeper semantic understanding through
+                  functionality, content, purpose, actions, data context, and user task dimensions.
+                  Adjust weights to fine-tune matching based on your use case.
+                </>
+              ) : (
+                <>
+                  Multi-modal search combines text, visual, and metadata embeddings for more accurate
+                  matching. Adjust weights to emphasize different aspects of page content. Higher match
+                  scores indicate better alignment across all modalities.
+                </>
+              )}
             </>
           ) : (
             <>

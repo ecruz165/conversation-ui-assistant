@@ -1,6 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
 import { api } from "~/api/service";
 import { mockConfig } from "~/config";
+import { mockEmbeddingTestResult } from "~/mocks/data";
 import type { EmbeddingTestQuery, EmbeddingTestResult } from "~/types";
 
 // Mock API for enhanced embedding tests
@@ -11,118 +12,11 @@ const mockApi = {
   ): Promise<EmbeddingTestResult> => {
     await new Promise((resolve) => setTimeout(resolve, 1500));
 
+    // Use the enhanced mock data from mocks/data.ts
+    // This data includes both enhanced scores and legacy modalityScores
     const mockResults: EmbeddingTestResult = {
-      query: query.query,
-      totalMatches: 3,
-      results: [
-        {
-          pageId: "page-1",
-          title: "User Account Settings",
-          url: "/account/settings",
-          description: "Manage your account preferences and personal information",
-          matchScore: 0.92,
-          modalityScores: query.useMultiModal
-            ? [
-                { modality: "text", score: 0.88, contributionWeight: 0.5 },
-                { modality: "visual", score: 0.95, contributionWeight: 0.3 },
-                { modality: "metadata", score: 0.89, contributionWeight: 0.2 },
-              ]
-            : undefined,
-          matchedIntents: ["account", "settings", "preferences"],
-          slots: {
-            matched: 0,
-            total: 0,
-            required: [],
-          },
-          isBestMatch: true,
-          visualPreview: "/screenshots/account-settings.png",
-          matchedVisualElements: query.useMultiModal
-            ? [
-                {
-                  type: "form",
-                  description: "Account settings form",
-                  location: { x: 200, y: 100, width: 600, height: 400 },
-                },
-                {
-                  type: "button",
-                  description: "Save Settings button",
-                  location: { x: 200, y: 520, width: 120, height: 40 },
-                  text: "Save Settings",
-                },
-              ]
-            : undefined,
-          analysisData: {
-            hasForm: true,
-            interactionComplexity: "medium",
-            contentDensity: "moderate",
-          },
-        },
-        {
-          pageId: "page-2",
-          title: "Profile Management",
-          url: "/profile",
-          description: "Update your profile information and photo",
-          matchScore: 0.78,
-          modalityScores: query.useMultiModal
-            ? [
-                { modality: "text", score: 0.82, contributionWeight: 0.5 },
-                { modality: "visual", score: 0.75, contributionWeight: 0.3 },
-                { modality: "metadata", score: 0.73, contributionWeight: 0.2 },
-              ]
-            : undefined,
-          matchedIntents: ["profile", "account"],
-          slots: {
-            matched: 0,
-            total: 0,
-            required: [],
-          },
-          isBestMatch: false,
-          analysisData: {
-            hasForm: true,
-            interactionComplexity: "low",
-            contentDensity: "sparse",
-          },
-        },
-        {
-          pageId: "page-3",
-          title: "Security Settings",
-          url: "/account/security",
-          description: "Manage password and two-factor authentication",
-          matchScore: 0.65,
-          modalityScores: query.useMultiModal
-            ? [
-                { modality: "text", score: 0.70, contributionWeight: 0.5 },
-                { modality: "visual", score: 0.62, contributionWeight: 0.3 },
-                { modality: "metadata", score: 0.58, contributionWeight: 0.2 },
-              ]
-            : undefined,
-          matchedIntents: ["security", "account"],
-          slots: {
-            matched: 0,
-            total: 0,
-            required: [],
-          },
-          isBestMatch: false,
-          analysisData: {
-            hasForm: true,
-            interactionComplexity: "high",
-            contentDensity: "moderate",
-          },
-        },
-      ],
-      searchMetadata: query.useMultiModal
-        ? {
-            multiModalUsed: true,
-            averageConfidence: 0.78,
-            modalitiesUsed: ["text", "visual", "metadata"],
-            searchDuration: 1500,
-          }
-        : {
-            multiModalUsed: false,
-            averageConfidence: 0.78,
-            modalitiesUsed: ["text"],
-            searchDuration: 800,
-          },
+      ...mockEmbeddingTestResult,
+      query: query.query, // Use the actual query from the request
     };
 
     // Filter by minConfidence if provided

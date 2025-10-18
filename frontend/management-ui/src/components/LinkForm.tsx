@@ -42,6 +42,7 @@ interface LinkFormData {
   displayName: string;
   targetUrl: string;
   isBookmarkable: boolean;
+  startingPath?: string;
   description?: string;
   aiGuidance?: string;
   keywords: string[];
@@ -86,6 +87,7 @@ export function LinkForm({ open, onClose, onSubmit, initialData, mode = "create"
       displayName: initialData?.displayName || "",
       targetUrl: initialData?.targetUrl || "",
       isBookmarkable: initialData?.isBookmarkable ?? true,
+      startingPath: initialData?.startingPath || "",
       description: initialData?.description || "",
       aiGuidance: initialData?.aiGuidance || "",
       keywords: initialData?.keywords || [],
@@ -193,6 +195,7 @@ export function LinkForm({ open, onClose, onSubmit, initialData, mode = "create"
         displayName: data.displayName,
         targetUrl: data.targetUrl,
         isBookmarkable: data.isBookmarkable,
+        startingPath: data.startingPath,
         description: data.description,
         aiGuidance: data.aiGuidance,
         keywords: data.keywords,
@@ -236,40 +239,7 @@ export function LinkForm({ open, onClose, onSubmit, initialData, mode = "create"
       <DialogTitle>{mode === "edit" ? "Edit Navigation Link" : "Add Navigation Link"}</DialogTitle>
       <DialogContent>
         <Stack spacing={3} sx={{ mt: 2 }}>
-          {/* Display Name */}
-          <Controller
-            name="displayName"
-            control={control}
-            rules={{ required: "Display name is required" }}
-            render={({ field }) => (
-              <TextField
-                {...field}
-                label="Display Name"
-                required
-                fullWidth
-                error={!!errors.displayName}
-                helperText={errors.displayName?.message || "Name shown to users"}
-              />
-            )}
-          />
-
-          {/* Description */}
-          <Controller
-            name="description"
-            control={control}
-            render={({ field }) => (
-              <TextField
-                {...field}
-                label="Description"
-                fullWidth
-                multiline
-                rows={2}
-                helperText="Brief description of what this link does"
-              />
-            )}
-          />
-
-          {/* Target URL */}
+          {/* Path (Target URL) */}
           <Controller
             name="targetUrl"
             control={control}
@@ -296,20 +266,20 @@ export function LinkForm({ open, onClose, onSubmit, initialData, mode = "create"
             )}
           />
 
-          {/* Detected Parameters */}
+          {/* Path/Query Param Slots */}
           {detectedParameters.length > 0 && (
             <Alert severity="info" icon={<CodeIcon />}>
               <Typography variant="subtitle2" className="font-semibold mb-1">
-                Detected Path Parameters
+                Path/Query Param Slots
               </Typography>
               <Typography variant="body2" className="mb-2">
-                These parameters will be collected from the user before navigation:
+                AI will collect these values from user before navigation:
               </Typography>
               <Box className="flex flex-wrap gap-1">
                 {detectedParameters.map((param, index) => (
                   <Chip
                     key={index}
-                    label={`{${param}}`}
+                    label={param}
                     size="small"
                     color="primary"
                     variant="outlined"
@@ -319,9 +289,88 @@ export function LinkForm({ open, onClose, onSubmit, initialData, mode = "create"
             </Alert>
           )}
 
+          {/* Title (Display Name) */}
+          <Controller
+            name="displayName"
+            control={control}
+            rules={{ required: "Title is required" }}
+            render={({ field }) => (
+              <TextField
+                {...field}
+                label="Title"
+                required
+                fullWidth
+                error={!!errors.displayName}
+                helperText={errors.displayName?.message || "Page title shown to users"}
+              />
+            )}
+          />
+
+          {/* Page Type */}
+          <Controller
+            name="isBookmarkable"
+            control={control}
+            render={({ field }) => (
+              <FormControl>
+                <FormLabel>Page Type</FormLabel>
+                <RadioGroup
+                  value={field.value ? "bookmarkable" : "journey"}
+                  onChange={(e) => field.onChange(e.target.value === "bookmarkable")}
+                >
+                  <FormControlLabel
+                    value="bookmarkable"
+                    control={<Radio />}
+                    label={
+                      <Box>
+                        <Typography variant="body2">Bookmarkable</Typography>
+                        <Typography variant="caption" className="text-gray-600">
+                          Users can navigate directly via URL
+                        </Typography>
+                      </Box>
+                    }
+                  />
+                  <FormControlLabel
+                    value="journey"
+                    control={<Radio />}
+                    label={
+                      <Box>
+                        <Typography variant="body2">Journey</Typography>
+                        <Typography variant="caption" className="text-gray-600">
+                          Requires user input or interaction
+                        </Typography>
+                      </Box>
+                    }
+                  />
+                </RadioGroup>
+              </FormControl>
+            )}
+          />
+
+          {/* Starting Path - Only for Journey pages */}
+          {!isBookmarkable && (
+            <Controller
+              name="startingPath"
+              control={control}
+              render={({ field }) => (
+                <TextField
+                  {...field}
+                  label="Starting Path"
+                  fullWidth
+                  placeholder="/dashboard"
+                  helperText="The page/URL where users start before reaching this journey endpoint"
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      fontFamily: 'monospace',
+                    }
+                  }}
+                />
+              )}
+            />
+          )}
+
           {/* Keywords */}
           <Box>
-            <FormLabel>Keywords</FormLabel>
+            <FormLabel>Keywords (Optional)</FormLabel>
             <Box className="flex gap-2 mt-2 mb-2">
               <TextField
                 value={keywordInput}
@@ -352,77 +401,18 @@ export function LinkForm({ open, onClose, onSubmit, initialData, mode = "create"
             </Box>
           </Box>
 
-          {/* Intent/Action */}
+          {/* Description */}
           <Controller
-            name="intent"
-            control={control}
-            rules={{
-              required: "Intent is required",
-              pattern: {
-                value: /^[a-z][a-z0-9_]*$/,
-                message:
-                  "Intent must be lowercase letters, numbers, and underscores only. Must start with a letter.",
-              },
-              minLength: {
-                value: 2,
-                message: "Intent must be at least 2 characters",
-              },
-            }}
-            render={({ field }) => (
-              <TextField
-                {...field}
-                label="Intent / Action"
-                required
-                fullWidth
-                placeholder="e.g., view_portfolio, transfer_funds"
-                error={!!errors.intent}
-                helperText={
-                  errors.intent?.message ||
-                  "Unique identifier for this action (auto-generated from URL)"
-                }
-                onChange={(e) => {
-                  // Auto-convert to lowercase
-                  const value = e.target.value.toLowerCase();
-                  field.onChange(value);
-                }}
-              />
-            )}
-          />
-
-          {/* Is Bookmarkable */}
-          <Controller
-            name="isBookmarkable"
-            control={control}
-            render={({ field }) => (
-              <FormControlLabel
-                control={<Checkbox {...field} checked={field.value} />}
-                label={
-                  <Box>
-                    <Typography variant="body2">Bookmarkable (Direct Navigation)</Typography>
-                    <Typography variant="caption" className="text-gray-600">
-                      {field.value
-                        ? "Users can be directly navigated to this page via URL"
-                        : "This is a journey page - requires user input or form submission"}
-                    </Typography>
-                  </Box>
-                }
-              />
-            )}
-          />
-
-          {/* AI Guidance */}
-          <Controller
-            name="aiGuidance"
+            name="description"
             control={control}
             render={({ field }) => (
               <TextField
                 {...field}
-                label="AI Guidance (Optional)"
+                label="Description"
                 fullWidth
                 multiline
                 rows={3}
-                helperText="Provide context to help AI understand what users can do on this page"
-                placeholder="e.g., On this page, users can view their portfolio balance, recent transactions, and investment performance charts..."
+                helperText="Brief description of what this page does"
               />
             )}
           />
@@ -557,6 +547,22 @@ export function LinkForm({ open, onClose, onSubmit, initialData, mode = "create"
               )}
             </Box>
           )}
+
+          {/* AI Guidance */}
+          <Controller
+            name="aiGuidance"
+            control={control}
+            render={({ field }) => (
+              <TextField
+                {...field}
+                label="AI Guidance (Optional)"
+                fullWidth
+                multiline
+                rows={3}
+                helperText="Optional guidance for AI to understand the page and how to navigate to it"
+              />
+            )}
+          />
 
           {/* Screenshot Upload */}
           <Box>
