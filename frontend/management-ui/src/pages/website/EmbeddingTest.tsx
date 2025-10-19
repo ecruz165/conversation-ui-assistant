@@ -77,85 +77,88 @@ function MultiModalScoreBreakdown({ result }: MultiModalScoreBreakdownProps) {
       </Typography>
       <Box className="space-y-2">
         {/* Enhanced 6-embedding scores */}
-        {hasEnhancedScores && result.enhancedScores!.map((enhancedScore) => {
-          const percentage = Math.round(enhancedScore.score * 100);
-          const weightPercentage = Math.round(enhancedScore.weight * 100);
-          const contributionPercentage = Math.round(enhancedScore.contribution * 100);
+        {hasEnhancedScores &&
+          result.enhancedScores!.map((enhancedScore) => {
+            const percentage = Math.round(enhancedScore.score * 100);
+            const weightPercentage = Math.round(enhancedScore.weight * 100);
+            const contributionPercentage = Math.round(enhancedScore.contribution * 100);
 
-          return (
-            <Box key={enhancedScore.type}>
-              <Box className="flex justify-between items-center mb-1">
-                <Box className="flex items-center gap-2">
-                  <Typography variant="caption" className="font-medium">
-                    {enhancedScore.label}
+            return (
+              <Box key={enhancedScore.type}>
+                <Box className="flex justify-between items-center mb-1">
+                  <Box className="flex items-center gap-2">
+                    <Typography variant="caption" className="font-medium">
+                      {enhancedScore.label}
+                    </Typography>
+                    <Chip
+                      label={`${weightPercentage}% weight → ${contributionPercentage}% contrib.`}
+                      size="small"
+                      variant="outlined"
+                      sx={{ height: 20, fontSize: "0.7rem" }}
+                    />
+                  </Box>
+                  <Typography variant="caption" className="font-bold">
+                    {percentage}%
                   </Typography>
-                  <Chip
-                    label={`${weightPercentage}% weight → ${contributionPercentage}% contrib.`}
-                    size="small"
-                    variant="outlined"
-                    sx={{ height: 20, fontSize: "0.7rem" }}
-                  />
                 </Box>
-                <Typography variant="caption" className="font-bold">
-                  {percentage}%
-                </Typography>
-              </Box>
-              <LinearProgress
-                variant="determinate"
-                value={percentage}
-                sx={{
-                  height: 6,
-                  borderRadius: 3,
-                  backgroundColor: "#e0e0e0",
-                  "& .MuiLinearProgress-bar": {
-                    backgroundColor: getMatchScoreColor(enhancedScore.score),
+                <LinearProgress
+                  variant="determinate"
+                  value={percentage}
+                  sx={{
+                    height: 6,
                     borderRadius: 3,
-                  },
-                }}
-              />
-            </Box>
-          );
-        })}
+                    backgroundColor: "#e0e0e0",
+                    "& .MuiLinearProgress-bar": {
+                      backgroundColor: getMatchScoreColor(enhancedScore.score),
+                      borderRadius: 3,
+                    },
+                  }}
+                />
+              </Box>
+            );
+          })}
 
         {/* Legacy 3-modality scores */}
-        {!hasEnhancedScores && hasLegacyScores && result.modalityScores!.map((modalityScore) => {
-          const percentage = Math.round(modalityScore.score * 100);
-          const contribution = Math.round(modalityScore.contributionWeight * 100);
+        {!hasEnhancedScores &&
+          hasLegacyScores &&
+          result.modalityScores!.map((modalityScore) => {
+            const percentage = Math.round(modalityScore.score * 100);
+            const contribution = Math.round(modalityScore.contributionWeight * 100);
 
-          return (
-            <Box key={modalityScore.modality}>
-              <Box className="flex justify-between items-center mb-1">
-                <Box className="flex items-center gap-2">
-                  <Typography variant="caption" className="font-medium capitalize">
-                    {modalityScore.modality}
+            return (
+              <Box key={modalityScore.modality}>
+                <Box className="flex justify-between items-center mb-1">
+                  <Box className="flex items-center gap-2">
+                    <Typography variant="caption" className="font-medium capitalize">
+                      {modalityScore.modality}
+                    </Typography>
+                    <Chip
+                      label={`${contribution}% weight`}
+                      size="small"
+                      variant="outlined"
+                      sx={{ height: 20, fontSize: "0.7rem" }}
+                    />
+                  </Box>
+                  <Typography variant="caption" className="font-bold">
+                    {percentage}%
                   </Typography>
-                  <Chip
-                    label={`${contribution}% weight`}
-                    size="small"
-                    variant="outlined"
-                    sx={{ height: 20, fontSize: "0.7rem" }}
-                  />
                 </Box>
-                <Typography variant="caption" className="font-bold">
-                  {percentage}%
-                </Typography>
-              </Box>
-              <LinearProgress
-                variant="determinate"
-                value={percentage}
-                sx={{
-                  height: 6,
-                  borderRadius: 3,
-                  backgroundColor: "#e0e0e0",
-                  "& .MuiLinearProgress-bar": {
-                    backgroundColor: getMatchScoreColor(modalityScore.score),
+                <LinearProgress
+                  variant="determinate"
+                  value={percentage}
+                  sx={{
+                    height: 6,
                     borderRadius: 3,
-                  },
-                }}
-              />
-            </Box>
-          );
-        })}
+                    backgroundColor: "#e0e0e0",
+                    "& .MuiLinearProgress-bar": {
+                      backgroundColor: getMatchScoreColor(modalityScore.score),
+                      borderRadius: 3,
+                    },
+                  }}
+                />
+              </Box>
+            );
+          })}
       </Box>
     </Box>
   );
@@ -305,13 +308,7 @@ function ResultCard({ result, rank }: ResultCardProps) {
           </Typography>
           <Box className="flex flex-wrap gap-1">
             {result.primaryActions.map((action, idx) => (
-              <Chip
-                key={idx}
-                label={action}
-                size="small"
-                color="secondary"
-                variant="outlined"
-              />
+              <Chip key={idx} label={action} size="small" color="secondary" variant="outlined" />
             ))}
           </Box>
         </Box>
@@ -325,13 +322,7 @@ function ResultCard({ result, rank }: ResultCardProps) {
           </Typography>
           <Box className="flex flex-wrap gap-1">
             {result.dataEntities.map((entity, idx) => (
-              <Chip
-                key={idx}
-                label={entity}
-                size="small"
-                color="info"
-                variant="outlined"
-              />
+              <Chip key={idx} label={entity} size="small" color="info" variant="outlined" />
             ))}
           </Box>
         </Box>
@@ -425,33 +416,48 @@ export function EmbeddingTest() {
 
   // Enhanced 6-embedding weights
   const [enhancedWeights, setEnhancedWeights] = useState<EnhancedEmbeddingWeights>({
-    functionality: 0.20,
+    functionality: 0.2,
     content: 0.15,
     purpose: 0.25,
-    action: 0.10,
-    dataContext: 0.20,
-    userTask: 0.10,
+    action: 0.1,
+    dataContext: 0.2,
+    userTask: 0.1,
   });
 
   // Helper function to adjust legacy weights proportionally when one changes
-  const adjustWeights = (changedWeight: 'text' | 'visual' | 'metadata', newValue: number) => {
+  const adjustWeights = (changedWeight: "text" | "visual" | "metadata", newValue: number) => {
     const clampedValue = Math.max(0, Math.min(1, newValue));
     const remaining = 1 - clampedValue;
 
     // Get the other two weights
     const otherWeights = {
-      text: changedWeight !== 'text' ? modalityWeights.text : 0,
-      visual: changedWeight !== 'visual' ? modalityWeights.visual : 0,
-      metadata: changedWeight !== 'metadata' ? modalityWeights.metadata : 0,
+      text: changedWeight !== "text" ? modalityWeights.text : 0,
+      visual: changedWeight !== "visual" ? modalityWeights.visual : 0,
+      metadata: changedWeight !== "metadata" ? modalityWeights.metadata : 0,
     };
 
     const otherTotal = otherWeights.text + otherWeights.visual + otherWeights.metadata;
 
     // Distribute remaining proportionally among other weights
     const newWeights = {
-      text: changedWeight === 'text' ? clampedValue : (otherTotal > 0 ? (otherWeights.text / otherTotal) * remaining : remaining / 2),
-      visual: changedWeight === 'visual' ? clampedValue : (otherTotal > 0 ? (otherWeights.visual / otherTotal) * remaining : remaining / 2),
-      metadata: changedWeight === 'metadata' ? clampedValue : (otherTotal > 0 ? (otherWeights.metadata / otherTotal) * remaining : 0),
+      text:
+        changedWeight === "text"
+          ? clampedValue
+          : otherTotal > 0
+            ? (otherWeights.text / otherTotal) * remaining
+            : remaining / 2,
+      visual:
+        changedWeight === "visual"
+          ? clampedValue
+          : otherTotal > 0
+            ? (otherWeights.visual / otherTotal) * remaining
+            : remaining / 2,
+      metadata:
+        changedWeight === "metadata"
+          ? clampedValue
+          : otherTotal > 0
+            ? (otherWeights.metadata / otherTotal) * remaining
+            : 0,
     };
 
     setModalityWeights(newWeights);
@@ -492,9 +498,8 @@ export function EmbeddingTest() {
       if (key === changedWeight) {
         newWeights[weightKey] = clampedValue;
       } else {
-        newWeights[weightKey] = otherTotal > 0
-          ? (enhancedWeights[weightKey] / otherTotal) * remaining
-          : remaining / 5; // Distribute equally among 5 other weights
+        newWeights[weightKey] =
+          otherTotal > 0 ? (enhancedWeights[weightKey] / otherTotal) * remaining : remaining / 5; // Distribute equally among 5 other weights
       }
     }
 
@@ -551,7 +556,7 @@ export function EmbeddingTest() {
     updateSearchConfigMutation.mutate(
       {
         defaultModalityWeights: modalityWeights,
-        description: `Custom weights for ${website?.type || 'website'}`,
+        description: `Custom weights for ${website?.type || "website"}`,
       },
       {
         onSuccess: () => {
@@ -659,7 +664,15 @@ export function EmbeddingTest() {
         },
       }
     );
-  }, [query, validateQuery, embeddingTestMutation, useMultiModal, useEnhancedEmbeddings, modalityWeights, enhancedWeights]);
+  }, [
+    query,
+    validateQuery,
+    embeddingTestMutation,
+    useMultiModal,
+    useEnhancedEmbeddings,
+    modalityWeights,
+    enhancedWeights,
+  ]);
 
   // Handle Enter key
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
@@ -849,7 +862,9 @@ export function EmbeddingTest() {
                           </Box>
                           <Slider
                             value={enhancedWeights.functionality}
-                            onChange={(_, value) => adjustEnhancedWeights("functionality", value as number)}
+                            onChange={(_, value) =>
+                              adjustEnhancedWeights("functionality", value as number)
+                            }
                             min={0}
                             max={1}
                             step={0.05}
@@ -870,7 +885,9 @@ export function EmbeddingTest() {
                           </Box>
                           <Slider
                             value={enhancedWeights.content}
-                            onChange={(_, value) => adjustEnhancedWeights("content", value as number)}
+                            onChange={(_, value) =>
+                              adjustEnhancedWeights("content", value as number)
+                            }
                             min={0}
                             max={1}
                             step={0.05}
@@ -891,7 +908,9 @@ export function EmbeddingTest() {
                           </Box>
                           <Slider
                             value={enhancedWeights.purpose}
-                            onChange={(_, value) => adjustEnhancedWeights("purpose", value as number)}
+                            onChange={(_, value) =>
+                              adjustEnhancedWeights("purpose", value as number)
+                            }
                             min={0}
                             max={1}
                             step={0.05}
@@ -912,7 +931,9 @@ export function EmbeddingTest() {
                           </Box>
                           <Slider
                             value={enhancedWeights.action}
-                            onChange={(_, value) => adjustEnhancedWeights("action", value as number)}
+                            onChange={(_, value) =>
+                              adjustEnhancedWeights("action", value as number)
+                            }
                             min={0}
                             max={1}
                             step={0.05}
@@ -933,7 +954,9 @@ export function EmbeddingTest() {
                           </Box>
                           <Slider
                             value={enhancedWeights.dataContext}
-                            onChange={(_, value) => adjustEnhancedWeights("dataContext", value as number)}
+                            onChange={(_, value) =>
+                              adjustEnhancedWeights("dataContext", value as number)
+                            }
                             min={0}
                             max={1}
                             step={0.05}
@@ -954,7 +977,9 @@ export function EmbeddingTest() {
                           </Box>
                           <Slider
                             value={enhancedWeights.userTask}
-                            onChange={(_, value) => adjustEnhancedWeights("userTask", value as number)}
+                            onChange={(_, value) =>
+                              adjustEnhancedWeights("userTask", value as number)
+                            }
                             min={0}
                             max={1}
                             step={0.05}
@@ -964,9 +989,9 @@ export function EmbeddingTest() {
                         </Box>
 
                         <Alert severity="info" sx={{ fontSize: "0.75rem" }}>
-                          Enhanced embeddings provide richer semantic understanding through 6 specialized
-                          dimensions: functionality, content, purpose, actions, data context, and user
-                          tasks.
+                          Enhanced embeddings provide richer semantic understanding through 6
+                          specialized dimensions: functionality, content, purpose, actions, data
+                          context, and user tasks.
                         </Alert>
                       </Box>
                     ) : (
@@ -1036,8 +1061,8 @@ export function EmbeddingTest() {
                           />
                         </Box>
                         <Alert severity="info" sx={{ fontSize: "0.75rem" }}>
-                          Weights determine how much each modality contributes to the final match score.
-                          Higher weights emphasize that modality's importance.
+                          Weights determine how much each modality contributes to the final match
+                          score. Higher weights emphasize that modality's importance.
                         </Alert>
                         {hasUnsavedChanges && (
                           <Alert severity="warning" sx={{ fontSize: "0.75rem", mt: 2 }}>
@@ -1052,7 +1077,9 @@ export function EmbeddingTest() {
                             startIcon={<SaveIcon />}
                             onClick={handleSaveAsDefault}
                             disabled={
-                              !hasUnsavedChanges || updateSearchConfigMutation.isPending || isSearching
+                              !hasUnsavedChanges ||
+                              updateSearchConfigMutation.isPending ||
+                              isSearching
                             }
                             fullWidth
                           >
@@ -1162,9 +1189,9 @@ export function EmbeddingTest() {
                 </>
               ) : (
                 <>
-                  Multi-modal search combines text, visual, and metadata embeddings for more accurate
-                  matching. Adjust weights to emphasize different aspects of page content. Higher match
-                  scores indicate better alignment across all modalities.
+                  Multi-modal search combines text, visual, and metadata embeddings for more
+                  accurate matching. Adjust weights to emphasize different aspects of page content.
+                  Higher match scores indicate better alignment across all modalities.
                 </>
               )}
             </>

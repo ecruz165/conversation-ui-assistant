@@ -23,8 +23,8 @@ import { WidgetCode } from "./pages/website/WidgetCode";
 import { theme } from "./theme";
 
 // Lazy load heavy components for code splitting
-const ScreenshotAnalysis = lazy(() =>
-  import(/* webpackChunkName: "screenshot-analysis" */ "./pages/website/ScreenshotAnalysis")
+const ScreenshotAnalysis = lazy(
+  () => import(/* webpackChunkName: "screenshot-analysis" */ "./pages/website/ScreenshotAnalysis")
 );
 
 // Create QueryClient instance

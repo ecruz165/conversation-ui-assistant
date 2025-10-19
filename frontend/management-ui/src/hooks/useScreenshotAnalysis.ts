@@ -94,7 +94,12 @@ const mockApi = {
     websiteId: string,
     page: number,
     pageSize: number
-  ): Promise<{ entries: ScreenshotAnalysisResult[]; total: number; page: number; pageSize: number }> => {
+  ): Promise<{
+    entries: ScreenshotAnalysisResult[];
+    total: number;
+    page: number;
+    pageSize: number;
+  }> => {
     await new Promise((resolve) => setTimeout(resolve, 500));
     const mockEntry = await mockApi.uploadScreenshot(websiteId, {
       websiteId,
@@ -146,11 +151,7 @@ export function useAnalysisJobStatus(websiteId: string, analysisId: string | nul
 }
 
 // Get analysis history
-export function useAnalysisHistory(
-  websiteId: string,
-  page: number = 0,
-  pageSize: number = 10
-) {
+export function useAnalysisHistory(websiteId: string, page: number = 0, pageSize: number = 10) {
   return useQuery({
     queryKey: ["analysisHistory", websiteId, page, pageSize],
     queryFn: () =>

@@ -16,6 +16,7 @@ export const mockWebsites: Website[] = [
     name: "Digital Individual Investor",
     type: "website",
     description: "Investment portfolio management platform",
+    containsPII: true,
     contact: {
       name: "John Doe",
       email: "john.doe@example.com",
@@ -25,9 +26,30 @@ export const mockWebsites: Website[] = [
     domains: {
       primary: "https://app.example.com",
       scannableDomains: [
-        { domain: "https://dev.example.com", isActive: true },
-        { domain: "https://staging.example.com", isActive: false },
-        { domain: "https://qa.example.com", isActive: false },
+        {
+          domain: "https://dev.example.com",
+          isActive: true,
+          credentials: {
+            username: "testuser@example.com",
+            password: "********",
+          },
+        },
+        {
+          domain: "https://staging.example.com",
+          isActive: false,
+          credentials: {
+            username: "stageuser@example.com",
+            password: "********",
+          },
+        },
+        {
+          domain: "https://qa.example.com",
+          isActive: false,
+          credentials: {
+            username: "qauser@example.com",
+            password: "********",
+          },
+        },
       ],
     },
     crawlStatus: {
@@ -36,12 +58,15 @@ export const mockWebsites: Website[] = [
       status: "completed",
     },
     searchConfiguration: {
-      defaultModalityWeights: {
-        text: 0.5,
-        visual: 0.3,
-        metadata: 0.2,
+      weights: {
+        functionality: 0.2,
+        content: 0.15,
+        purpose: 0.25,
+        action: 0.1,
+        dataContext: 0.2,
+        userTask: 0.1,
       },
-      description: "Default weights optimized for financial applications",
+      description: "6-embedding weights optimized for financial applications",
       updatedAt: "2024-01-15T14:30:00Z",
     },
     createdAt: "2024-01-15T10:00:00Z",
@@ -141,6 +166,97 @@ export const mockNavigationLinks: NavigationLink[] = [
       },
       createdAt: "2024-01-15T10:05:00Z",
       updatedAt: "2024-01-15T10:05:00Z",
+    },
+    pageAnalysis: {
+      pageId: "link-1",
+      visualElements: [
+        {
+          type: "heading",
+          description: "Main hero heading 'Your new online account experience is almost here'",
+          text: "Your new online account experience is almost here",
+          location: { x: 120, y: 80, width: 960, height: 72 },
+        },
+        {
+          type: "button",
+          description: "Primary call-to-action button in hero section",
+          text: "FIND OUT MORE",
+          location: { x: 480, y: 180, width: 240, height: 48 },
+        },
+        {
+          type: "button",
+          description: "Login button in sidebar",
+          text: "LOGIN",
+          location: { x: 920, y: 40, width: 160, height: 44 },
+        },
+        {
+          type: "heading",
+          description: "Section heading for 'Who We Are'",
+          text: "Who We Are",
+          location: { x: 120, y: 320, width: 400, height: 48 },
+        },
+        {
+          type: "text",
+          description: "Tagline describing company mission",
+          text: "Your goals are what matter",
+          location: { x: 120, y: 380, width: 600, height: 32 },
+        },
+        {
+          type: "text",
+          description: "Company information paragraph",
+          text: "For over 94 years, Capital Group has helped investors pursue long-term investment success with $3 trillion in assets under management.",
+          location: { x: 120, y: 420, width: 800, height: 64 },
+        },
+        {
+          type: "image",
+          description: "Hero image showing people collaborating",
+          location: { x: 120, y: 520, width: 960, height: 540 },
+        },
+        {
+          type: "navigation",
+          description: "Navigation button for About Us section",
+          text: "ABOUT US",
+          location: { x: 120, y: 1080, width: 200, height: 44 },
+        },
+        {
+          type: "link",
+          description: "Service and support contact link with phone icon",
+          text: "Service & Support",
+          location: { x: 120, y: 1200, width: 240, height: 36 },
+        },
+        {
+          type: "text",
+          description: "Announcements section with proxy vote information",
+          text: "2025 Proxy Vote Details",
+          location: { x: 120, y: 1280, width: 400, height: 28 },
+        },
+      ],
+      contentStructure: {
+        headings: [
+          "Your new online account experience is almost here",
+          "Who We Are",
+          "Service & Support",
+          "Announcements",
+        ],
+        paragraphs: 8,
+        links: 12,
+        forms: 0,
+        images: 3,
+      },
+      interactions: {
+        clickableElements: 15,
+        inputFields: 0,
+        buttons: 3,
+      },
+      accessibility: {
+        hasAltText: true,
+        hasAriaLabels: true,
+        contrastRatio: 7.2,
+      },
+      performance: {
+        loadTime: 1240,
+        pageSize: 487000,
+      },
+      analyzedAt: "2024-01-15T10:05:00Z",
     },
     isActive: true,
     createdAt: "2024-01-15T10:00:00Z",
@@ -301,12 +417,11 @@ export const mockEmbeddingTestResult: EmbeddingTestResult = {
       matchedIntents: ["check_balance"],
       slots: { matched: 1, total: 1, required: [] },
       isBestMatch: true,
-      // Enhanced 6-embedding scores
-      enhancedScores: [
+      embeddingScores: [
         {
           type: "functionality",
           score: 0.95,
-          weight: 0.20,
+          weight: 0.2,
           contribution: 0.19,
           label: "Functionality Match",
         },
@@ -327,21 +442,21 @@ export const mockEmbeddingTestResult: EmbeddingTestResult = {
         {
           type: "action",
           score: 0.88,
-          weight: 0.10,
+          weight: 0.1,
           contribution: 0.088,
           label: "Action Match",
         },
         {
           type: "dataContext",
           score: 0.96,
-          weight: 0.20,
+          weight: 0.2,
           contribution: 0.192,
           label: "Data Context Match",
         },
         {
           type: "userTask",
           score: 0.94,
-          weight: 0.10,
+          weight: 0.1,
           contribution: 0.094,
           label: "User Task Match",
         },
@@ -365,12 +480,11 @@ export const mockEmbeddingTestResult: EmbeddingTestResult = {
         ],
       },
       isBestMatch: false,
-      // Enhanced scores - lower match because query is more about "summary" than "history"
-      enhancedScores: [
+      embeddingScores: [
         {
           type: "functionality",
           score: 0.82,
-          weight: 0.20,
+          weight: 0.2,
           contribution: 0.164,
           label: "Functionality Match",
         },
@@ -391,21 +505,21 @@ export const mockEmbeddingTestResult: EmbeddingTestResult = {
         {
           type: "action",
           score: 0.65,
-          weight: 0.10,
+          weight: 0.1,
           contribution: 0.065,
           label: "Action Match",
         },
         {
           type: "dataContext",
           score: 0.89,
-          weight: 0.20,
+          weight: 0.2,
           contribution: 0.178,
           label: "Data Context Match",
         },
         {
           type: "userTask",
           score: 0.73,
-          weight: 0.10,
+          weight: 0.1,
           contribution: 0.073,
           label: "User Task Match",
         },
@@ -429,6 +543,7 @@ export const mockEmbeddingTestResult: EmbeddingTestResult = {
         ],
       },
       isBestMatch: false,
+      embeddingScores: [],
     },
     {
       pageId: "4",
@@ -439,6 +554,7 @@ export const mockEmbeddingTestResult: EmbeddingTestResult = {
       matchedIntents: ["view_portfolio"],
       slots: { matched: 0, total: 0, required: [] },
       isBestMatch: false,
+      embeddingScores: [],
     },
     {
       pageId: "5",
@@ -456,6 +572,7 @@ export const mockEmbeddingTestResult: EmbeddingTestResult = {
         ],
       },
       isBestMatch: false,
+      embeddingScores: [],
     },
   ],
 };

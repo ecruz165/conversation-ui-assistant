@@ -17,9 +17,11 @@ import {
   FormControlLabel,
   FormLabel,
   IconButton,
+  MenuItem,
   Paper,
   Radio,
   RadioGroup,
+  Select,
   Stack,
   TextField,
   Typography,
@@ -34,7 +36,6 @@ interface FormField {
   slot: string;
   type: "text" | "email" | "number" | "date" | "select" | "textarea";
   required: boolean;
-  placeholder?: string;
 }
 
 interface LinkFormData {
@@ -71,7 +72,6 @@ export function LinkForm({ open, onClose, onSubmit, initialData, mode = "create"
     slot: "",
     type: "text",
     required: true,
-    placeholder: "",
   });
 
   const {
@@ -163,7 +163,6 @@ export function LinkForm({ open, onClose, onSubmit, initialData, mode = "create"
         slot: "",
         type: "text",
         required: true,
-        placeholder: "",
       });
     }
   };
@@ -277,13 +276,7 @@ export function LinkForm({ open, onClose, onSubmit, initialData, mode = "create"
               </Typography>
               <Box className="flex flex-wrap gap-1">
                 {detectedParameters.map((param, index) => (
-                  <Chip
-                    key={index}
-                    label={param}
-                    size="small"
-                    color="primary"
-                    variant="outlined"
-                  />
+                  <Chip key={index} label={param} size="small" color="primary" variant="outlined" />
                 ))}
               </Box>
             </Alert>
@@ -359,9 +352,9 @@ export function LinkForm({ open, onClose, onSubmit, initialData, mode = "create"
                   placeholder="/dashboard"
                   helperText="The page/URL where users start before reaching this journey endpoint"
                   sx={{
-                    '& .MuiOutlinedInput-root': {
-                      fontFamily: 'monospace',
-                    }
+                    "& .MuiOutlinedInput-root": {
+                      fontFamily: "monospace",
+                    },
                   }}
                 />
               )}
@@ -449,20 +442,18 @@ export function LinkForm({ open, onClose, onSubmit, initialData, mode = "create"
                       setFormFieldInput({ ...formFieldInput, label: e.target.value })
                     }
                     size="small"
-                    placeholder="e.g., Email Address"
                   />
                   <TextField
                     label="Slot Name"
                     value={formFieldInput.slot}
                     onChange={(e) => setFormFieldInput({ ...formFieldInput, slot: e.target.value })}
                     size="small"
-                    placeholder="e.g., email"
                   />
                 </Box>
-                <Box className="grid grid-cols-3 gap-2">
-                  <FormControl size="small">
+                <Box className="grid grid-cols-2 gap-2">
+                  <FormControl size="small" fullWidth>
                     <FormLabel sx={{ fontSize: "0.75rem" }}>Type</FormLabel>
-                    <select
+                    <Select
                       value={formFieldInput.type}
                       onChange={(e) =>
                         setFormFieldInput({
@@ -470,39 +461,32 @@ export function LinkForm({ open, onClose, onSubmit, initialData, mode = "create"
                           type: e.target.value as FormField["type"],
                         })
                       }
-                      className="p-2 border border-gray-300 rounded"
                     >
-                      <option value="text">Text</option>
-                      <option value="email">Email</option>
-                      <option value="number">Number</option>
-                      <option value="date">Date</option>
-                      <option value="select">Select</option>
-                      <option value="textarea">Textarea</option>
-                    </select>
+                      <MenuItem value="text">Text</MenuItem>
+                      <MenuItem value="email">Email</MenuItem>
+                      <MenuItem value="number">Number</MenuItem>
+                      <MenuItem value="date">Date</MenuItem>
+                      <MenuItem value="select">Select</MenuItem>
+                      <MenuItem value="textarea">Textarea</MenuItem>
+                    </Select>
                   </FormControl>
-                  <TextField
-                    label="Placeholder (Optional)"
-                    value={formFieldInput.placeholder}
-                    onChange={(e) =>
-                      setFormFieldInput({ ...formFieldInput, placeholder: e.target.value })
-                    }
-                    size="small"
-                  />
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        checked={formFieldInput.required}
-                        onChange={(e) =>
-                          setFormFieldInput({
-                            ...formFieldInput,
-                            required: e.target.checked,
-                          })
-                        }
-                        size="small"
-                      />
-                    }
-                    label="Required"
-                  />
+                  <Box className="flex items-center">
+                    <FormControlLabel
+                      control={
+                        <Checkbox
+                          checked={formFieldInput.required}
+                          onChange={(e) =>
+                            setFormFieldInput({
+                              ...formFieldInput,
+                              required: e.target.checked,
+                            })
+                          }
+                          size="small"
+                        />
+                      }
+                      label="Required"
+                    />
+                  </Box>
                 </Box>
                 <Button onClick={handleAddFormField} variant="outlined" size="small" fullWidth>
                   Add Field
@@ -527,11 +511,6 @@ export function LinkForm({ open, onClose, onSubmit, initialData, mode = "create"
                             <Chip label={field.type} size="small" color="primary" />
                             {field.required && <Chip label="Required" size="small" color="error" />}
                           </Box>
-                          {field.placeholder && (
-                            <Typography variant="caption" className="text-gray-500">
-                              Placeholder: {field.placeholder}
-                            </Typography>
-                          )}
                         </Box>
                         <IconButton
                           size="small"

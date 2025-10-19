@@ -12,10 +12,7 @@ import type {
 
 // Mock API for synthetic queries
 const mockApi = {
-  getSyntheticQueries: async (
-    websiteId: string,
-    pageId?: string
-  ): Promise<SyntheticQuery[]> => {
+  getSyntheticQueries: async (websiteId: string, pageId?: string): Promise<SyntheticQuery[]> => {
     await new Promise((resolve) => setTimeout(resolve, 500));
 
     const allQueries: SyntheticQuery[] = [
@@ -95,9 +92,7 @@ const mockApi = {
       },
     ];
 
-    return pageId
-      ? allQueries.filter((q) => q.expectedPageId === pageId)
-      : allQueries;
+    return pageId ? allQueries.filter((q) => q.expectedPageId === pageId) : allQueries;
   },
 
   generateSyntheticQueries: async (
@@ -129,7 +124,8 @@ const mockApi = {
 
     for (let i = 0; i < count; i++) {
       const queryType = queryTypes[i % queryTypes.length];
-      const template = templates[queryType][Math.floor(Math.random() * templates[queryType].length)];
+      const template =
+        templates[queryType][Math.floor(Math.random() * templates[queryType].length)];
       queries.push({
         query: `${template} ${data.pageId ? `page ${data.pageId}` : `item ${i + 1}`}`,
         queryType,

@@ -77,12 +77,7 @@ export function ImageWithPlaceholder({
               }}
             />
           ) : (
-            <Skeleton
-              variant="rectangular"
-              width="100%"
-              height={height || 200}
-              animation="wave"
-            />
+            <Skeleton variant="rectangular" width="100%" height={height || 200} animation="wave" />
           )}
           <CircularProgress
             size={40}

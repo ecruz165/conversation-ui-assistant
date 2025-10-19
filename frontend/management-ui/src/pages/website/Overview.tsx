@@ -60,7 +60,9 @@ export function WebsiteOverview() {
       queryClient.prefetchQuery({
         queryKey: ["navigationLinks", websiteId],
         queryFn: () =>
-          mockConfig.enabled ? mockApi.getNavigationLinks(websiteId) : api.getNavigationLinks(websiteId),
+          mockConfig.enabled
+            ? mockApi.getNavigationLinks(websiteId)
+            : api.getNavigationLinks(websiteId),
       });
     }
   }, [website, websiteId, queryClient]);
@@ -106,6 +108,7 @@ export function WebsiteOverview() {
       name: website.name,
       type: website.type,
       description: website.description || "",
+      containsPII: website.containsPII || false,
       contact: {
         name: website.contact.name,
         email: website.contact.email,
@@ -117,7 +120,7 @@ export function WebsiteOverview() {
         scannableDomains: website.domains.scannableDomains.map((d) => ({
           url: d.domain,
           isActiveForScanning: d.isActive,
-          requiresCredentials: false,
+          requiresCredentials: website.containsPII || false,
           credentials: { username: "", password: "" },
         })),
       },
@@ -248,7 +251,12 @@ export function WebsiteOverview() {
               <Typography variant="h6" className="font-semibold">
                 Website Information
               </Typography>
-              <Button variant="outlined" startIcon={<EditIcon />} onClick={handleEdit} sx={ACTION_BUTTON_STYLE}>
+              <Button
+                variant="outlined"
+                startIcon={<EditIcon />}
+                onClick={handleEdit}
+                sx={ACTION_BUTTON_STYLE}
+              >
                 Edit
               </Button>
             </Box>
@@ -332,21 +340,40 @@ export function WebsiteOverview() {
                   )}
                 </Box>
                 <Box>
-                  <Typography variant="body2" className="text-gray-600 mb-2">
-                    Scannable Domain
+                  <Typography variant="body2" className="text-gray-600 mb-1">
+                    {website?.containsPII
+                      ? "Contains Sensitive Data / Alt Source to Scan"
+                      : "Contains Sensitive Data"}
                   </Typography>
                   {isLoading ? (
-                    <div className="flex flex-wrap gap-2">
-                      <div className="h-7 bg-gray-200 rounded w-32 animate-pulse"></div>
-                      <div className="h-7 bg-gray-200 rounded w-36 animate-pulse"></div>
-                    </div>
+                    <div className="h-8 bg-gray-200 rounded w-44 animate-pulse"></div>
+                  ) : website?.containsPII ? (
+                    <Box className="flex flex-wrap gap-2 items-center h-8">
+                      <Chip label="Yes" size="small" />
+                      <Typography variant="body2" className="text-gray-400">
+                        /
+                      </Typography>
+                      <Chip
+                        label={
+                          website.domains.scannableDomains?.find((d) => d.isActive)?.domain ||
+                          "Not configured"
+                        }
+                        size="small"
+                      />
+                      {website.domains.scannableDomains?.find((d) => d.isActive)?.credentials
+                        ?.username && (
+                        <Chip
+                          label={
+                            website.domains.scannableDomains.find((d) => d.isActive)?.credentials
+                              ?.username
+                          }
+                          size="small"
+                        />
+                      )}
+                    </Box>
                   ) : (
-                    <Box className="flex flex-wrap gap-2">
-                      {website?.domains?.scannableDomains
-                        ?.filter((d) => d.isActive)
-                        .map((domainObj, index) => (
-                          <Chip key={index} label={domainObj.domain} variant="outlined" />
-                        ))}
+                    <Box className="h-8 flex items-center">
+                      <Chip label="No" size="small" />
                     </Box>
                   )}
                 </Box>
@@ -453,72 +480,121 @@ export function WebsiteOverview() {
               </Button>
             </Box>
 
-            {website?.searchConfiguration?.defaultModalityWeights ? (
+            {website?.searchConfiguration?.weights ? (
               <Box className="space-y-4">
                 <Typography variant="body2" className="text-gray-600 mb-3">
-                  Default modality weights for embedding searches
+                  6-Embedding weights for semantic search
                 </Typography>
-                <Box className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <Box className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   <Box>
                     <Typography variant="body2" className="text-gray-600 mb-2">
-                      Text Embeddings
+                      Functionality
                     </Typography>
                     <Box className="flex items-center gap-2">
                       <Box className="flex-1 bg-gray-200 rounded-full h-2">
                         <Box
-                          className="bg-primary-600 h-2 rounded-full"
+                          className="bg-indigo-600 h-2 rounded-full"
                           style={{
-                            width: `${Math.round(website.searchConfiguration.defaultModalityWeights.text * 100)}%`,
+                            width: `${Math.round(website.searchConfiguration.weights.functionality * 100)}%`,
                           }}
                         />
                       </Box>
                       <Typography variant="body2" className="font-semibold min-w-[3ch]">
-                        {Math.round(website.searchConfiguration.defaultModalityWeights.text * 100)}%
+                        {Math.round(website.searchConfiguration.weights.functionality * 100)}%
                       </Typography>
                     </Box>
                   </Box>
                   <Box>
                     <Typography variant="body2" className="text-gray-600 mb-2">
-                      Visual Embeddings
+                      Content
                     </Typography>
                     <Box className="flex items-center gap-2">
                       <Box className="flex-1 bg-gray-200 rounded-full h-2">
                         <Box
-                          className="bg-primary-600 h-2 rounded-full"
+                          className="bg-purple-600 h-2 rounded-full"
                           style={{
-                            width: `${Math.round(website.searchConfiguration.defaultModalityWeights.visual * 100)}%`,
+                            width: `${Math.round(website.searchConfiguration.weights.content * 100)}%`,
                           }}
                         />
                       </Box>
                       <Typography variant="body2" className="font-semibold min-w-[3ch]">
-                        {Math.round(website.searchConfiguration.defaultModalityWeights.visual * 100)}%
+                        {Math.round(website.searchConfiguration.weights.content * 100)}%
                       </Typography>
                     </Box>
                   </Box>
                   <Box>
                     <Typography variant="body2" className="text-gray-600 mb-2">
-                      Metadata Embeddings
+                      Purpose
                     </Typography>
                     <Box className="flex items-center gap-2">
                       <Box className="flex-1 bg-gray-200 rounded-full h-2">
                         <Box
-                          className="bg-primary-600 h-2 rounded-full"
+                          className="bg-blue-600 h-2 rounded-full"
                           style={{
-                            width: `${Math.round(website.searchConfiguration.defaultModalityWeights.metadata * 100)}%`,
+                            width: `${Math.round(website.searchConfiguration.weights.purpose * 100)}%`,
                           }}
                         />
                       </Box>
                       <Typography variant="body2" className="font-semibold min-w-[3ch]">
-                        {Math.round(website.searchConfiguration.defaultModalityWeights.metadata * 100)}%
+                        {Math.round(website.searchConfiguration.weights.purpose * 100)}%
+                      </Typography>
+                    </Box>
+                  </Box>
+                  <Box>
+                    <Typography variant="body2" className="text-gray-600 mb-2">
+                      Action
+                    </Typography>
+                    <Box className="flex items-center gap-2">
+                      <Box className="flex-1 bg-gray-200 rounded-full h-2">
+                        <Box
+                          className="bg-green-600 h-2 rounded-full"
+                          style={{
+                            width: `${Math.round(website.searchConfiguration.weights.action * 100)}%`,
+                          }}
+                        />
+                      </Box>
+                      <Typography variant="body2" className="font-semibold min-w-[3ch]">
+                        {Math.round(website.searchConfiguration.weights.action * 100)}%
+                      </Typography>
+                    </Box>
+                  </Box>
+                  <Box>
+                    <Typography variant="body2" className="text-gray-600 mb-2">
+                      Data Context
+                    </Typography>
+                    <Box className="flex items-center gap-2">
+                      <Box className="flex-1 bg-gray-200 rounded-full h-2">
+                        <Box
+                          className="bg-orange-600 h-2 rounded-full"
+                          style={{
+                            width: `${Math.round(website.searchConfiguration.weights.dataContext * 100)}%`,
+                          }}
+                        />
+                      </Box>
+                      <Typography variant="body2" className="font-semibold min-w-[3ch]">
+                        {Math.round(website.searchConfiguration.weights.dataContext * 100)}%
+                      </Typography>
+                    </Box>
+                  </Box>
+                  <Box>
+                    <Typography variant="body2" className="text-gray-600 mb-2">
+                      User Task
+                    </Typography>
+                    <Box className="flex items-center gap-2">
+                      <Box className="flex-1 bg-gray-200 rounded-full h-2">
+                        <Box
+                          className="bg-pink-600 h-2 rounded-full"
+                          style={{
+                            width: `${Math.round(website.searchConfiguration.weights.userTask * 100)}%`,
+                          }}
+                        />
+                      </Box>
+                      <Typography variant="body2" className="font-semibold min-w-[3ch]">
+                        {Math.round(website.searchConfiguration.weights.userTask * 100)}%
                       </Typography>
                     </Box>
                   </Box>
                 </Box>
-                {website.searchConfiguration.description && (
-                  <Alert severity="info" sx={{ mt: 3 }}>
-                    {website.searchConfiguration.description}
-                  </Alert>
-                )}
                 {website.searchConfiguration.updatedAt && (
                   <Typography variant="caption" className="text-gray-500 block mt-2">
                     Last updated: {new Date(website.searchConfiguration.updatedAt).toLocaleString()}
@@ -527,8 +603,8 @@ export function WebsiteOverview() {
               </Box>
             ) : (
               <Alert severity="warning">
-                No default search weights configured. Visit the Embeddings Tester to set up optimized
-                weights for this website.
+                No search weights configured. Visit the Embeddings Tester to set up optimized
+                6-embedding weights for this website.
               </Alert>
             )}
           </Paper>

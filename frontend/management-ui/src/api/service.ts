@@ -213,7 +213,10 @@ class ApiService {
     );
   }
 
-  async getAnalysisJobStatus(websiteId: string, analysisId: string): Promise<ScreenshotAnalysisResult> {
+  async getAnalysisJobStatus(
+    websiteId: string,
+    analysisId: string
+  ): Promise<ScreenshotAnalysisResult> {
     return this.fetchJson<ScreenshotAnalysisResult>(
       `${this.baseUrl}/websites/${websiteId}/screenshot-analysis/${analysisId}`
     );
@@ -223,7 +226,12 @@ class ApiService {
     websiteId: string,
     page: number = 0,
     pageSize: number = 10
-  ): Promise<{ entries: ScreenshotAnalysisResult[]; total: number; page: number; pageSize: number }> {
+  ): Promise<{
+    entries: ScreenshotAnalysisResult[];
+    total: number;
+    page: number;
+    pageSize: number;
+  }> {
     return this.fetchJson(
       `${this.baseUrl}/websites/${websiteId}/screenshot-analysis/history?page=${page}&pageSize=${pageSize}`
     );
@@ -268,26 +276,25 @@ class ApiService {
       differences: string[];
     }>;
   }> {
-    return this.fetchJson(
-      `${this.baseUrl}/websites/${websiteId}/embeddings/compare`,
-      {
-        method: "POST",
-        body: JSON.stringify(data),
-      }
-    );
+    return this.fetchJson(`${this.baseUrl}/websites/${websiteId}/embeddings/compare`, {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
   }
 
   // Synthetic Queries endpoints
   async getSyntheticQueries(
     websiteId: string,
     pageId?: string
-  ): Promise<Array<{
-    id: string;
-    query: string;
-    expectedPageId: string;
-    validated: boolean;
-    matchScore?: number;
-  }>> {
+  ): Promise<
+    Array<{
+      id: string;
+      query: string;
+      expectedPageId: string;
+      validated: boolean;
+      matchScore?: number;
+    }>
+  > {
     const url = pageId
       ? `${this.baseUrl}/websites/${websiteId}/synthetic-queries?pageId=${pageId}`
       : `${this.baseUrl}/websites/${websiteId}/synthetic-queries`;
@@ -301,18 +308,17 @@ class ApiService {
       count?: number;
       useMultiModal?: boolean;
     }
-  ): Promise<Array<{
-    query: string;
-    expectedPageId: string;
-    confidence: number;
-  }>> {
-    return this.fetchJson(
-      `${this.baseUrl}/websites/${websiteId}/synthetic-queries/generate`,
-      {
-        method: "POST",
-        body: JSON.stringify(data),
-      }
-    );
+  ): Promise<
+    Array<{
+      query: string;
+      expectedPageId: string;
+      confidence: number;
+    }>
+  > {
+    return this.fetchJson(`${this.baseUrl}/websites/${websiteId}/synthetic-queries/generate`, {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
   }
 
   async validateSyntheticQuery(
@@ -329,13 +335,10 @@ class ApiService {
     isValid: boolean;
     issues?: string[];
   }> {
-    return this.fetchJson(
-      `${this.baseUrl}/websites/${websiteId}/synthetic-queries/validate`,
-      {
-        method: "POST",
-        body: JSON.stringify(data),
-      }
-    );
+    return this.fetchJson(`${this.baseUrl}/websites/${websiteId}/synthetic-queries/validate`, {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
   }
 }
 

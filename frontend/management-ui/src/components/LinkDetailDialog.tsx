@@ -68,7 +68,9 @@ function TabPanel({ children, value, index }: TabPanelProps) {
 export function LinkDetailDialog({ open, onClose, link, onEdit }: LinkDetailDialogProps) {
   const [activeTab, setActiveTab] = useState(0);
   const [isEditingEmbeddings, setIsEditingEmbeddings] = useState(false);
-  const [editedEmbeddings, setEditedEmbeddings] = useState<Partial<EnhancedPageEmbedding> | null>(null);
+  const [editedEmbeddings, setEditedEmbeddings] = useState<Partial<EnhancedPageEmbedding> | null>(
+    null
+  );
   const [zoomLevel, setZoomLevel] = useState(1);
   const [isGenerating, setIsGenerating] = useState(false);
   const [screenshotInfoAnchor, setScreenshotInfoAnchor] = useState<HTMLButtonElement | null>(null);
@@ -208,364 +210,374 @@ export function LinkDetailDialog({ open, onClose, link, onEdit }: LinkDetailDial
 
         {/* Tab 0: Overview */}
         <TabPanel value={activeTab} index={0}>
-        <Box className="space-y-4">
-          {/* Link Details */}
-          <Paper elevation={0} className="p-4 bg-gradient-to-br from-blue-50 to-indigo-50">
-            <Box className="space-y-3">
-              {/* Path */}
-              <Box>
-                <Typography variant="caption" className="text-gray-600 font-semibold">
-                  Path
-                </Typography>
-                <Typography variant="body2" className="font-mono bg-white px-2 py-1 rounded border border-gray-200">
-                  {link.targetUrl}
-                </Typography>
-              </Box>
-
-              {/* Path/Query Param Slots */}
-              {link.parameters && link.parameters.length > 0 && (
+          <Box className="space-y-4">
+            {/* Link Details */}
+            <Paper elevation={0} className="p-4 bg-gradient-to-br from-blue-50 to-indigo-50">
+              <Box className="space-y-3">
+                {/* Path */}
                 <Box>
-                  <Typography variant="caption" className="text-gray-600 font-semibold block mb-1">
-                    Path/Query Param Slots
+                  <Typography variant="caption" className="text-gray-600 font-semibold">
+                    Path
                   </Typography>
-                  <Box className="flex flex-wrap gap-1">
-                    {link.parameters.map((param, index) => (
-                      <Chip
-                        key={index}
-                        label={param.name}
-                        size="small"
-                        color="primary"
-                        variant="outlined"
-                      />
-                    ))}
-                  </Box>
-                  <Typography variant="caption" className="text-gray-500 block mt-1">
-                    AI will collect these values from user before navigation
-                  </Typography>
-                </Box>
-              )}
-
-              {/* Title */}
-              <Box>
-                <Typography variant="caption" className="text-gray-600 font-semibold">
-                  Title
-                </Typography>
-                <Typography variant="body1" className="font-medium">
-                  {link.displayName}
-                </Typography>
-              </Box>
-
-              {/* Page Type */}
-              <Box>
-                <Typography variant="caption" className="text-gray-600 font-semibold block mb-1">
-                  Page Type
-                </Typography>
-                <Box className="flex items-center gap-2">
-                  {link.isBookmarkable ? (
-                    <Chip
-                      label="Bookmarkable"
-                      size="medium"
-                      color="success"
-                      icon={<CheckCircle />}
-                    />
-                  ) : (
-                    <Chip
-                      label="Journey"
-                      size="medium"
-                      color="warning"
-                      icon={<HourglassEmpty />}
-                    />
-                  )}
-                  <Typography variant="caption" className="text-gray-600">
-                    {link.isBookmarkable
-                      ? "Users can navigate directly via URL"
-                      : "Requires user input or interaction"}
-                  </Typography>
-                </Box>
-              </Box>
-
-              {/* Starting Path - Only for Journey pages */}
-              {!link.isBookmarkable && (
-                <Box>
-                  <Typography variant="caption" className="text-gray-600 font-semibold block mb-1">
-                    Starting Path
-                  </Typography>
-                  <TextField
-                    fullWidth
-                    variant="outlined"
-                    size="small"
-                    placeholder="Enter the path where this journey begins (e.g., /dashboard)"
-                    defaultValue={link.startingPath || ""}
-                    sx={{
-                      bgcolor: 'white',
-                      '& .MuiOutlinedInput-root': {
-                        bgcolor: 'white',
-                        fontFamily: 'monospace',
-                      }
-                    }}
-                  />
-                  <Typography variant="caption" className="text-gray-500 block mt-1">
-                    {link.startingPath
-                      ? "Crawler-detected or manually set starting path"
-                      : "The page/URL where users start before reaching this journey endpoint"}
-                  </Typography>
-                </Box>
-              )}
-
-              {/* Keywords */}
-              {link.keywords && link.keywords.length > 0 && (
-                <Box>
-                  <Typography variant="caption" className="text-gray-600 font-semibold block mb-1">
-                    Keywords
-                  </Typography>
-                  <Box className="flex flex-wrap gap-1">
-                    {link.keywords.map((keyword, index) => (
-                      <Chip key={index} label={keyword} size="small" variant="outlined" />
-                    ))}
-                  </Box>
-                </Box>
-              )}
-
-              {/* Description */}
-              <Box>
-                <Typography variant="caption" className="text-gray-600 font-semibold block mb-1">
-                  Description
-                </Typography>
-                <TextField
-                  fullWidth
-                  multiline
-                  rows={3}
-                  variant="outlined"
-                  size="small"
-                  placeholder="Enter page description..."
-                  defaultValue={link.description || ""}
-                  sx={{
-                    bgcolor: 'white',
-                    '& .MuiOutlinedInput-root': {
-                      bgcolor: 'white',
-                    }
-                  }}
-                />
-              </Box>
-
-              {/* Forms - Only if page has forms */}
-              {link.hasForm && link.formFields && link.formFields.length > 0 && (
-                <Box>
-                  <Typography variant="caption" className="text-gray-600 font-semibold block mb-1">
-                    Forms
-                  </Typography>
-                  <Box className="space-y-2">
-                    {link.formFields.map((field, index) => (
-                      <Box key={index} className="flex items-center justify-between bg-white px-3 py-2 rounded border border-gray-200">
-                        <Box className="flex items-center gap-2">
-                          <Typography variant="body2" className="font-medium">
-                            {field.label}
-                          </Typography>
-                          <Chip label={field.type} size="small" color="primary" variant="outlined" />
-                        </Box>
-                        {field.required ? (
-                          <Chip label="Required" size="small" color="error" />
-                        ) : (
-                          <Chip label="Optional" size="small" variant="outlined" />
-                        )}
-                      </Box>
-                    ))}
-                  </Box>
-                  <Typography variant="caption" className="text-gray-500 block mt-1">
-                    {link.formFields.filter(f => f.required).length} required field(s), {link.formFields.filter(f => !f.required).length} optional
-                  </Typography>
-                </Box>
-              )}
-            </Box>
-          </Paper>
-
-
-          {/* AI Guidance */}
-          {link.aiGuidance && (
-            <Paper elevation={0} className="p-4 bg-green-50">
-              <Typography variant="subtitle2" className="font-semibold mb-2 text-green-900">
-                AI Guidance
-              </Typography>
-              <Typography variant="body2" className="text-gray-700">
-                {link.aiGuidance}
-              </Typography>
-            </Paper>
-          )}
-
-          {/* Screenshot */}
-          {link.screenshot && (
-            <Paper elevation={0} className="p-4 bg-purple-50">
-              <Typography variant="subtitle2" className="font-semibold mb-3">
-                Screenshot
-              </Typography>
-
-              {/* Screenshot Display */}
-              <Paper variant="outlined" className="p-3 bg-white">
-                <Box className="flex justify-between items-center mb-2">
-                  <Typography variant="caption" className="font-semibold text-gray-700">
-                    Screenshot
-                  </Typography>
-                  <Box className="flex items-center gap-1">
-                    {link.screenshotMetadata && (
-                      <Tooltip title="Screenshot Information">
-                        <IconButton
-                          size="small"
-                          onClick={handleScreenshotInfoClick}
-                        >
-                          <InfoIcon fontSize="small" />
-                        </IconButton>
-                      </Tooltip>
-                    )}
-                    <Tooltip title="Zoom Out">
-                      <span>
-                        <IconButton
-                          size="small"
-                          onClick={handleZoomOut}
-                          disabled={zoomLevel <= 0.5}
-                        >
-                          <ZoomOut fontSize="small" />
-                        </IconButton>
-                      </span>
-                    </Tooltip>
-                    <Tooltip title="Reset Zoom">
-                      <IconButton
-                        size="small"
-                        onClick={handleZoomReset}
-                        disabled={zoomLevel === 1}
-                      >
-                        <ZoomOutMap fontSize="small" />
-                      </IconButton>
-                    </Tooltip>
-                    <Tooltip title="Zoom In">
-                      <span>
-                        <IconButton
-                          size="small"
-                          onClick={handleZoomIn}
-                          disabled={zoomLevel >= 3}
-                        >
-                          <ZoomIn fontSize="small" />
-                        </IconButton>
-                      </span>
-                    </Tooltip>
-                    <Typography variant="caption" className="text-gray-600 ml-1">
-                      {Math.round(zoomLevel * 100)}%
-                    </Typography>
-                    <Button variant="outlined" size="small" href={link.screenshot} target="_blank">
-                      Open
-                    </Button>
-                  </Box>
-                </Box>
-                <Box
-                  sx={{
-                    border: 1,
-                    borderColor: "divider",
-                    borderRadius: 1,
-                    overflow: "auto",
-                    maxHeight: "600px",
-                    bgcolor: "grey.50",
-                    cursor: zoomLevel > 1 ? "move" : "default",
-                  }}
-                >
-                  <Box
-                    sx={{
-                      transform: `scale(${zoomLevel})`,
-                      transformOrigin: "top left",
-                      transition: "transform 0.2s ease-in-out",
-                    }}
+                  <Typography
+                    variant="body2"
+                    className="font-mono bg-white px-2 py-1 rounded border border-gray-200"
                   >
-                    <ImageWithPlaceholder
-                      src={link.screenshot}
-                      alt={`Screenshot of ${link.displayName}`}
-                      width="100%"
-                      height="auto"
-                      objectFit="contain"
-                    />
+                    {link.targetUrl}
+                  </Typography>
+                </Box>
+
+                {/* Path/Query Param Slots */}
+                {link.parameters && link.parameters.length > 0 && (
+                  <Box>
+                    <Typography
+                      variant="caption"
+                      className="text-gray-600 font-semibold block mb-1"
+                    >
+                      Path/Query Param Slots
+                    </Typography>
+                    <Box className="flex flex-wrap gap-1">
+                      {link.parameters.map((param, index) => (
+                        <Chip
+                          key={index}
+                          label={param.name}
+                          size="small"
+                          color="primary"
+                          variant="outlined"
+                        />
+                      ))}
+                    </Box>
+                    <Typography variant="caption" className="text-gray-500 block mt-1">
+                      AI will collect these values from user before navigation
+                    </Typography>
+                  </Box>
+                )}
+
+                {/* Title */}
+                <Box>
+                  <Typography variant="caption" className="text-gray-600 font-semibold">
+                    Title
+                  </Typography>
+                  <Typography variant="body1" className="font-medium">
+                    {link.displayName}
+                  </Typography>
+                </Box>
+
+                {/* Page Type */}
+                <Box>
+                  <Typography variant="caption" className="text-gray-600 font-semibold block mb-1">
+                    Page Type
+                  </Typography>
+                  <Box className="flex items-center gap-2">
+                    {link.isBookmarkable ? (
+                      <Chip
+                        label="Bookmarkable"
+                        size="medium"
+                        color="success"
+                        icon={<CheckCircle />}
+                      />
+                    ) : (
+                      <Chip
+                        label="Journey"
+                        size="medium"
+                        color="warning"
+                        icon={<HourglassEmpty />}
+                      />
+                    )}
+                    <Typography variant="caption" className="text-gray-600">
+                      {link.isBookmarkable
+                        ? "Users can navigate directly via URL"
+                        : "Requires user input or interaction"}
+                    </Typography>
                   </Box>
                 </Box>
-              </Paper>
 
-              {/* Screenshot Info Popover */}
-              {link.screenshotMetadata && (
-                <Popover
-                  open={screenshotInfoOpen}
-                  anchorEl={screenshotInfoAnchor}
-                  onClose={handleScreenshotInfoClose}
-                  anchorOrigin={{
-                    vertical: 'bottom',
-                    horizontal: 'left',
-                  }}
-                  transformOrigin={{
-                    vertical: 'top',
-                    horizontal: 'left',
-                  }}
-                >
-                  <Box className="p-3" sx={{ minWidth: 250 }}>
-                    <Typography variant="subtitle2" className="font-semibold mb-2">
-                      Screenshot Information
+                {/* Starting Path - Only for Journey pages */}
+                {!link.isBookmarkable && (
+                  <Box>
+                    <Typography
+                      variant="caption"
+                      className="text-gray-600 font-semibold block mb-1"
+                    >
+                      Starting Path
                     </Typography>
-                    <Box className="space-y-2">
-                      <Box>
-                        <Typography variant="caption" className="text-gray-600 block">
-                          Capture Type
-                        </Typography>
-                        <Typography variant="body2" className="font-medium capitalize">
-                          {link.screenshotMetadata.captureType.replace("-", " ")}
-                        </Typography>
-                      </Box>
-                      <Box>
-                        <Typography variant="caption" className="text-gray-600 block">
-                          Dimensions
-                        </Typography>
-                        <Typography variant="body2" className="font-medium font-mono">
-                          {link.screenshotMetadata.dimensions.width}×{link.screenshotMetadata.dimensions.height}px
-                        </Typography>
-                      </Box>
-                      {link.screenshotMetadata.dimensions.viewportHeight && (
-                        <Box>
-                          <Typography variant="caption" className="text-gray-600 block">
-                            Viewport Height
-                          </Typography>
-                          <Typography variant="body2" className="font-medium font-mono">
-                            {link.screenshotMetadata.dimensions.viewportHeight}px
-                          </Typography>
-                        </Box>
-                      )}
-                      {link.screenshotMetadata.fileSize && (
-                        <Box>
-                          <Typography variant="caption" className="text-gray-600 block">
-                            File Size
-                          </Typography>
-                          <Typography variant="body2" className="font-medium">
-                            {Math.round(link.screenshotMetadata.fileSize / 1024)}KB
-                          </Typography>
-                        </Box>
-                      )}
-                      {link.screenshotMetadata.capturedAt && (
-                        <Box>
-                          <Typography variant="caption" className="text-gray-600 block">
-                            Captured At
-                          </Typography>
-                          <Typography variant="body2" className="font-medium">
-                            {new Date(link.screenshotMetadata.capturedAt).toLocaleString()}
-                          </Typography>
-                        </Box>
-                      )}
+                    {link.startingPath ? (
+                      <Typography
+                        variant="body2"
+                        className="font-mono bg-white px-2 py-1 rounded border border-gray-200"
+                      >
+                        {link.startingPath}
+                      </Typography>
+                    ) : (
+                      <Typography
+                        variant="body2"
+                        className="text-gray-500 italic bg-white px-2 py-1 rounded border border-gray-200"
+                      >
+                        Not specified
+                      </Typography>
+                    )}
+                    <Typography variant="caption" className="text-gray-500 block mt-1">
+                      {link.startingPath
+                        ? "Crawler-detected or manually set starting path"
+                        : "The page/URL where users start before reaching this journey endpoint"}
+                    </Typography>
+                  </Box>
+                )}
+
+                {/* Keywords */}
+                {link.keywords && link.keywords.length > 0 && (
+                  <Box>
+                    <Typography
+                      variant="caption"
+                      className="text-gray-600 font-semibold block mb-1"
+                    >
+                      Keywords
+                    </Typography>
+                    <Box className="flex flex-wrap gap-1">
+                      {link.keywords.map((keyword, index) => (
+                        <Chip key={index} label={keyword} size="small" variant="outlined" />
+                      ))}
                     </Box>
                   </Box>
-                </Popover>
-              )}
+                )}
+
+                {/* Description */}
+                {link.description && (
+                  <Box>
+                    <Typography
+                      variant="caption"
+                      className="text-gray-600 font-semibold block mb-1"
+                    >
+                      Description
+                    </Typography>
+                    <Typography
+                      variant="body2"
+                      className="bg-white px-2 py-2 rounded border border-gray-200 whitespace-pre-wrap"
+                    >
+                      {link.description}
+                    </Typography>
+                  </Box>
+                )}
+
+                {/* Forms - Only if page has forms */}
+                {link.hasForm && link.formFields && link.formFields.length > 0 && (
+                  <Box>
+                    <Typography
+                      variant="caption"
+                      className="text-gray-600 font-semibold block mb-1"
+                    >
+                      Forms
+                    </Typography>
+                    <Box className="space-y-2">
+                      {link.formFields.map((field, index) => (
+                        <Box
+                          key={index}
+                          className="flex items-center justify-between bg-white px-3 py-2 rounded border border-gray-200"
+                        >
+                          <Box className="flex items-center gap-2">
+                            <Typography variant="body2" className="font-medium">
+                              {field.label}
+                            </Typography>
+                            <Chip
+                              label={field.type}
+                              size="small"
+                              color="primary"
+                              variant="outlined"
+                            />
+                          </Box>
+                          {field.required ? (
+                            <Chip label="Required" size="small" color="error" />
+                          ) : (
+                            <Chip label="Optional" size="small" variant="outlined" />
+                          )}
+                        </Box>
+                      ))}
+                    </Box>
+                    <Typography variant="caption" className="text-gray-500 block mt-1">
+                      {link.formFields.filter((f) => f.required).length} required field(s),{" "}
+                      {link.formFields.filter((f) => !f.required).length} optional
+                    </Typography>
+                  </Box>
+                )}
+              </Box>
             </Paper>
-          )}
-        </Box>
+
+            {/* AI Guidance */}
+            {link.aiGuidance && (
+              <Paper elevation={0} className="p-4 bg-green-50">
+                <Typography variant="subtitle2" className="font-semibold mb-2 text-green-900">
+                  AI Guidance
+                </Typography>
+                <Typography variant="body2" className="text-gray-700">
+                  {link.aiGuidance}
+                </Typography>
+              </Paper>
+            )}
+
+            {/* Screenshot */}
+            {link.screenshot && (
+              <Paper elevation={0} className="p-4 bg-purple-50">
+                {/* Screenshot Display */}
+                <Paper variant="outlined" className="p-3 bg-white">
+                  <Box className="flex justify-between items-center mb-2">
+                    <Box className="flex items-center gap-1">
+                      {link.screenshotMetadata && (
+                        <Tooltip title="Screenshot Information">
+                          <IconButton size="small" onClick={handleScreenshotInfoClick}>
+                            <InfoIcon fontSize="small" />
+                          </IconButton>
+                        </Tooltip>
+                      )}
+                      <Tooltip title="Zoom Out">
+                        <span>
+                          <IconButton
+                            size="small"
+                            onClick={handleZoomOut}
+                            disabled={zoomLevel <= 0.5}
+                          >
+                            <ZoomOut fontSize="small" />
+                          </IconButton>
+                        </span>
+                      </Tooltip>
+                      <Tooltip title="Reset Zoom">
+                        <IconButton
+                          size="small"
+                          onClick={handleZoomReset}
+                          disabled={zoomLevel === 1}
+                        >
+                          <ZoomOutMap fontSize="small" />
+                        </IconButton>
+                      </Tooltip>
+                      <Tooltip title="Zoom In">
+                        <span>
+                          <IconButton size="small" onClick={handleZoomIn} disabled={zoomLevel >= 3}>
+                            <ZoomIn fontSize="small" />
+                          </IconButton>
+                        </span>
+                      </Tooltip>
+                      <Typography variant="caption" className="text-gray-600 ml-1">
+                        {Math.round(zoomLevel * 100)}%
+                      </Typography>
+                      <Button
+                        variant="outlined"
+                        size="small"
+                        href={link.screenshot}
+                        target="_blank"
+                      >
+                        Open
+                      </Button>
+                    </Box>
+                  </Box>
+                  <Box
+                    sx={{
+                      border: 1,
+                      borderColor: "divider",
+                      borderRadius: 1,
+                      overflow: "auto",
+                      maxHeight: "600px",
+                      bgcolor: "grey.50",
+                      cursor: zoomLevel > 1 ? "move" : "default",
+                    }}
+                  >
+                    <Box
+                      sx={{
+                        transform: `scale(${zoomLevel})`,
+                        transformOrigin: "top left",
+                        transition: "transform 0.2s ease-in-out",
+                      }}
+                    >
+                      <ImageWithPlaceholder
+                        src={link.screenshot}
+                        alt={`Screenshot of ${link.displayName}`}
+                        width="100%"
+                        height="auto"
+                        objectFit="contain"
+                      />
+                    </Box>
+                  </Box>
+                </Paper>
+
+                {/* Screenshot Info Popover */}
+                {link.screenshotMetadata && (
+                  <Popover
+                    open={screenshotInfoOpen}
+                    anchorEl={screenshotInfoAnchor}
+                    onClose={handleScreenshotInfoClose}
+                    anchorOrigin={{
+                      vertical: "bottom",
+                      horizontal: "left",
+                    }}
+                    transformOrigin={{
+                      vertical: "top",
+                      horizontal: "left",
+                    }}
+                  >
+                    <Box className="p-3" sx={{ minWidth: 250 }}>
+                      <Typography variant="subtitle2" className="font-semibold mb-2">
+                        Screenshot Information
+                      </Typography>
+                      <Box className="space-y-2">
+                        <Box>
+                          <Typography variant="caption" className="text-gray-600 block">
+                            Capture Type
+                          </Typography>
+                          <Typography variant="body2" className="font-medium capitalize">
+                            {link.screenshotMetadata.captureType.replace("-", " ")}
+                          </Typography>
+                        </Box>
+                        <Box>
+                          <Typography variant="caption" className="text-gray-600 block">
+                            Dimensions
+                          </Typography>
+                          <Typography variant="body2" className="font-medium font-mono">
+                            {link.screenshotMetadata.dimensions.width}×
+                            {link.screenshotMetadata.dimensions.height}px
+                          </Typography>
+                        </Box>
+                        {link.screenshotMetadata.dimensions.viewportHeight && (
+                          <Box>
+                            <Typography variant="caption" className="text-gray-600 block">
+                              Viewport Height
+                            </Typography>
+                            <Typography variant="body2" className="font-medium font-mono">
+                              {link.screenshotMetadata.dimensions.viewportHeight}px
+                            </Typography>
+                          </Box>
+                        )}
+                        {link.screenshotMetadata.fileSize && (
+                          <Box>
+                            <Typography variant="caption" className="text-gray-600 block">
+                              File Size
+                            </Typography>
+                            <Typography variant="body2" className="font-medium">
+                              {Math.round(link.screenshotMetadata.fileSize / 1024)}KB
+                            </Typography>
+                          </Box>
+                        )}
+                        {link.screenshotMetadata.capturedAt && (
+                          <Box>
+                            <Typography variant="caption" className="text-gray-600 block">
+                              Captured At
+                            </Typography>
+                            <Typography variant="body2" className="font-medium">
+                              {new Date(link.screenshotMetadata.capturedAt).toLocaleString()}
+                            </Typography>
+                          </Box>
+                        )}
+                      </Box>
+                    </Box>
+                  </Popover>
+                )}
+              </Paper>
+            )}
+          </Box>
         </TabPanel>
 
         {/* Tab 1: Embeddings */}
         <TabPanel value={activeTab} index={1}>
           <Box className="space-y-4">
             <Box className="flex items-center justify-between mb-3">
-              <Typography variant="h6">
-                Multi-Modal Embedding Status
-              </Typography>
+              <Typography variant="h6">Multi-Modal Embedding Status</Typography>
               {link.screenshot && (
                 <Box className="flex gap-2">
                   <Button
@@ -596,7 +608,8 @@ export function LinkDetailDialog({ open, onClose, link, onEdit }: LinkDetailDial
                 <Box className="flex items-center gap-2">
                   <CircularProgress size={16} />
                   <Typography variant="caption">
-                    Analyzing screenshot and generating embeddings... This may take up to 30 seconds.
+                    Analyzing screenshot and generating embeddings... This may take up to 30
+                    seconds.
                   </Typography>
                 </Box>
               </Alert>
@@ -604,7 +617,6 @@ export function LinkDetailDialog({ open, onClose, link, onEdit }: LinkDetailDial
 
             {link.embeddingMetadata ? (
               <>
-
                 {/* Enhanced Embedding Text Content - Editable Section */}
                 <Paper elevation={0} className="p-4 bg-gradient-to-br from-indigo-50 to-purple-50">
                   <Box className="flex items-center justify-between mb-3">
@@ -644,14 +656,17 @@ export function LinkDetailDialog({ open, onClose, link, onEdit }: LinkDetailDial
                   </Box>
 
                   <Alert severity="info" sx={{ mb: 3 }}>
-                    These text variants are used to generate the 6 embedding vectors for semantic search.
-                    Edit them to refine matching accuracy.
+                    These text variants are used to generate the 6 embedding vectors for semantic
+                    search. Edit them to refine matching accuracy.
                   </Alert>
 
                   <Box className="space-y-3">
                     {/* Functionality Embedding */}
                     <Paper variant="outlined" className="p-3 bg-white">
-                      <Typography variant="caption" className="font-semibold text-indigo-700 block mb-2">
+                      <Typography
+                        variant="caption"
+                        className="font-semibold text-indigo-700 block mb-2"
+                      >
                         1. Functionality Embedding
                       </Typography>
                       <Typography variant="caption" className="text-gray-600 block mb-2">
@@ -671,10 +686,19 @@ export function LinkDetailDialog({ open, onClose, link, onEdit }: LinkDetailDial
                         <Paper variant="outlined" className="p-2 bg-gray-50">
                           <Box component="ul" className="pl-5 space-y-1">
                             {link.aiSummary?.whatUsersCanDo.map((item, idx) => (
-                              <Typography key={idx} component="li" variant="body2" className="text-gray-700">
+                              <Typography
+                                key={idx}
+                                component="li"
+                                variant="body2"
+                                className="text-gray-700"
+                              >
                                 {item}
                               </Typography>
-                            )) || <Typography variant="body2" className="text-gray-500 italic">Not generated</Typography>}
+                            )) || (
+                              <Typography variant="body2" className="text-gray-500 italic">
+                                Not generated
+                              </Typography>
+                            )}
                           </Box>
                         </Paper>
                       )}
@@ -682,7 +706,10 @@ export function LinkDetailDialog({ open, onClose, link, onEdit }: LinkDetailDial
 
                     {/* Content Embedding */}
                     <Paper variant="outlined" className="p-3 bg-white">
-                      <Typography variant="caption" className="font-semibold text-purple-700 block mb-2">
+                      <Typography
+                        variant="caption"
+                        className="font-semibold text-purple-700 block mb-2"
+                      >
                         2. Content Embedding
                       </Typography>
                       <Typography variant="caption" className="text-gray-600 block mb-2">
@@ -702,10 +729,19 @@ export function LinkDetailDialog({ open, onClose, link, onEdit }: LinkDetailDial
                         <Paper variant="outlined" className="p-2 bg-gray-50">
                           <Box component="ul" className="pl-5 space-y-1">
                             {link.aiSummary?.whatUsersSee.map((item, idx) => (
-                              <Typography key={idx} component="li" variant="body2" className="text-gray-700">
+                              <Typography
+                                key={idx}
+                                component="li"
+                                variant="body2"
+                                className="text-gray-700"
+                              >
                                 {item}
                               </Typography>
-                            )) || <Typography variant="body2" className="text-gray-500 italic">Not generated</Typography>}
+                            )) || (
+                              <Typography variant="body2" className="text-gray-500 italic">
+                                Not generated
+                              </Typography>
+                            )}
                           </Box>
                         </Paper>
                       )}
@@ -713,7 +749,10 @@ export function LinkDetailDialog({ open, onClose, link, onEdit }: LinkDetailDial
 
                     {/* Purpose Embedding */}
                     <Paper variant="outlined" className="p-3 bg-white">
-                      <Typography variant="caption" className="font-semibold text-blue-700 block mb-2">
+                      <Typography
+                        variant="caption"
+                        className="font-semibold text-blue-700 block mb-2"
+                      >
                         3. Purpose Embedding
                       </Typography>
                       <Typography variant="caption" className="text-gray-600 block mb-2">
@@ -732,7 +771,9 @@ export function LinkDetailDialog({ open, onClose, link, onEdit }: LinkDetailDial
                       ) : (
                         <Paper variant="outlined" className="p-2 bg-gray-50">
                           <Typography variant="body2" className="text-gray-700">
-                            {link.description || <span className="text-gray-500 italic">Not specified</span>}
+                            {link.description || (
+                              <span className="text-gray-500 italic">Not specified</span>
+                            )}
                           </Typography>
                         </Paper>
                       )}
@@ -740,7 +781,10 @@ export function LinkDetailDialog({ open, onClose, link, onEdit }: LinkDetailDial
 
                     {/* Action Embedding */}
                     <Paper variant="outlined" className="p-3 bg-white">
-                      <Typography variant="caption" className="font-semibold text-green-700 block mb-2">
+                      <Typography
+                        variant="caption"
+                        className="font-semibold text-green-700 block mb-2"
+                      >
                         4. Action Embedding
                       </Typography>
                       <Typography variant="caption" className="text-gray-600 block mb-2">
@@ -755,24 +799,39 @@ export function LinkDetailDialog({ open, onClose, link, onEdit }: LinkDetailDial
                           size="small"
                           placeholder="List primary actions/buttons (comma-separated)"
                           defaultValue={
-                            (link.multiModalEmbedding?.enhanced?.primaryActions || []).join(", ") || ""
+                            (link.multiModalEmbedding?.enhanced?.primaryActions || []).join(", ") ||
+                            ""
                           }
                           onChange={(e) => {
                             setEditedEmbeddings((prev) => ({
                               ...prev,
-                              primaryActions: e.target.value.split(",").map((a) => a.trim()).filter(Boolean),
+                              primaryActions: e.target.value
+                                .split(",")
+                                .map((a) => a.trim())
+                                .filter(Boolean),
                             }));
                           }}
                         />
                       ) : (
                         <Paper variant="outlined" className="p-2 bg-gray-50">
                           <Box className="flex flex-wrap gap-1">
-                            {(link.multiModalEmbedding?.enhanced?.primaryActions || []).length > 0 ? (
-                              link.multiModalEmbedding?.enhanced?.primaryActions.map((action, idx) => (
-                                <Chip key={idx} label={action} size="small" color="success" variant="outlined" />
-                              ))
+                            {(link.multiModalEmbedding?.enhanced?.primaryActions || []).length >
+                            0 ? (
+                              link.multiModalEmbedding?.enhanced?.primaryActions.map(
+                                (action, idx) => (
+                                  <Chip
+                                    key={idx}
+                                    label={action}
+                                    size="small"
+                                    color="success"
+                                    variant="outlined"
+                                  />
+                                )
+                              )
                             ) : (
-                              <Typography variant="body2" className="text-gray-500 italic">Not extracted</Typography>
+                              <Typography variant="body2" className="text-gray-500 italic">
+                                Not extracted
+                              </Typography>
                             )}
                           </Box>
                         </Paper>
@@ -781,7 +840,10 @@ export function LinkDetailDialog({ open, onClose, link, onEdit }: LinkDetailDial
 
                     {/* Data Context Embedding */}
                     <Paper variant="outlined" className="p-3 bg-white">
-                      <Typography variant="caption" className="font-semibold text-orange-700 block mb-2">
+                      <Typography
+                        variant="caption"
+                        className="font-semibold text-orange-700 block mb-2"
+                      >
                         5. Data Context Embedding
                       </Typography>
                       <Typography variant="caption" className="text-gray-600 block mb-2">
@@ -796,12 +858,16 @@ export function LinkDetailDialog({ open, onClose, link, onEdit }: LinkDetailDial
                           size="small"
                           placeholder="List data entities (comma-separated, e.g., accounts, transactions, portfolios)"
                           defaultValue={
-                            (link.multiModalEmbedding?.enhanced?.dataEntities || []).join(", ") || ""
+                            (link.multiModalEmbedding?.enhanced?.dataEntities || []).join(", ") ||
+                            ""
                           }
                           onChange={(e) => {
                             setEditedEmbeddings((prev) => ({
                               ...prev,
-                              dataEntities: e.target.value.split(",").map((a) => a.trim()).filter(Boolean),
+                              dataEntities: e.target.value
+                                .split(",")
+                                .map((a) => a.trim())
+                                .filter(Boolean),
                             }));
                           }}
                         />
@@ -809,11 +875,21 @@ export function LinkDetailDialog({ open, onClose, link, onEdit }: LinkDetailDial
                         <Paper variant="outlined" className="p-2 bg-gray-50">
                           <Box className="flex flex-wrap gap-1">
                             {(link.multiModalEmbedding?.enhanced?.dataEntities || []).length > 0 ? (
-                              link.multiModalEmbedding?.enhanced?.dataEntities.map((entity, idx) => (
-                                <Chip key={idx} label={entity} size="small" color="warning" variant="outlined" />
-                              ))
+                              link.multiModalEmbedding?.enhanced?.dataEntities.map(
+                                (entity, idx) => (
+                                  <Chip
+                                    key={idx}
+                                    label={entity}
+                                    size="small"
+                                    color="warning"
+                                    variant="outlined"
+                                  />
+                                )
+                              )
                             ) : (
-                              <Typography variant="body2" className="text-gray-500 italic">Not extracted</Typography>
+                              <Typography variant="body2" className="text-gray-500 italic">
+                                Not extracted
+                              </Typography>
                             )}
                           </Box>
                         </Paper>
@@ -822,7 +898,10 @@ export function LinkDetailDialog({ open, onClose, link, onEdit }: LinkDetailDial
 
                     {/* User Task Embedding */}
                     <Paper variant="outlined" className="p-3 bg-white">
-                      <Typography variant="caption" className="font-semibold text-pink-700 block mb-2">
+                      <Typography
+                        variant="caption"
+                        className="font-semibold text-pink-700 block mb-2"
+                      >
                         6. User Task Embedding
                       </Typography>
                       <Typography variant="caption" className="text-gray-600 block mb-2">
@@ -841,7 +920,13 @@ export function LinkDetailDialog({ open, onClose, link, onEdit }: LinkDetailDial
                       ) : (
                         <Paper variant="outlined" className="p-2 bg-gray-50">
                           <Typography variant="body2" className="text-gray-700">
-                            Intent: <Chip label={link.intent} size="small" color="primary" className="ml-1" />
+                            Intent:{" "}
+                            <Chip
+                              label={link.intent}
+                              size="small"
+                              color="primary"
+                              className="ml-1"
+                            />
                           </Typography>
                           {link.hasForm && link.formFields && (
                             <Box className="mt-2">
@@ -986,7 +1071,8 @@ export function LinkDetailDialog({ open, onClose, link, onEdit }: LinkDetailDial
 
                   {link.embeddingMetadata.lastEmbeddingUpdate && (
                     <Typography variant="caption" className="text-gray-500 block mt-3">
-                      Last updated: {new Date(link.embeddingMetadata.lastEmbeddingUpdate).toLocaleString()}
+                      Last updated:{" "}
+                      {new Date(link.embeddingMetadata.lastEmbeddingUpdate).toLocaleString()}
                     </Typography>
                   )}
                 </Paper>
@@ -1004,7 +1090,7 @@ export function LinkDetailDialog({ open, onClose, link, onEdit }: LinkDetailDial
                             scores={[
                               {
                                 label: "Functionality",
-                                score: link.multiModalEmbedding.enhanced.confidence || 0.90,
+                                score: link.multiModalEmbedding.enhanced.confidence || 0.9,
                               },
                               {
                                 label: "Content",
@@ -1033,12 +1119,30 @@ export function LinkDetailDialog({ open, onClose, link, onEdit }: LinkDetailDial
                         <Box>
                           <MultiModalRadarChart
                             data={[
-                              { axis: "Functionality", value: link.multiModalEmbedding.enhanced.confidence || 0.90 },
-                              { axis: "Content", value: link.multiModalEmbedding.enhanced.confidence || 0.88 },
-                              { axis: "Purpose", value: link.multiModalEmbedding.enhanced.confidence || 0.92 },
-                              { axis: "Action", value: link.multiModalEmbedding.enhanced.confidence || 0.85 },
-                              { axis: "Data Context", value: link.multiModalEmbedding.enhanced.confidence || 0.87 },
-                              { axis: "User Task", value: link.multiModalEmbedding.enhanced.confidence || 0.89 },
+                              {
+                                axis: "Functionality",
+                                value: link.multiModalEmbedding.enhanced.confidence || 0.9,
+                              },
+                              {
+                                axis: "Content",
+                                value: link.multiModalEmbedding.enhanced.confidence || 0.88,
+                              },
+                              {
+                                axis: "Purpose",
+                                value: link.multiModalEmbedding.enhanced.confidence || 0.92,
+                              },
+                              {
+                                axis: "Action",
+                                value: link.multiModalEmbedding.enhanced.confidence || 0.85,
+                              },
+                              {
+                                axis: "Data Context",
+                                value: link.multiModalEmbedding.enhanced.confidence || 0.87,
+                              },
+                              {
+                                axis: "User Task",
+                                value: link.multiModalEmbedding.enhanced.confidence || 0.89,
+                              },
                             ]}
                             size={250}
                           />
@@ -1061,7 +1165,9 @@ export function LinkDetailDialog({ open, onClose, link, onEdit }: LinkDetailDial
                                 Functionality
                               </Typography>
                               <Typography variant="body2" className="font-mono text-xs">
-                                Dimensions: {link.multiModalEmbedding.enhanced.functionalityEmbedding?.length || 0}
+                                Dimensions:{" "}
+                                {link.multiModalEmbedding.enhanced.functionalityEmbedding?.length ||
+                                  0}
                               </Typography>
                             </Box>
                             <Box>
@@ -1069,7 +1175,8 @@ export function LinkDetailDialog({ open, onClose, link, onEdit }: LinkDetailDial
                                 Content
                               </Typography>
                               <Typography variant="body2" className="font-mono text-xs">
-                                Dimensions: {link.multiModalEmbedding.enhanced.contentEmbedding?.length || 0}
+                                Dimensions:{" "}
+                                {link.multiModalEmbedding.enhanced.contentEmbedding?.length || 0}
                               </Typography>
                             </Box>
                             <Box>
@@ -1077,7 +1184,8 @@ export function LinkDetailDialog({ open, onClose, link, onEdit }: LinkDetailDial
                                 Purpose
                               </Typography>
                               <Typography variant="body2" className="font-mono text-xs">
-                                Dimensions: {link.multiModalEmbedding.enhanced.purposeEmbedding?.length || 0}
+                                Dimensions:{" "}
+                                {link.multiModalEmbedding.enhanced.purposeEmbedding?.length || 0}
                               </Typography>
                             </Box>
                             <Box>
@@ -1085,7 +1193,8 @@ export function LinkDetailDialog({ open, onClose, link, onEdit }: LinkDetailDial
                                 Action
                               </Typography>
                               <Typography variant="body2" className="font-mono text-xs">
-                                Dimensions: {link.multiModalEmbedding.enhanced.actionEmbedding?.length || 0}
+                                Dimensions:{" "}
+                                {link.multiModalEmbedding.enhanced.actionEmbedding?.length || 0}
                               </Typography>
                             </Box>
                             <Box>
@@ -1093,7 +1202,9 @@ export function LinkDetailDialog({ open, onClose, link, onEdit }: LinkDetailDial
                                 Data Context
                               </Typography>
                               <Typography variant="body2" className="font-mono text-xs">
-                                Dimensions: {link.multiModalEmbedding.enhanced.dataContextEmbedding?.length || 0}
+                                Dimensions:{" "}
+                                {link.multiModalEmbedding.enhanced.dataContextEmbedding?.length ||
+                                  0}
                               </Typography>
                             </Box>
                             <Box>
@@ -1101,14 +1212,18 @@ export function LinkDetailDialog({ open, onClose, link, onEdit }: LinkDetailDial
                                 User Task
                               </Typography>
                               <Typography variant="body2" className="font-mono text-xs">
-                                Dimensions: {link.multiModalEmbedding.enhanced.userTaskEmbedding?.length || 0}
+                                Dimensions:{" "}
+                                {link.multiModalEmbedding.enhanced.userTaskEmbedding?.length || 0}
                               </Typography>
                             </Box>
                           </Box>
                           {link.multiModalEmbedding.enhanced.extractedAt && (
                             <Typography variant="caption" className="text-gray-500 block mt-2">
                               Model: {link.multiModalEmbedding.enhanced.modelUsed || "Unknown"} |
-                              Extracted: {new Date(link.multiModalEmbedding.enhanced.extractedAt).toLocaleString()}
+                              Extracted:{" "}
+                              {new Date(
+                                link.multiModalEmbedding.enhanced.extractedAt
+                              ).toLocaleString()}
                             </Typography>
                           )}
                         </Box>
@@ -1119,7 +1234,8 @@ export function LinkDetailDialog({ open, onClose, link, onEdit }: LinkDetailDial
               </>
             ) : (
               <Alert severity="info">
-                No embedding data available for this link. Embeddings will be generated during the next crawl.
+                No embedding data available for this link. Embeddings will be generated during the
+                next crawl.
               </Alert>
             )}
           </Box>
@@ -1286,7 +1402,8 @@ export function LinkDetailDialog({ open, onClose, link, onEdit }: LinkDetailDial
               </>
             ) : (
               <Alert severity="info">
-                No analysis data available for this page. Analysis will be performed during the next screenshot capture.
+                No analysis data available for this page. Analysis will be performed during the next
+                screenshot capture.
               </Alert>
             )}
           </Box>
@@ -1299,7 +1416,8 @@ export function LinkDetailDialog({ open, onClose, link, onEdit }: LinkDetailDial
               Synthetic Test Queries
             </Typography>
             <Alert severity="info">
-              Synthetic queries for this specific link are managed in the Synthetic Query Manager. This view shows queries associated with this page.
+              Synthetic queries for this specific link are managed in the Synthetic Query Manager.
+              This view shows queries associated with this page.
             </Alert>
             <Paper elevation={0} className="p-4">
               <Typography variant="subtitle2" className="font-semibold mb-3">
@@ -1349,7 +1467,8 @@ export function LinkDetailDialog({ open, onClose, link, onEdit }: LinkDetailDial
               Analysis History
             </Typography>
             <Alert severity="info">
-              Analysis history shows changes to this page over time, including embedding updates and visual changes.
+              Analysis history shows changes to this page over time, including embedding updates and
+              visual changes.
             </Alert>
             <Paper elevation={0} className="p-4">
               <Typography variant="subtitle2" className="font-semibold mb-3">
@@ -1377,7 +1496,8 @@ export function LinkDetailDialog({ open, onClose, link, onEdit }: LinkDetailDial
                     </Typography>
                   </Box>
                   <Typography variant="caption" className="text-gray-600">
-                    Analyzed: {new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toLocaleDateString()} | Confidence: 92%
+                    Analyzed: {new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toLocaleDateString()}{" "}
+                    | Confidence: 92%
                   </Typography>
                 </Paper>
                 <Paper variant="outlined" className="p-3 opacity-75">
@@ -1387,7 +1507,8 @@ export function LinkDetailDialog({ open, onClose, link, onEdit }: LinkDetailDial
                     </Typography>
                   </Box>
                   <Typography variant="caption" className="text-gray-600">
-                    Analyzed: {new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toLocaleDateString()} | Confidence: 88%
+                    Analyzed: {new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toLocaleDateString()}{" "}
+                    | Confidence: 88%
                   </Typography>
                 </Paper>
               </Box>

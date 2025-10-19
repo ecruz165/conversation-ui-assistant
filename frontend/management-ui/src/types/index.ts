@@ -102,6 +102,7 @@ export interface Website {
   name: string;
   type: "website" | "internal_app" | "mobile_app";
   description?: string;
+  containsPII?: boolean; // Whether the application contains Personal Identifiable Information
   contact: {
     name: string;
     email: string;
@@ -113,6 +114,10 @@ export interface Website {
     scannableDomains: Array<{
       domain: string;
       isActive: boolean;
+      credentials?: {
+        username: string;
+        password: string;
+      };
     }>;
   };
   crawlStatus?: {
@@ -121,10 +126,14 @@ export interface Website {
     status: "pending" | "in-progress" | "completed" | "failed";
   };
   searchConfiguration?: {
-    defaultModalityWeights?: {
-      text: number;
-      visual: number;
-      metadata: number;
+    // 6-embedding weights for semantic search
+    weights: {
+      functionality: number; // What users can do - capabilities and features
+      content: number; // What users can see - visible content and layout
+      purpose: number; // Purpose of page - intent and goal
+      action: number; // Extracted CTAs and buttons - specific actions
+      dataContext: number; // Data entities shown - domain objects
+      userTask: number; // Common user tasks - workflows and processes
     };
     description?: string;
     updatedAt?: string;
@@ -212,28 +221,14 @@ export interface EmbeddingTestQuery {
   query: string;
   maxResults?: number;
   minConfidence?: number;
-  useMultiModal?: boolean; // Whether to use multi-modal embeddings for search
-  modalityWeights?: {
-    // Custom weights for different modalities in search (legacy)
-    text?: number; // 0-1, default 0.5
-    visual?: number; // 0-1, default 0.3
-    metadata?: number; // 0-1, default 0.2
-  };
-  // Enhanced weights (6 embedding types)
-  enhancedWeights?: Partial<EnhancedEmbeddingWeights>;
-  useEnhancedEmbeddings?: boolean; // Whether to use 6-embedding structure
+  // 6-embedding weights for search
+  weights?: Partial<EnhancedEmbeddingWeights>;
 }
 
 export interface SlotInfo {
   name: string;
   type: string;
   description?: string;
-}
-
-export interface ModalityMatchScore {
-  modality: EmbeddingModality;
-  score: number; // 0-1
-  contributionWeight: number; // How much this modality contributed to final score
 }
 
 // Enhanced Modality Scoring (6 embedding types)
@@ -267,9 +262,8 @@ export interface PageMatch {
   title: string;
   url: string;
   description?: string;
-  matchScore: number; // 0-1 decimal (combined score across modalities)
-  modalityScores?: ModalityMatchScore[]; // Breakdown by modality (legacy)
-  enhancedScores?: EnhancedModalityScore[]; // Enhanced 6-embedding breakdown
+  matchScore: number; // 0-1 decimal (combined score across all 6 embeddings)
+  embeddingScores: EnhancedModalityScore[]; // 6-embedding breakdown
   matchedIntents: string[];
   slots: {
     matched: number;
@@ -295,9 +289,8 @@ export interface EmbeddingTestResult {
   totalMatches: number;
   results: PageMatch[];
   searchMetadata?: {
-    multiModalUsed: boolean;
     averageConfidence: number;
-    modalitiesUsed: EmbeddingModality[];
+    embeddingTypesUsed: EnhancedEmbeddingType[];
     searchDuration: number; // in milliseconds
   };
 }

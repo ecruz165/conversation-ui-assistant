@@ -43,7 +43,11 @@ export function ConfidenceIndicator({
       {showLabel && (
         <Box className="flex items-center justify-between mb-1">
           <Box className="flex items-center gap-1">
-            <Typography variant="caption" sx={{ fontSize: config.fontSize }} className="font-medium">
+            <Typography
+              variant="caption"
+              sx={{ fontSize: config.fontSize }}
+              className="font-medium"
+            >
               Confidence
             </Typography>
             <Tooltip title={`${level} confidence (${percentage}%)`}>

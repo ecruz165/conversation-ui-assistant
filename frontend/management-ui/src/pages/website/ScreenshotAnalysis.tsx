@@ -38,7 +38,11 @@ const tabs = [
   { label: "Crawl Management", value: "crawl-management", path: "/website/crawl-management" },
   { label: "Link Management", value: "links", path: "/website/links" },
   { label: "Embeddings Tester", value: "embedding-test", path: "/website/embedding-test" },
-  { label: "Screenshot Analysis", value: "screenshot-analysis", path: "/website/screenshot-analysis" },
+  {
+    label: "Screenshot Analysis",
+    value: "screenshot-analysis",
+    path: "/website/screenshot-analysis",
+  },
   { label: "Widget Code", value: "code", path: "/website/code" },
 ];
 
@@ -387,7 +391,9 @@ export function ScreenshotAnalysis() {
               <Box className="mb-4">
                 <Box className="flex items-center gap-2 mb-2">
                   <CircularProgress size={20} />
-                  <Typography variant="body2">Analyzing screenshot with {selectedModel}...</Typography>
+                  <Typography variant="body2">
+                    Analyzing screenshot with {selectedModel}...
+                  </Typography>
                 </Box>
                 <LinearProgress />
               </Box>

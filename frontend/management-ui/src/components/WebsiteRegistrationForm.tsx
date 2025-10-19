@@ -76,6 +76,7 @@ export function WebsiteRegistrationForm({
     control,
     handleSubmit,
     watch,
+    setValue,
     formState: { errors },
   } = useForm<WebsiteFormData>({
     defaultValues: initialData || {
@@ -461,8 +462,11 @@ export function WebsiteRegistrationForm({
                     <Typography variant="subtitle1" className="font-medium text-gray-700">
                       Non-Production Domain to Scan <span className="text-red-600">*</span>
                     </Typography>
-                    <Typography variant="caption" className="text-gray-500">
+                    <Typography variant="caption" className="text-gray-500 block">
                       Provide test/dev/staging environment URLs with credentials for each domain
+                    </Typography>
+                    <Typography variant="caption" className="text-gray-600 block mt-1">
+                      Select one domain as active for scanning using the radio button
                     </Typography>
                   </Box>
                   <Button
@@ -487,14 +491,45 @@ export function WebsiteRegistrationForm({
                   {fields.map((field, index) => {
                     const domainUrl =
                       watch(`domains.scannableDomains.${index}.url`) || "New Domain";
+                    const isActive = watch(`domains.scannableDomains.${index}.isActiveForScanning`);
 
                     return (
                       <Accordion key={field.id} defaultExpanded>
                         <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                           <Box className="flex items-center justify-between w-full pr-2">
-                            <Typography className="font-medium text-gray-900">
-                              {domainUrl}
-                            </Typography>
+                            <Box className="flex items-center gap-2">
+                              <Controller
+                                name={`domains.scannableDomains.${index}.isActiveForScanning`}
+                                control={control}
+                                render={({ field: radioField }) => (
+                                  <Radio
+                                    checked={radioField.value}
+                                    onChange={(e) => {
+                                      // Set all domains to inactive first
+                                      fields.forEach((_, i) => {
+                                        setValue(
+                                          `domains.scannableDomains.${i}.isActiveForScanning`,
+                                          i === index
+                                        );
+                                      });
+                                    }}
+                                    onClick={(e) => e.stopPropagation()}
+                                    size="small"
+                                  />
+                                )}
+                              />
+                              <Typography className="font-medium text-gray-900">
+                                {domainUrl}
+                              </Typography>
+                              {isActive && (
+                                <Typography
+                                  variant="caption"
+                                  className="text-green-600 font-semibold"
+                                >
+                                  (Active)
+                                </Typography>
+                              )}
+                            </Box>
                             <IconButton
                               onClick={(e) => {
                                 e.stopPropagation();

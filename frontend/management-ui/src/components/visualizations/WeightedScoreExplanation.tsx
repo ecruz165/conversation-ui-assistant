@@ -43,7 +43,8 @@ export function WeightedScoreExplanation({
                       {modalityScore.modality}
                     </Typography>
                     <Typography variant="caption" className="text-gray-500">
-                      ({Math.round(modalityScore.score * 100)}% × {Math.round(modalityScore.contributionWeight * 100)}%)
+                      ({Math.round(modalityScore.score * 100)}% ×{" "}
+                      {Math.round(modalityScore.contributionWeight * 100)}%)
                     </Typography>
                   </Box>
                   <Chip

@@ -37,7 +37,10 @@ function getStatusColor(status: "completed" | "failed" | "processing") {
 }
 
 // Helper function to calculate text difference
-function calculateDiff(text1: string, text2: string): {
+function calculateDiff(
+  text1: string,
+  text2: string
+): {
   added: number;
   removed: number;
   unchanged: number;
@@ -57,11 +60,7 @@ function calculateDiff(text1: string, text2: string): {
 }
 
 // Confidence Trend Chart Component
-function ConfidenceTrendChart({
-  entries,
-}: {
-  entries: ScreenshotAnalysisResult[];
-}) {
+function ConfidenceTrendChart({ entries }: { entries: ScreenshotAnalysisResult[] }) {
   const width = 600;
   const height = 200;
   const padding = { top: 20, right: 20, bottom: 40, left: 50 };
@@ -142,7 +141,15 @@ function ConfidenceTrendChart({
 
         {/* Data points */}
         {points.map((point, index) => (
-          <circle key={index} cx={point.x} cy={point.y} r="4" fill="#1976d2" stroke="white" strokeWidth="2">
+          <circle
+            key={index}
+            cx={point.x}
+            cy={point.y}
+            r="4"
+            fill="#1976d2"
+            stroke="white"
+            strokeWidth="2"
+          >
             <title>{`${(point.confidence * 100).toFixed(1)}% - ${new Date(point.date).toLocaleString()}`}</title>
           </circle>
         ))}
@@ -236,7 +243,8 @@ function TimelineEntry({
           </Typography>
         </Box>
         <Typography variant="caption" className="text-gray-600">
-          Regions detected: {entry.regions.length} | Processing: {entry.metadata.processingDuration}ms
+          Regions detected: {entry.regions.length} | Processing: {entry.metadata.processingDuration}
+          ms
         </Typography>
       </Box>
     </Box>
@@ -532,7 +540,12 @@ export function AnalysisHistoryViewer() {
 
           <Box className="flex-1" />
 
-          <Button variant="outlined" startIcon={<RefreshIcon />} onClick={() => refetch()} size="small">
+          <Button
+            variant="outlined"
+            startIcon={<RefreshIcon />}
+            onClick={() => refetch()}
+            size="small"
+          >
             Refresh
           </Button>
 
@@ -553,7 +566,9 @@ export function AnalysisHistoryViewer() {
         <Alert severity="info" className="mb-4">
           <Typography variant="body2">
             {selectedEntry1 && !selectedEntry2 && "Select another version to compare"}
-            {selectedEntry1 && selectedEntry2 && "Comparing two versions - click any entry to start new selection"}
+            {selectedEntry1 &&
+              selectedEntry2 &&
+              "Comparing two versions - click any entry to start new selection"}
           </Typography>
         </Alert>
       )}
@@ -569,15 +584,12 @@ export function AnalysisHistoryViewer() {
             <Typography variant="subtitle1" className="font-semibold mb-3">
               Analysis Timeline
             </Typography>
-            <Box
-              ref={parentRef}
-              className="h-[800px] pr-2 overflow-auto"
-            >
+            <Box ref={parentRef} className="h-[800px] pr-2 overflow-auto">
               <div
                 style={{
                   height: `${rowVirtualizer.getTotalSize()}px`,
-                  width: '100%',
-                  position: 'relative',
+                  width: "100%",
+                  position: "relative",
                 }}
               >
                 {rowVirtualizer.getVirtualItems().map((virtualRow) => {
@@ -586,10 +598,10 @@ export function AnalysisHistoryViewer() {
                     <div
                       key={virtualRow.key}
                       style={{
-                        position: 'absolute',
+                        position: "absolute",
                         top: 0,
                         left: 0,
-                        width: '100%',
+                        width: "100%",
                         height: `${virtualRow.size}px`,
                         transform: `translateY(${virtualRow.start}px)`,
                       }}
@@ -686,7 +698,12 @@ export function AnalysisHistoryViewer() {
                           </Typography>
                           <Box className="flex flex-wrap gap-1">
                             {selectedEntry1.regions.map((region) => (
-                              <Chip key={region.id} label={region.type} size="small" variant="outlined" />
+                              <Chip
+                                key={region.id}
+                                label={region.type}
+                                size="small"
+                                variant="outlined"
+                              />
                             ))}
                           </Box>
                         </Box>

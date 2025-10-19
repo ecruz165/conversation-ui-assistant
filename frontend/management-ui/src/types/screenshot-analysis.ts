@@ -2,7 +2,16 @@
 
 export interface PageRegion {
   id: string;
-  type: "header" | "navigation" | "content" | "sidebar" | "footer" | "form" | "card" | "modal" | "other";
+  type:
+    | "header"
+    | "navigation"
+    | "content"
+    | "sidebar"
+    | "footer"
+    | "form"
+    | "card"
+    | "modal"
+    | "other";
   boundingBox: {
     x: number; // Top-left x coordinate
     y: number; // Top-left y coordinate
