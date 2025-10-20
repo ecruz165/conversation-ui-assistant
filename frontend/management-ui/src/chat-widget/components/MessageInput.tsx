@@ -2,6 +2,48 @@ import { Mic, MicOff, Send } from "lucide-react";
 import React, { type KeyboardEvent, useCallback, useEffect, useRef, useState } from "react";
 import type { Theme } from "../types";
 
+// Speech Recognition API types
+interface SpeechRecognitionEvent extends Event {
+  results: SpeechRecognitionResultList;
+  resultIndex: number;
+}
+
+interface SpeechRecognitionResultList {
+  length: number;
+  item(index: number): SpeechRecognitionResult;
+  [index: number]: SpeechRecognitionResult;
+}
+
+interface SpeechRecognitionResult {
+  isFinal: boolean;
+  length: number;
+  item(index: number): SpeechRecognitionAlternative;
+  [index: number]: SpeechRecognitionAlternative;
+}
+
+interface SpeechRecognitionAlternative {
+  transcript: string;
+  confidence: number;
+}
+
+interface SpeechRecognitionErrorEvent extends Event {
+  error: string;
+  message: string;
+}
+
+interface SpeechRecognition extends EventTarget {
+  continuous: boolean;
+  interimResults: boolean;
+  lang: string;
+  start(): void;
+  stop(): void;
+  abort(): void;
+  onstart: ((this: SpeechRecognition, ev: Event) => void) | null;
+  onresult: ((this: SpeechRecognition, ev: SpeechRecognitionEvent) => void) | null;
+  onerror: ((this: SpeechRecognition, ev: SpeechRecognitionErrorEvent) => void) | null;
+  onend: ((this: SpeechRecognition, ev: Event) => void) | null;
+}
+
 interface MessageInputProps {
   onSendMessage: (message: string, audioBlob?: Blob) => void;
   placeholder?: string;
@@ -26,7 +68,7 @@ const MessageInput: React.FC<MessageInputProps> = ({
   const [_isTranscribing, setIsTranscribing] = useState(false);
   const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const recognitionRef = useRef<any>(null);
+  const recognitionRef = useRef<SpeechRecognition | null>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
   const streamRef = useRef<MediaStream | null>(null);
@@ -116,9 +158,9 @@ const MessageInput: React.FC<MessageInputProps> = ({
   // Initialize speech recognition
   useEffect(() => {
     if ("webkitSpeechRecognition" in window || "SpeechRecognition" in window) {
-      const SpeechRecognition =
+      const SpeechRecognitionConstructor =
         (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-      recognitionRef.current = new SpeechRecognition();
+      recognitionRef.current = new SpeechRecognitionConstructor() as SpeechRecognition;
 
       const recognition = recognitionRef.current;
       recognition.continuous = true;
@@ -130,7 +172,7 @@ const MessageInput: React.FC<MessageInputProps> = ({
         setIsTranscribing(true);
       };
 
-      recognition.onresult = (event: any) => {
+      recognition.onresult = (event: SpeechRecognitionEvent) => {
         let interimTranscript = "";
         let finalTranscript = "";
 
@@ -163,7 +205,7 @@ const MessageInput: React.FC<MessageInputProps> = ({
         }
       };
 
-      recognition.onerror = (event: any) => {
+      recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
         console.error("🚫 Speech recognition error:", event.error);
         setIsListening(false);
         setIsTranscribing(false);
