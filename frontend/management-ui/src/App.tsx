@@ -47,9 +47,9 @@ function App() {
             <Route path="/" element={<LandingPage />} />
             <Route path="/register" element={<RegisterWebsite />} />
             <Route path="/website/overview" element={<WebsiteOverview />} />
-            <Route path="/website/links" element={<LinkManagement />} />
-            <Route path="/website/code" element={<WidgetCode />} />
-            <Route path="/website/embedding-test" element={<EmbeddingTest />} />
+            <Route path="/website/link-management" element={<LinkManagement />} />
+            <Route path="/website/widget-code" element={<WidgetCode />} />
+            <Route path="/website/embeddings-tester" element={<EmbeddingTest />} />
             <Route
               path="/website/screenshot-analysis"
               element={

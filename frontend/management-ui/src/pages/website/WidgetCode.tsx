@@ -27,9 +27,9 @@ type IntegrationMethod = "script" | "npm" | "webcomponent";
 const tabs = [
   { label: "Overview", value: "overview", path: "/website/overview" },
   { label: "Crawl Management", value: "crawl-management", path: "/website/crawl-management" },
-  { label: "Link Management", value: "links", path: "/website/links" },
-  { label: "Embeddings Tester", value: "embedding-test", path: "/website/embedding-test" },
-  { label: "Widget Code", value: "code", path: "/website/code" },
+  { label: "Link Management", value: "link-management", path: "/website/link-management" },
+  { label: "Embeddings Tester", value: "embeddings-tester", path: "/website/embeddings-tester" },
+  { label: "Widget Code", value: "widget-code", path: "/website/widget-code" },
 ];
 
 const SECTION_TITLE_CLASS = "mb-2 font-semibold text-gray-900";

@@ -150,12 +150,12 @@ export const mockNavigationLinks: NavigationLink[] = [
         },
       ],
       enhanced: {
-        functionalityEmbedding: new Array(768).fill(0).map(() => Math.random()),
-        contentEmbedding: new Array(768).fill(0).map(() => Math.random()),
-        purposeEmbedding: new Array(768).fill(0).map(() => Math.random()),
-        actionEmbedding: new Array(768).fill(0).map(() => Math.random()),
-        dataContextEmbedding: new Array(768).fill(0).map(() => Math.random()),
-        userTaskEmbedding: new Array(768).fill(0).map(() => Math.random()),
+        functionalityEmbedding: new Array(1536).fill(0).map(() => Math.random()), // High quality
+        contentEmbedding: new Array(768).fill(0).map(() => Math.random()), // Medium-high quality
+        purposeEmbedding: new Array(1536).fill(0).map(() => Math.random()), // High quality
+        actionEmbedding: new Array(384).fill(0).map(() => Math.random()), // Medium quality
+        dataContextEmbedding: new Array(768).fill(0).map(() => Math.random()), // Medium-high quality
+        userTaskEmbedding: new Array(512).fill(0).map(() => Math.random()), // Medium quality
         path: "/dashboard",
         pageTitle: "Portfolio Dashboard",
         primaryActions: ["View Portfolio", "Check Balance", "Download Statements", "View History"],

@@ -35,14 +35,14 @@ import type { PageRegion } from "~/types";
 const tabs = [
   { label: "Overview", value: "overview", path: "/website/overview" },
   { label: "Crawl Management", value: "crawl-management", path: "/website/crawl-management" },
-  { label: "Link Management", value: "links", path: "/website/links" },
-  { label: "Embeddings Tester", value: "embedding-test", path: "/website/embedding-test" },
+  { label: "Link Management", value: "link-management", path: "/website/link-management" },
+  { label: "Embeddings Tester", value: "embeddings-tester", path: "/website/embeddings-tester" },
   {
     label: "Screenshot Analysis",
     value: "screenshot-analysis",
     path: "/website/screenshot-analysis",
   },
-  { label: "Widget Code", value: "code", path: "/website/code" },
+  { label: "Widget Code", value: "widget-code", path: "/website/widget-code" },
 ];
 
 // Region Overlay Component - highlights detected regions on screenshot

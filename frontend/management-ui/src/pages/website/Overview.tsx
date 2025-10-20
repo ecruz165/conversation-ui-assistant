@@ -36,9 +36,9 @@ import type { Website } from "~/types";
 const tabs = [
   { label: "Overview", value: "overview", path: "/website/overview" },
   { label: "Crawl Management", value: "crawl-management", path: "/website/crawl-management" },
-  { label: "Link Management", value: "links", path: "/website/links" },
-  { label: "Embeddings Tester", value: "embedding-test", path: "/website/embedding-test" },
-  { label: "Widget Code", value: "code", path: "/website/code" },
+  { label: "Link Management", value: "link-management", path: "/website/link-management" },
+  { label: "Embeddings Tester", value: "embeddings-tester", path: "/website/embeddings-tester" },
+  { label: "Widget Code", value: "widget-code", path: "/website/widget-code" },
 ];
 
 const ACTION_BUTTON_STYLE = { minWidth: 192 };
@@ -226,7 +226,7 @@ export function WebsiteOverview() {
                 >
                   <Box>
                     <MetricCard
-                      label={`Crawl Status: ${website?.crawlStatus?.status === "completed" ? "Success" : website?.crawlStatus?.status || "Pending"}`}
+                      label="Last Successful Crawl"
                       value={
                         website?.crawlStatus?.lastCrawl
                           ? (() => {

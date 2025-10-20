@@ -179,6 +179,19 @@ export function LinkDetailDialog({ open, onClose, link, onEdit }: LinkDetailDial
     }
   };
 
+  // Calculate quality score for individual embedding based on vector length and existence
+  const calculateEmbeddingQuality = (embeddingLength?: number): number => {
+    if (!embeddingLength || embeddingLength === 0) return 0;
+
+    // Quality score based on dimensionality
+    // Higher dimensions generally indicate better quality embeddings
+    if (embeddingLength >= 1536) return 0.95; // OpenAI ada-002 or similar high-quality
+    if (embeddingLength >= 768) return 0.85;  // BERT-style models
+    if (embeddingLength >= 384) return 0.75;  // Smaller but still good
+    if (embeddingLength >= 128) return 0.65;  // Minimal quality
+    return 0.5; // Very low dimension, questionable quality
+  };
+
   return (
     <Dialog open={open} onClose={onClose} maxWidth="lg" fullWidth>
       <DialogTitle>
@@ -1089,27 +1102,39 @@ export function LinkDetailDialog({ open, onClose, link, onEdit }: LinkDetailDial
                             scores={[
                               {
                                 label: "Functionality",
-                                score: link.multiModalEmbedding.enhanced.confidence || 0.9,
+                                score: calculateEmbeddingQuality(
+                                  link.multiModalEmbedding.enhanced.functionalityEmbedding?.length
+                                ),
                               },
                               {
                                 label: "Content",
-                                score: link.multiModalEmbedding.enhanced.confidence || 0.88,
+                                score: calculateEmbeddingQuality(
+                                  link.multiModalEmbedding.enhanced.contentEmbedding?.length
+                                ),
                               },
                               {
                                 label: "Purpose",
-                                score: link.multiModalEmbedding.enhanced.confidence || 0.92,
+                                score: calculateEmbeddingQuality(
+                                  link.multiModalEmbedding.enhanced.purposeEmbedding?.length
+                                ),
                               },
                               {
                                 label: "Action",
-                                score: link.multiModalEmbedding.enhanced.confidence || 0.85,
+                                score: calculateEmbeddingQuality(
+                                  link.multiModalEmbedding.enhanced.actionEmbedding?.length
+                                ),
                               },
                               {
                                 label: "Data Context",
-                                score: link.multiModalEmbedding.enhanced.confidence || 0.87,
+                                score: calculateEmbeddingQuality(
+                                  link.multiModalEmbedding.enhanced.dataContextEmbedding?.length
+                                ),
                               },
                               {
                                 label: "User Task",
-                                score: link.multiModalEmbedding.enhanced.confidence || 0.89,
+                                score: calculateEmbeddingQuality(
+                                  link.multiModalEmbedding.enhanced.userTaskEmbedding?.length
+                                ),
                               },
                             ]}
                             colorful={true}
@@ -1120,27 +1145,39 @@ export function LinkDetailDialog({ open, onClose, link, onEdit }: LinkDetailDial
                             data={[
                               {
                                 axis: "Functionality",
-                                value: link.multiModalEmbedding.enhanced.confidence || 0.9,
+                                value: calculateEmbeddingQuality(
+                                  link.multiModalEmbedding.enhanced.functionalityEmbedding?.length
+                                ),
                               },
                               {
                                 axis: "Content",
-                                value: link.multiModalEmbedding.enhanced.confidence || 0.88,
+                                value: calculateEmbeddingQuality(
+                                  link.multiModalEmbedding.enhanced.contentEmbedding?.length
+                                ),
                               },
                               {
                                 axis: "Purpose",
-                                value: link.multiModalEmbedding.enhanced.confidence || 0.92,
+                                value: calculateEmbeddingQuality(
+                                  link.multiModalEmbedding.enhanced.purposeEmbedding?.length
+                                ),
                               },
                               {
                                 axis: "Action",
-                                value: link.multiModalEmbedding.enhanced.confidence || 0.85,
+                                value: calculateEmbeddingQuality(
+                                  link.multiModalEmbedding.enhanced.actionEmbedding?.length
+                                ),
                               },
                               {
                                 axis: "Data Context",
-                                value: link.multiModalEmbedding.enhanced.confidence || 0.87,
+                                value: calculateEmbeddingQuality(
+                                  link.multiModalEmbedding.enhanced.dataContextEmbedding?.length
+                                ),
                               },
                               {
                                 axis: "User Task",
-                                value: link.multiModalEmbedding.enhanced.confidence || 0.89,
+                                value: calculateEmbeddingQuality(
+                                  link.multiModalEmbedding.enhanced.userTaskEmbedding?.length
+                                ),
                               },
                             ]}
                             size={250}
