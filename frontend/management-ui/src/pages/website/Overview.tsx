@@ -18,7 +18,7 @@ import {
 } from "@mui/material";
 import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { api } from "~/api/service";
 import { ErrorBoundary } from "~/components/ErrorBoundary";
 import { Layout } from "~/components/Layout";
@@ -33,20 +33,23 @@ import { useWebsite } from "~/hooks/useWebsite";
 import { mockApi } from "~/mocks/api";
 import type { Website } from "~/types";
 
-const tabs = [
-  { label: "Overview", value: "overview", path: "/website/overview" },
-  { label: "Crawl Management", value: "crawl-management", path: "/website/crawl-management" },
-  { label: "Link Management", value: "link-management", path: "/website/link-management" },
-  { label: "Embeddings Tester", value: "embeddings-tester", path: "/website/embeddings-tester" },
-  { label: "Widget Code", value: "widget-code", path: "/website/widget-code" },
+const getTabs = (websiteId: string) => [
+  { label: "Overview", value: "overview", path: `/${websiteId}/overview` },
+  { label: "Crawl Management", value: "crawl-management", path: `/${websiteId}/crawl-management` },
+  { label: "Link Management", value: "link-management", path: `/${websiteId}/link-management` },
+  {
+    label: "Embeddings Tester",
+    value: "embeddings-tester",
+    path: `/${websiteId}/embeddings-tester`,
+  },
+  { label: "Widget Code", value: "widget-code", path: `/${websiteId}/widget-code` },
 ];
 
 const ACTION_BUTTON_STYLE = { minWidth: 192 };
 
 export function WebsiteOverview() {
-  // For now, use the first mock website ID
-  const websiteId = "mock-website-1";
-  const { data: website, isLoading } = useWebsite(websiteId);
+  const { websiteId } = useParams<{ websiteId: string }>();
+  const { data: website, isLoading } = useWebsite(websiteId || "");
   const { data: metrics } = useSystemMetrics();
   const [isEditing, setIsEditing] = useState(false);
   const [showAppKey, setShowAppKey] = useState(false);
@@ -56,7 +59,7 @@ export function WebsiteOverview() {
 
   // Prefetch navigation links for faster navigation to Link Management tab
   useEffect(() => {
-    if (website) {
+    if (website && websiteId) {
       queryClient.prefetchQuery({
         queryKey: ["navigationLinks", websiteId],
         queryFn: () =>
@@ -65,7 +68,7 @@ export function WebsiteOverview() {
             : api.getNavigationLinks(websiteId),
       });
     }
-  }, [website, queryClient]);
+  }, [website, websiteId, queryClient]);
 
   const handleEdit = () => {
     setIsEditing(true);
@@ -151,7 +154,7 @@ export function WebsiteOverview() {
         </Box>
 
         {/* Tabs */}
-        <PageTabs tabs={tabs} />
+        <PageTabs tabs={getTabs(websiteId || "")} />
 
         {/* Edit Form */}
         <WebsiteRegistrationForm
@@ -189,7 +192,7 @@ export function WebsiteOverview() {
         </Box>
 
         {/* Tabs */}
-        <PageTabs tabs={tabs} />
+        <PageTabs tabs={getTabs(websiteId || "")} />
 
         {/* Content */}
         <Box className="max-w-7xl mx-auto px-page md:px-6 lg:px-8 py-8 space-y-6">
@@ -476,7 +479,7 @@ export function WebsiteOverview() {
               <Button
                 variant="outlined"
                 component={Link}
-                to="/website/embeddings-tester"
+                to={`/${websiteId}/embeddings-tester`}
                 sx={ACTION_BUTTON_STYLE}
               >
                 Test & Configure

@@ -3,7 +3,7 @@ import {
   Cancel as CancelIcon,
   CheckCircle,
   Edit as EditIcon,
-  Error,
+  Error as ErrorIcon,
   History as HistoryIcon,
   HourglassEmpty,
   Info as InfoIcon,
@@ -158,7 +158,7 @@ export function LinkDetailDialog({ open, onClose, link, onEdit }: LinkDetailDial
       case "pending":
         return <Pending color="info" fontSize="small" />;
       case "failed":
-        return <Error color="error" fontSize="small" />;
+        return <ErrorIcon color="error" fontSize="small" />;
       default:
         return null;
     }
@@ -249,9 +249,9 @@ export function LinkDetailDialog({ open, onClose, link, onEdit }: LinkDetailDial
                       Path/Query Param Slots
                     </Typography>
                     <Box className="flex flex-wrap gap-1">
-                      {link.parameters.map((param, index) => (
+                      {link.parameters.map((param) => (
                         <Chip
-                          key={index}
+                          key={param.name}
                           label={param.name}
                           size="small"
                           color="primary"
@@ -346,8 +346,8 @@ export function LinkDetailDialog({ open, onClose, link, onEdit }: LinkDetailDial
                       Keywords
                     </Typography>
                     <Box className="flex flex-wrap gap-1">
-                      {link.keywords.map((keyword, index) => (
-                        <Chip key={index} label={keyword} size="small" variant="outlined" />
+                      {link.keywords.map((keyword) => (
+                        <Chip key={keyword} label={keyword} size="small" variant="outlined" />
                       ))}
                     </Box>
                   </Box>
@@ -381,9 +381,9 @@ export function LinkDetailDialog({ open, onClose, link, onEdit }: LinkDetailDial
                       Forms
                     </Typography>
                     <Box className="space-y-2">
-                      {link.formFields.map((field, index) => (
+                      {link.formFields.map((field) => (
                         <Box
-                          key={index}
+                          key={field.label}
                           className="flex items-center justify-between bg-white px-3 py-2 rounded border border-gray-200"
                         >
                           <Box className="flex items-center gap-2">
@@ -697,9 +697,9 @@ export function LinkDetailDialog({ open, onClose, link, onEdit }: LinkDetailDial
                       ) : (
                         <Paper variant="outlined" className="p-2 bg-gray-50">
                           <Box component="ul" className="pl-5 space-y-1">
-                            {link.aiSummary?.whatUsersCanDo.map((item, idx) => (
+                            {link.aiSummary?.whatUsersCanDo.map((item) => (
                               <Typography
-                                key={idx}
+                                key={item}
                                 component="li"
                                 variant="body2"
                                 className="text-gray-700"
@@ -740,9 +740,9 @@ export function LinkDetailDialog({ open, onClose, link, onEdit }: LinkDetailDial
                       ) : (
                         <Paper variant="outlined" className="p-2 bg-gray-50">
                           <Box component="ul" className="pl-5 space-y-1">
-                            {link.aiSummary?.whatUsersSee.map((item, idx) => (
+                            {link.aiSummary?.whatUsersSee.map((item) => (
                               <Typography
-                                key={idx}
+                                key={item}
                                 component="li"
                                 variant="body2"
                                 className="text-gray-700"
@@ -829,17 +829,15 @@ export function LinkDetailDialog({ open, onClose, link, onEdit }: LinkDetailDial
                           <Box className="flex flex-wrap gap-1">
                             {(link.multiModalEmbedding?.enhanced?.primaryActions || []).length >
                             0 ? (
-                              link.multiModalEmbedding?.enhanced?.primaryActions.map(
-                                (action, idx) => (
-                                  <Chip
-                                    key={idx}
-                                    label={action}
-                                    size="small"
-                                    color="success"
-                                    variant="outlined"
-                                  />
-                                )
-                              )
+                              link.multiModalEmbedding?.enhanced?.primaryActions.map((action) => (
+                                <Chip
+                                  key={action}
+                                  label={action}
+                                  size="small"
+                                  color="success"
+                                  variant="outlined"
+                                />
+                              ))
                             ) : (
                               <Typography variant="body2" className="text-gray-500 italic">
                                 Not extracted
@@ -887,17 +885,15 @@ export function LinkDetailDialog({ open, onClose, link, onEdit }: LinkDetailDial
                         <Paper variant="outlined" className="p-2 bg-gray-50">
                           <Box className="flex flex-wrap gap-1">
                             {(link.multiModalEmbedding?.enhanced?.dataEntities || []).length > 0 ? (
-                              link.multiModalEmbedding?.enhanced?.dataEntities.map(
-                                (entity, idx) => (
-                                  <Chip
-                                    key={idx}
-                                    label={entity}
-                                    size="small"
-                                    color="warning"
-                                    variant="outlined"
-                                  />
-                                )
-                              )
+                              link.multiModalEmbedding?.enhanced?.dataEntities.map((entity) => (
+                                <Chip
+                                  key={entity}
+                                  label={entity}
+                                  size="small"
+                                  color="warning"
+                                  variant="outlined"
+                                />
+                              ))
                             ) : (
                               <Typography variant="body2" className="text-gray-500 italic">
                                 Not extracted
@@ -966,14 +962,15 @@ export function LinkDetailDialog({ open, onClose, link, onEdit }: LinkDetailDial
                         Functionality Embedding
                       </Typography>
                       <Box className="flex items-center gap-2 mt-1">
-                        {(link.multiModalEmbedding?.enhanced?.functionalityEmbedding?.length ?? 0) > 0 ? (
+                        {(link.multiModalEmbedding?.enhanced?.functionalityEmbedding?.length ?? 0) >
+                        0 ? (
                           <>
                             <CheckCircle color="success" fontSize="small" />
                             <Typography variant="body2">Generated</Typography>
                           </>
                         ) : (
                           <>
-                            <Error color="error" fontSize="small" />
+                            <ErrorIcon color="error" fontSize="small" />
                             <Typography variant="body2">Pending</Typography>
                           </>
                         )}
@@ -993,7 +990,7 @@ export function LinkDetailDialog({ open, onClose, link, onEdit }: LinkDetailDial
                           </>
                         ) : (
                           <>
-                            <Error color="error" fontSize="small" />
+                            <ErrorIcon color="error" fontSize="small" />
                             <Typography variant="body2">Pending</Typography>
                           </>
                         )}
@@ -1013,7 +1010,7 @@ export function LinkDetailDialog({ open, onClose, link, onEdit }: LinkDetailDial
                           </>
                         ) : (
                           <>
-                            <Error color="error" fontSize="small" />
+                            <ErrorIcon color="error" fontSize="small" />
                             <Typography variant="body2">Pending</Typography>
                           </>
                         )}
@@ -1033,7 +1030,7 @@ export function LinkDetailDialog({ open, onClose, link, onEdit }: LinkDetailDial
                           </>
                         ) : (
                           <>
-                            <Error color="error" fontSize="small" />
+                            <ErrorIcon color="error" fontSize="small" />
                             <Typography variant="body2">Pending</Typography>
                           </>
                         )}
@@ -1046,14 +1043,15 @@ export function LinkDetailDialog({ open, onClose, link, onEdit }: LinkDetailDial
                         Data Context Embedding
                       </Typography>
                       <Box className="flex items-center gap-2 mt-1">
-                        {(link.multiModalEmbedding?.enhanced?.dataContextEmbedding?.length ?? 0) > 0 ? (
+                        {(link.multiModalEmbedding?.enhanced?.dataContextEmbedding?.length ?? 0) >
+                        0 ? (
                           <>
                             <CheckCircle color="success" fontSize="small" />
                             <Typography variant="body2">Generated</Typography>
                           </>
                         ) : (
                           <>
-                            <Error color="error" fontSize="small" />
+                            <ErrorIcon color="error" fontSize="small" />
                             <Typography variant="body2">Pending</Typography>
                           </>
                         )}
@@ -1066,14 +1064,15 @@ export function LinkDetailDialog({ open, onClose, link, onEdit }: LinkDetailDial
                         User Task Embedding
                       </Typography>
                       <Box className="flex items-center gap-2 mt-1">
-                        {(link.multiModalEmbedding?.enhanced?.userTaskEmbedding?.length ?? 0) > 0 ? (
+                        {(link.multiModalEmbedding?.enhanced?.userTaskEmbedding?.length ?? 0) >
+                        0 ? (
                           <>
                             <CheckCircle color="success" fontSize="small" />
                             <Typography variant="body2">Generated</Typography>
                           </>
                         ) : (
                           <>
-                            <Error color="error" fontSize="small" />
+                            <ErrorIcon color="error" fontSize="small" />
                             <Typography variant="body2">Pending</Typography>
                           </>
                         )}
@@ -1292,8 +1291,8 @@ export function LinkDetailDialog({ open, onClose, link, onEdit }: LinkDetailDial
                     Visual Elements Detected ({link.pageAnalysis.visualElements.length})
                   </Typography>
                   <Box className="space-y-2">
-                    {link.pageAnalysis.visualElements.slice(0, 5).map((element, index) => (
-                      <Paper key={index} variant="outlined" className="p-3">
+                    {link.pageAnalysis.visualElements.slice(0, 5).map((element) => (
+                      <Paper key={element.description} variant="outlined" className="p-3">
                         <Box className="flex items-start gap-2">
                           <Chip label={element.type} size="small" color="primary" />
                           <Box className="flex-1">

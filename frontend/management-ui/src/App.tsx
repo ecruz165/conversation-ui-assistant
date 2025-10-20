@@ -46,12 +46,12 @@ function App() {
           <Routes>
             <Route path="/" element={<LandingPage />} />
             <Route path="/register" element={<RegisterWebsite />} />
-            <Route path="/website/overview" element={<WebsiteOverview />} />
-            <Route path="/website/link-management" element={<LinkManagement />} />
-            <Route path="/website/widget-code" element={<WidgetCode />} />
-            <Route path="/website/embeddings-tester" element={<EmbeddingTest />} />
+            <Route path="/:websiteId/overview" element={<WebsiteOverview />} />
+            <Route path="/:websiteId/link-management" element={<LinkManagement />} />
+            <Route path="/:websiteId/widget-code" element={<WidgetCode />} />
+            <Route path="/:websiteId/embeddings-tester" element={<EmbeddingTest />} />
             <Route
-              path="/website/screenshot-analysis"
+              path="/:websiteId/screenshot-analysis"
               element={
                 <ErrorBoundary>
                   <Suspense fallback={<PageSkeleton />}>
@@ -60,9 +60,9 @@ function App() {
                 </ErrorBoundary>
               }
             />
-            <Route path="/website/analysis-history" element={<AnalysisHistoryViewer />} />
-            <Route path="/website/synthetic-queries" element={<SyntheticQueryManager />} />
-            <Route path="/website/crawl-management" element={<CrawlManagement />} />
+            <Route path="/:websiteId/analysis-history" element={<AnalysisHistoryViewer />} />
+            <Route path="/:websiteId/synthetic-queries" element={<SyntheticQueryManager />} />
+            <Route path="/:websiteId/crawl-management" element={<CrawlManagement />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Router>
@@ -165,7 +165,7 @@ function LandingPage() {
                 {websites.map((website) => (
                   <Link
                     key={website.id}
-                    to="/website/overview"
+                    to={`/${website.id}/overview`}
                     className="block p-4 border border-gray-200 rounded-lg hover:border-primary-500 transition-colors no-underline"
                   >
                     <h3 className="text-lg font-semibold text-gray-900">{website.name}</h3>

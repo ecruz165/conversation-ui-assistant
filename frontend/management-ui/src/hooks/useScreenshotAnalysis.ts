@@ -87,8 +87,10 @@ const mockApi = {
     return mockApi.uploadScreenshot(websiteId, {
       websiteId,
       analysisOptions: {
-          generateEmbeddings: true, detectRegions: true, extractText: true,
-          analyzeAccessibility: false
+        generateEmbeddings: true,
+        detectRegions: true,
+        extractText: true,
+        analyzeAccessibility: false,
       },
     });
   },
@@ -107,8 +109,10 @@ const mockApi = {
     const mockEntry = await mockApi.uploadScreenshot(websiteId, {
       websiteId,
       analysisOptions: {
-          generateEmbeddings: true, detectRegions: true, extractText: true,
-          analyzeAccessibility: false
+        generateEmbeddings: true,
+        detectRegions: true,
+        extractText: true,
+        analyzeAccessibility: false,
       },
     });
 
@@ -134,7 +138,7 @@ export function useUploadScreenshot(websiteId: string) {
       // Invalidate all analysis history queries for this website (matches any page/pageSize)
       queryClient.invalidateQueries({
         queryKey: ["analysisHistory", websiteId],
-        exact: false // This is the default, but being explicit helps clarity
+        exact: false, // This is the default, but being explicit helps clarity
       });
     },
     retry: 1,

@@ -1,5 +1,5 @@
-import { test, expect } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
+import { expect, test } from "@playwright/test";
 
 test.describe("Accessibility", () => {
   test("homepage should not have automatically detectable accessibility issues", async ({
@@ -27,7 +27,9 @@ test.describe("Accessibility", () => {
     await page.goto("/");
 
     // Get all focusable elements
-    const focusableElements = await page.locator("a, button, input, [tabindex]:not([tabindex='-1'])").all();
+    const focusableElements = await page
+      .locator("a, button, input, [tabindex]:not([tabindex='-1'])")
+      .all();
 
     expect(focusableElements.length).toBeGreaterThan(0);
 
@@ -47,7 +49,7 @@ test.describe("Accessibility", () => {
 
     const skipLink = page.locator('a[href="#main"]').first();
 
-    if (await skipLink.count() > 0) {
+    if ((await skipLink.count()) > 0) {
       expect(await skipLink.isVisible()).toBe(true);
     }
   });

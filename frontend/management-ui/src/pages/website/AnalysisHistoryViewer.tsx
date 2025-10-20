@@ -25,6 +25,7 @@ import {
 } from "@mui/material";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { useMemo, useRef, useState } from "react";
+import { useParams } from "react-router-dom";
 import { useAnalysisHistory } from "~/hooks";
 import type { ScreenshotAnalysisResult } from "~/types";
 
@@ -91,7 +92,13 @@ function ConfidenceTrendChart({ entries }: { entries: ScreenshotAnalysisResult[]
         <TrendingUpIcon fontSize="small" />
         Confidence Score Trend
       </Typography>
-      <svg width={width} height={height} style={{ maxWidth: "100%", height: "auto" }}>
+      <svg
+        width={width}
+        height={height}
+        style={{ maxWidth: "100%", height: "auto" }}
+        aria-label="Confidence Score Trend Chart"
+      >
+        <title>Confidence Score Trend Chart</title>
         {/* Grid lines */}
         {[0, 0.25, 0.5, 0.75, 1.0].map((value) => {
           const y =
@@ -121,7 +128,7 @@ function ConfidenceTrendChart({ entries }: { entries: ScreenshotAnalysisResult[]
             const date = new Date(point.date);
             return (
               <text
-                key={index}
+                key={point.date}
                 x={point.x}
                 y={height - 10}
                 textAnchor="middle"
@@ -139,9 +146,9 @@ function ConfidenceTrendChart({ entries }: { entries: ScreenshotAnalysisResult[]
         <path d={pathData} fill="none" stroke="#1976d2" strokeWidth="2" />
 
         {/* Data points */}
-        {points.map((point, index) => (
+        {points.map((point) => (
           <circle
-            key={index}
+            key={point.date}
             cx={point.x}
             cy={point.y}
             r="4"
@@ -428,7 +435,7 @@ function ComparisonView({
 }
 
 export function AnalysisHistoryViewer() {
-  const websiteId = "website-1"; // Should come from route params in real app
+  const { websiteId } = useParams<{ websiteId: string }>();
 
   // State
   const [page, _setPage] = useState(0);
@@ -440,7 +447,7 @@ export function AnalysisHistoryViewer() {
   const [viewMode, setViewMode] = useState<"timeline" | "comparison">("timeline");
 
   // Hooks
-  const { data, isLoading, refetch } = useAnalysisHistory(websiteId, page, pageSize);
+  const { data, isLoading, refetch } = useAnalysisHistory(websiteId || "", page, pageSize);
   const parentRef = useRef<HTMLDivElement>(null);
 
   const entries = data?.entries || [];

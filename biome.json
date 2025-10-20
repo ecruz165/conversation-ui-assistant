@@ -9,17 +9,20 @@
     "ignoreUnknown": false,
     "includes": [
       "**",
-      "!**/node_modules/**",
-      "!**/dist/**",
-      "!**/build/**",
-      "!**/target/**",
-      "!**/.output/**",
-      "!**/.vite/**",
-      "!**/coverage/**",
-      "!**/.next/**",
+      "!**/node_modules",
+      "!**/dist",
+      "!**/build",
+      "!**/target",
+      "!**/.output",
+      "!**/.vite",
+      "!**/coverage",
+      "!**/.next",
       "!**/pnpm-lock.yaml",
       "!**/package-lock.json",
-      "!**/yarn.lock"
+      "!**/yarn.lock",
+      "!**/*.gen.ts",
+      "!**/*.generated.ts",
+      "!**/routeTree.gen.ts"
     ]
   },
   "formatter": {

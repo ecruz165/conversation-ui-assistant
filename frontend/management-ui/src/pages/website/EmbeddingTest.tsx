@@ -29,7 +29,7 @@ import {
 } from "@mui/material";
 import type React from "react";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { Layout } from "~/components/Layout";
 import { PageTabs } from "~/components/PageTabs";
 import { PageTitle } from "~/components/PageTitle";
@@ -151,9 +151,9 @@ function MatchExplanationCard({ result }: MatchExplanationCardProps) {
                   Visual Elements Detected:
                 </Typography>
                 <Box className="flex flex-wrap gap-1">
-                  {result.matchedVisualElements.map((element, idx) => (
+                  {result.matchedVisualElements.map((element) => (
                     <Chip
-                      key={idx}
+                      key={element.description}
                       label={element.description}
                       size="small"
                       variant="outlined"
@@ -274,7 +274,7 @@ interface ResultCardProps {
   rank: number;
 }
 
-function ResultCard({ result, rank }: ResultCardProps) {
+function ResultCard({ result }: ResultCardProps) {
   const matchPercentage = Math.round(result.matchScore * 100);
   const matchColor = getMatchScoreColor(result.matchScore);
   const _matchLabel = getMatchScoreLabel(result.matchScore);
@@ -325,8 +325,8 @@ function ResultCard({ result, rank }: ResultCardProps) {
 
       {/* Intent tags and slot info */}
       <Box className="flex flex-wrap items-center gap-2 mb-3">
-        {result.matchedIntents.map((intent, idx) => (
-          <Chip key={idx} label={intent} size="small" color="primary" variant="outlined" />
+        {result.matchedIntents.map((intent) => (
+          <Chip key={intent} label={intent} size="small" color="primary" variant="outlined" />
         ))}
         {result.slots.total > 0 && (
           <Chip
@@ -344,8 +344,8 @@ function ResultCard({ result, rank }: ResultCardProps) {
             Primary Actions:
           </Typography>
           <Box className="flex flex-wrap gap-1">
-            {result.primaryActions.map((action, idx) => (
-              <Chip key={idx} label={action} size="small" color="secondary" variant="outlined" />
+            {result.primaryActions.map((action) => (
+              <Chip key={action} label={action} size="small" color="secondary" variant="outlined" />
             ))}
           </Box>
         </Box>
@@ -358,8 +358,8 @@ function ResultCard({ result, rank }: ResultCardProps) {
             Data Entities:
           </Typography>
           <Box className="flex flex-wrap gap-1">
-            {result.dataEntities.map((entity, idx) => (
-              <Chip key={idx} label={entity} size="small" color="info" variant="outlined" />
+            {result.dataEntities.map((entity) => (
+              <Chip key={entity} label={entity} size="small" color="info" variant="outlined" />
             ))}
           </Box>
         </Box>
@@ -372,8 +372,8 @@ function ResultCard({ result, rank }: ResultCardProps) {
             Required Slots:
           </Typography>
           <Box className="flex flex-wrap gap-2">
-            {result.slots.required.map((slot, idx) => (
-              <Box key={idx} className="inline-flex items-center gap-1 text-xs text-gray-600">
+            {result.slots.required.map((slot) => (
+              <Box key={slot.name} className="inline-flex items-center gap-1 text-xs text-gray-600">
                 <Typography variant="caption" className="font-mono">
                   {slot.name}
                 </Typography>
@@ -412,24 +412,28 @@ function ResultCard({ result, rank }: ResultCardProps) {
   );
 }
 
-const tabs = [
-  { label: "Overview", value: "overview", path: "/website/overview" },
-  { label: "Crawl Management", value: "crawl-management", path: "/website/crawl-management" },
-  { label: "Link Management", value: "link-management", path: "/website/link-management" },
-  { label: "Embeddings Tester", value: "embeddings-tester", path: "/website/embeddings-tester" },
-  { label: "Widget Code", value: "widget-code", path: "/website/widget-code" },
+const getTabs = (websiteId: string) => [
+  { label: "Overview", value: "overview", path: `/${websiteId}/overview` },
+  { label: "Crawl Management", value: "crawl-management", path: `/${websiteId}/crawl-management` },
+  { label: "Link Management", value: "link-management", path: `/${websiteId}/link-management` },
+  {
+    label: "Embeddings Tester",
+    value: "embeddings-tester",
+    path: `/${websiteId}/embeddings-tester`,
+  },
+  { label: "Widget Code", value: "widget-code", path: `/${websiteId}/widget-code` },
 ];
 
 export function EmbeddingTest() {
-  const websiteId = "mock-website-1";
-  const { data: website, isLoading } = useWebsite(websiteId);
+  const { websiteId } = useParams<{ websiteId: string }>();
+  const { data: website, isLoading } = useWebsite(websiteId || "");
   const navigate = useNavigate();
 
   // Embedding test mutation - use enhanced version
-  const embeddingTestMutation = useEnhancedEmbeddingTest(websiteId);
+  const embeddingTestMutation = useEnhancedEmbeddingTest(websiteId || "");
 
   // Search configuration mutation
-  const updateSearchConfigMutation = useUpdateSearchConfiguration(websiteId);
+  const updateSearchConfigMutation = useUpdateSearchConfiguration(websiteId || "");
 
   // Snackbar state for save confirmation
   const [showSaveSnackbar, setShowSaveSnackbar] = useState(false);
@@ -720,7 +724,7 @@ export function EmbeddingTest() {
       </Box>
 
       {/* Tabs */}
-      <PageTabs tabs={tabs} />
+      <PageTabs tabs={getTabs(websiteId || "")} />
 
       {/* Content */}
       <Box className="max-w-7xl mx-auto px-page md:px-6 lg:px-8 py-8 space-y-6">
@@ -974,9 +978,9 @@ export function EmbeddingTest() {
               Recent Queries
             </Typography>
             <Box className="space-y-2">
-              {recentQueries.map((recentQuery, idx) => (
+              {recentQueries.map((recentQuery) => (
                 <Box
-                  key={idx}
+                  key={recentQuery}
                   className="p-3 bg-gray-50 rounded cursor-pointer hover:bg-gray-100 transition-colors"
                   onClick={() => {
                     setQuery(recentQuery);
