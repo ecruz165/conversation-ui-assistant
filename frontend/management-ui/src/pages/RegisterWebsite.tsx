@@ -1,8 +1,6 @@
-import React from "react";
 import { useNavigate } from "react-router-dom";
 import { Layout } from "~/components/Layout";
 import { WebsiteRegistrationForm } from "~/components/WebsiteRegistrationForm";
-import { mockApi } from "~/mocks/api";
 import type { Website } from "~/types";
 
 export function RegisterWebsite() {

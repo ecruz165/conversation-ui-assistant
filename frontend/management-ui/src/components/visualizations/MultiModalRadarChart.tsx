@@ -1,5 +1,5 @@
 import { Box, Paper, Typography } from "@mui/material";
-import React, { memo } from "react";
+import { memo } from "react";
 
 interface RadarDataPoint {
   axis: string;
@@ -73,7 +73,7 @@ export const MultiModalRadarChart = memo(function MultiModalRadarChart({
           })}
 
           {/* Axis lines */}
-          {data.map((d, i) => {
+          {data.map((_d, i) => {
             const endPoint = calculatePoint(1, i, data.length);
             return (
               <line

@@ -66,7 +66,7 @@ class MockApiService {
   }
 
   // Embedding Test endpoint
-  async testEmbedding(websiteId: string, query: EmbeddingTestQuery): Promise<EmbeddingTestResult> {
+  async testEmbedding(_websiteId: string, query: EmbeddingTestQuery): Promise<EmbeddingTestResult> {
     await this.delay();
     if (this.shouldFail()) {
       throw new Error("Mock: Failed to test embedding");
@@ -80,7 +80,7 @@ class MockApiService {
   }
 
   // Crawl Management endpoints
-  async getCrawlSchedule(websiteId: string): Promise<CrawlSchedule> {
+  async getCrawlSchedule(_websiteId: string): Promise<CrawlSchedule> {
     await this.delay();
     if (this.shouldFail()) {
       throw new Error("Mock: Failed to fetch crawl schedule");
@@ -88,7 +88,7 @@ class MockApiService {
     return { ...mockCrawlSchedule };
   }
 
-  async updateCrawlSchedule(websiteId: string, schedule: CrawlSchedule): Promise<CrawlSchedule> {
+  async updateCrawlSchedule(_websiteId: string, schedule: CrawlSchedule): Promise<CrawlSchedule> {
     await this.delay();
     if (this.shouldFail()) {
       throw new Error("Mock: Failed to update crawl schedule");
@@ -96,7 +96,7 @@ class MockApiService {
     return { ...schedule };
   }
 
-  async getCrawlConfiguration(websiteId: string): Promise<CrawlConfiguration> {
+  async getCrawlConfiguration(_websiteId: string): Promise<CrawlConfiguration> {
     await this.delay();
     if (this.shouldFail()) {
       throw new Error("Mock: Failed to fetch crawl configuration");
@@ -105,7 +105,7 @@ class MockApiService {
   }
 
   async updateCrawlConfiguration(
-    websiteId: string,
+    _websiteId: string,
     config: CrawlConfiguration
   ): Promise<CrawlConfiguration> {
     await this.delay();
@@ -119,7 +119,7 @@ class MockApiService {
   }
 
   async getCrawlHistory(
-    websiteId: string,
+    _websiteId: string,
     page: number = 0,
     pageSize: number = 10
   ): Promise<CrawlHistoryResponse> {
@@ -140,7 +140,7 @@ class MockApiService {
     };
   }
 
-  async startCrawl(websiteId: string): Promise<StartCrawlResponse> {
+  async startCrawl(_websiteId: string): Promise<StartCrawlResponse> {
     await this.delay();
     if (this.shouldFail()) {
       throw new Error("Mock: Failed to start crawl");
@@ -154,8 +154,8 @@ class MockApiService {
   }
 
   async getCrawlStatus(
-    websiteId: string,
-    crawlId: string
+    _websiteId: string,
+    _crawlId: string
   ): Promise<{ status: string; pagesIndexed: number }> {
     await this.delay();
     if (this.shouldFail()) {

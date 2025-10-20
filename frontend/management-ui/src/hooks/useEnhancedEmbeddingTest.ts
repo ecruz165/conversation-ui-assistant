@@ -7,7 +7,7 @@ import type { EmbeddingTestQuery, EmbeddingTestResult } from "~/types";
 // Mock API for enhanced embedding tests
 const mockApi = {
   testEnhancedEmbedding: async (
-    websiteId: string,
+    _websiteId: string,
     query: EmbeddingTestQuery
   ): Promise<EmbeddingTestResult> => {
     await new Promise((resolve) => setTimeout(resolve, 1500));
@@ -36,7 +36,7 @@ const mockApi = {
   },
 
   compareEmbeddings: async (
-    websiteId: string,
+    _websiteId: string,
     data: {
       pageId: string;
       comparisonType: "text-vs-visual" | "old-vs-new" | "multiple";

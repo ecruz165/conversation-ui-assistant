@@ -2,12 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api } from "~/api/service";
 import { mockConfig } from "~/config";
 import { mockApi } from "~/mocks/api";
-import type {
-  CrawlConfiguration,
-  CrawlHistoryResponse,
-  CrawlSchedule,
-  StartCrawlResponse,
-} from "~/types";
+import type { CrawlConfiguration, CrawlSchedule } from "~/types";
 
 // Crawl Schedule Hooks
 export const useCrawlSchedule = (websiteId: string) => {

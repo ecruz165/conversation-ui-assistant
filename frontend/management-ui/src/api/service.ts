@@ -9,6 +9,7 @@ import type {
   ScreenshotAnalysisRequest,
   ScreenshotAnalysisResult,
   StartCrawlResponse,
+  SyntheticQuery,
   SystemMetrics,
   Website,
 } from "~/types";
@@ -283,18 +284,7 @@ class ApiService {
   }
 
   // Synthetic Queries endpoints
-  async getSyntheticQueries(
-    websiteId: string,
-    pageId?: string
-  ): Promise<
-    Array<{
-      id: string;
-      query: string;
-      expectedPageId: string;
-      validated: boolean;
-      matchScore?: number;
-    }>
-  > {
+  async getSyntheticQueries(websiteId: string, pageId?: string): Promise<SyntheticQuery[]> {
     const url = pageId
       ? `${this.baseUrl}/websites/${websiteId}/synthetic-queries?pageId=${pageId}`
       : `${this.baseUrl}/websites/${websiteId}/synthetic-queries`;

@@ -1,5 +1,5 @@
+import { MessageCircle, Minimize2, X } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
-import { MessageCircle, Minimize2, Send, X } from "lucide-react";
 import type React from "react";
 import { useEffect, useRef, useState } from "react";
 import { useConversation } from "../hooks/useConversation";
@@ -89,7 +89,7 @@ const ChatWidget: React.FC<ChatWidgetProps> = ({
   useEffect(() => {
     if (isOpen && showWelcomeMessage && state.messages.length === 0) {
       // Add welcome message to state (this would typically come from the conversation provider)
-      const welcomeMsg: Message = {
+      const _welcomeMsg: Message = {
         id: "welcome",
         content: welcomeMessage,
         sender: "assistant",

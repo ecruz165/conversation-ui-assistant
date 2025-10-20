@@ -6,7 +6,7 @@ import type { ScreenshotAnalysisRequest, ScreenshotAnalysisResult } from "~/type
 // Mock API functions for development
 const mockApi = {
   uploadScreenshot: async (
-    websiteId: string,
+    _websiteId: string,
     request: ScreenshotAnalysisRequest
   ): Promise<ScreenshotAnalysisResult> => {
     await new Promise((resolve) => setTimeout(resolve, 2000)); // Simulate processing time
@@ -80,7 +80,7 @@ const mockApi = {
 
   getAnalysisStatus: async (
     websiteId: string,
-    analysisId: string
+    _analysisId: string
   ): Promise<ScreenshotAnalysisResult> => {
     await new Promise((resolve) => setTimeout(resolve, 300));
     // Return completed status with mock data

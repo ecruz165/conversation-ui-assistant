@@ -169,7 +169,7 @@ export function WidgetCode() {
         message: "Code copied to clipboard!",
         severity: "success",
       });
-    } catch (err) {
+    } catch (_err) {
       setSnackbar({
         open: true,
         message: "Failed to copy code",

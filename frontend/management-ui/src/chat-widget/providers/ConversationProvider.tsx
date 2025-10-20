@@ -1,5 +1,5 @@
 import type React from "react";
-import { createContext, ReactNode, useContext } from "react";
+import { createContext, useContext } from "react";
 import type { ConversationProviderProps } from "../types";
 
 /**

@@ -78,7 +78,7 @@ function MultiModalScoreBreakdown({ result }: MultiModalScoreBreakdownProps) {
       <Box className="space-y-2">
         {/* Enhanced 6-embedding scores */}
         {hasEnhancedScores &&
-          result.enhancedScores!.map((enhancedScore) => {
+          result.enhancedScores?.map((enhancedScore) => {
             const percentage = Math.round(enhancedScore.score * 100);
             const weightPercentage = Math.round(enhancedScore.weight * 100);
             const contributionPercentage = Math.round(enhancedScore.contribution * 100);
@@ -121,7 +121,7 @@ function MultiModalScoreBreakdown({ result }: MultiModalScoreBreakdownProps) {
         {/* Legacy 3-modality scores */}
         {!hasEnhancedScores &&
           hasLegacyScores &&
-          result.modalityScores!.map((modalityScore) => {
+          result.modalityScores?.map((modalityScore) => {
             const percentage = Math.round(modalityScore.score * 100);
             const contribution = Math.round(modalityScore.contributionWeight * 100);
 
@@ -240,7 +240,7 @@ interface ResultCardProps {
 function ResultCard({ result, rank }: ResultCardProps) {
   const matchPercentage = Math.round(result.matchScore * 100);
   const matchColor = getMatchScoreColor(result.matchScore);
-  const matchLabel = getMatchScoreLabel(result.matchScore);
+  const _matchLabel = getMatchScoreLabel(result.matchScore);
 
   return (
     <Paper
@@ -399,7 +399,7 @@ export function EmbeddingTest() {
 
   // Query input state
   const [query, setQuery] = useState("");
-  const [debouncedQuery, setDebouncedQuery] = useState("");
+  const [_debouncedQuery, setDebouncedQuery] = useState("");
   const [validationError, setValidationError] = useState<string | null>(null);
 
   // Multi-modal settings
@@ -525,14 +525,20 @@ export function EmbeddingTest() {
 
   // Load default weights from website configuration on mount
   useEffect(() => {
-    if (website?.searchConfiguration?.defaultModalityWeights) {
-      setModalityWeights(website.searchConfiguration.defaultModalityWeights);
+    if (website?.searchConfiguration?.weights) {
+      // Map enhanced weights structure to legacy modality weights
+      const weights = website.searchConfiguration.weights;
+      setModalityWeights({
+        text: (weights.functionality + weights.content + weights.purpose) / 3,
+        visual: (weights.action + weights.dataContext) / 2,
+        metadata: weights.userTask,
+      });
     }
   }, [website]);
 
   // Check if current weights differ from saved defaults
   const hasUnsavedChanges = useMemo(() => {
-    if (!website?.searchConfiguration?.defaultModalityWeights) {
+    if (!website?.searchConfiguration?.weights) {
       // No saved defaults, so any non-standard weights are "unsaved"
       return (
         modalityWeights.text !== 0.5 ||
@@ -541,21 +547,37 @@ export function EmbeddingTest() {
       );
     }
 
-    const saved = website.searchConfiguration.defaultModalityWeights;
+    // Map enhanced weights to legacy for comparison
+    const saved = website.searchConfiguration.weights;
+    const savedLegacy = {
+      text: (saved.functionality + saved.content + saved.purpose) / 3,
+      visual: (saved.action + saved.dataContext) / 2,
+      metadata: saved.userTask,
+    };
     const threshold = 0.001; // Account for floating point precision
 
     return (
-      Math.abs(modalityWeights.text - saved.text) > threshold ||
-      Math.abs(modalityWeights.visual - saved.visual) > threshold ||
-      Math.abs(modalityWeights.metadata - saved.metadata) > threshold
+      Math.abs(modalityWeights.text - savedLegacy.text) > threshold ||
+      Math.abs(modalityWeights.visual - savedLegacy.visual) > threshold ||
+      Math.abs(modalityWeights.metadata - savedLegacy.metadata) > threshold
     );
-  }, [modalityWeights, website?.searchConfiguration?.defaultModalityWeights]);
+  }, [modalityWeights, website?.searchConfiguration?.weights]);
 
   // Handler for saving current weights as default
   const handleSaveAsDefault = () => {
+    // Convert legacy modality weights to enhanced 6-embedding weights for storage
+    const enhancedWeightsToSave: EnhancedEmbeddingWeights = {
+      functionality: modalityWeights.text * 0.4,
+      content: modalityWeights.text * 0.3,
+      purpose: modalityWeights.text * 0.3,
+      action: modalityWeights.visual * 0.6,
+      dataContext: modalityWeights.visual * 0.4,
+      userTask: modalityWeights.metadata,
+    };
+
     updateSearchConfigMutation.mutate(
       {
-        defaultModalityWeights: modalityWeights,
+        weights: enhancedWeightsToSave,
         description: `Custom weights for ${website?.type || "website"}`,
       },
       {
@@ -568,8 +590,14 @@ export function EmbeddingTest() {
 
   // Handler for resetting to default weights
   const handleResetToDefault = () => {
-    if (website?.searchConfiguration?.defaultModalityWeights) {
-      setModalityWeights(website.searchConfiguration.defaultModalityWeights);
+    if (website?.searchConfiguration?.weights) {
+      // Map enhanced weights to legacy
+      const weights = website.searchConfiguration.weights;
+      setModalityWeights({
+        text: (weights.functionality + weights.content + weights.purpose) / 3,
+        visual: (weights.action + weights.dataContext) / 2,
+        metadata: weights.userTask,
+      });
     } else {
       // Fallback to standard defaults
       setModalityWeights({
@@ -1180,21 +1208,19 @@ export function EmbeddingTest() {
         {/* Info Alert */}
         <Alert severity="info">
           {useMultiModal ? (
-            <>
-              {useEnhancedEmbeddings ? (
-                <>
-                  Enhanced 6-embedding search provides deeper semantic understanding through
-                  functionality, content, purpose, actions, data context, and user task dimensions.
-                  Adjust weights to fine-tune matching based on your use case.
-                </>
-              ) : (
-                <>
-                  Multi-modal search combines text, visual, and metadata embeddings for more
-                  accurate matching. Adjust weights to emphasize different aspects of page content.
-                  Higher match scores indicate better alignment across all modalities.
-                </>
-              )}
-            </>
+            useEnhancedEmbeddings ? (
+              <>
+                Enhanced 6-embedding search provides deeper semantic understanding through
+                functionality, content, purpose, actions, data context, and user task dimensions.
+                Adjust weights to fine-tune matching based on your use case.
+              </>
+            ) : (
+              <>
+                Multi-modal search combines text, visual, and metadata embeddings for more
+                accurate matching. Adjust weights to emphasize different aspects of page content.
+                Higher match scores indicate better alignment across all modalities.
+              </>
+            )
           ) : (
             <>
               This tool helps you validate that user queries correctly match your navigation pages.

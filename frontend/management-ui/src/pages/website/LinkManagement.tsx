@@ -16,7 +16,6 @@ import {
   Box,
   Button,
   Checkbox,
-  Chip,
   Dialog,
   DialogActions,
   DialogContent,
@@ -53,13 +52,13 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import { AnimatePresence, motion } from "motion/react";
-import React, { useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Layout } from "~/components/Layout";
 import { LinkDetailDialog } from "~/components/LinkDetailDialog";
 import { LinkForm } from "~/components/LinkForm";
-import { useDebounce } from "~/hooks";
 import { PageTabs } from "~/components/PageTabs";
+import { useDebounce } from "~/hooks";
 import {
   useBulkDelete,
   useBulkUpdateActive,
@@ -359,7 +358,7 @@ export function LinkManagement() {
     getFilteredRowModel: getFilteredRowModel(),
     getGroupedRowModel: getGroupedRowModel(),
     getExpandedRowModel: getExpandedRowModel(),
-    globalFilterFn: (row, columnId, filterValue) => {
+    globalFilterFn: (row, _columnId, filterValue) => {
       const searchableFields = [row.original.displayName, row.original.targetUrl];
       return searchableFields.some((field) =>
         field?.toLowerCase().includes(filterValue.toLowerCase())

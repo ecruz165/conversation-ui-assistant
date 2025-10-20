@@ -14,7 +14,6 @@ import {
   CardContent,
   Chip,
   CircularProgress,
-  Divider,
   FormControl,
   IconButton,
   InputLabel,
@@ -31,7 +30,7 @@ import { PageTabs } from "~/components/PageTabs";
 import { PageTitle } from "~/components/PageTitle";
 import { useAnalysisJobStatus, useUploadScreenshot } from "~/hooks/useScreenshotAnalysis";
 import { useWebsite } from "~/hooks/useWebsite";
-import type { PageRegion, ScreenshotAnalysisResult } from "~/types";
+import type { PageRegion } from "~/types";
 
 const tabs = [
   { label: "Overview", value: "overview", path: "/website/overview" },
@@ -54,7 +53,7 @@ interface RegionOverlayProps {
   onRegionClick?: (region: PageRegion) => void;
 }
 
-function RegionOverlay({ regions, imageWidth, imageHeight, onRegionClick }: RegionOverlayProps) {
+function _RegionOverlay({ regions, imageWidth, imageHeight, onRegionClick }: RegionOverlayProps) {
   return (
     <Box sx={{ position: "relative", display: "inline-block" }}>
       {regions.map((region) => (
@@ -191,7 +190,7 @@ export function ScreenshotAnalysis() {
     "gpt-4-vision"
   );
   const [analysisId, setAnalysisId] = useState<string | null>(null);
-  const [selectedRegion, setSelectedRegion] = useState<PageRegion | null>(null);
+  const [_selectedRegion, setSelectedRegion] = useState<PageRegion | null>(null);
 
   // Hooks
   const uploadMutation = useUploadScreenshot(websiteId);
@@ -573,3 +572,5 @@ export function ScreenshotAnalysis() {
     </Layout>
   );
 }
+
+export default ScreenshotAnalysis;

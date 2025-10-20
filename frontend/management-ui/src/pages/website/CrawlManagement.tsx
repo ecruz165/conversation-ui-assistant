@@ -30,7 +30,7 @@ import {
   Typography,
 } from "@mui/material";
 import type React from "react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Layout } from "~/components/Layout";
 import { PageTabs } from "~/components/PageTabs";
@@ -212,7 +212,7 @@ export function CrawlManagement() {
   // Handle crawl depth change
   const handleCrawlDepthChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = Number.parseInt(e.target.value, 10);
-    if (!isNaN(value)) {
+    if (!Number.isNaN(value)) {
       setCrawlDepth(value);
       setDepthError(validateCrawlDepth(value));
     }
@@ -221,7 +221,7 @@ export function CrawlManagement() {
   // Handle max pages change
   const handleMaxPagesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = Number.parseInt(e.target.value, 10);
-    if (!isNaN(value)) {
+    if (!Number.isNaN(value)) {
       setMaxPages(value);
       setMaxPagesError(validateMaxPages(value));
     }
@@ -468,19 +468,17 @@ export function CrawlManagement() {
 
             {/* Time Picker - Hidden when Manual Only */}
             {frequency !== "manual" && (
-              <>
-                <TextField
-                  fullWidth
-                  type="time"
-                  label="Scheduled Time"
-                  value={scheduledTime}
-                  onChange={(e) => setScheduledTime(e.target.value)}
-                  InputLabelProps={{
-                    shrink: true,
-                  }}
-                  helperText={`Time in ${timezone} (${formatTime12Hour(scheduledTime)})`}
-                />
-              </>
+              <TextField
+                fullWidth
+                type="time"
+                label="Scheduled Time"
+                value={scheduledTime}
+                onChange={(e) => setScheduledTime(e.target.value)}
+                InputLabelProps={{
+                  shrink: true,
+                }}
+                helperText={`Time in ${timezone} (${formatTime12Hour(scheduledTime)})`}
+              />
             )}
 
             {/* Save Button */}

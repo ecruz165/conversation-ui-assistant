@@ -1,5 +1,5 @@
-import { AnimatePresence, motion } from "motion/react";
 import { Bot, Loader2, User } from "lucide-react";
+import { AnimatePresence, motion } from "motion/react";
 import type React from "react";
 import { useEffect, useRef } from "react";
 import type { Message, Theme } from "../types";
@@ -19,7 +19,7 @@ const MessageList: React.FC<MessageListProps> = ({ messages, isLoading, theme })
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages, isLoading]);
+  }, []);
 
   const formatTime = (timestamp: Date) => {
     return timestamp.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });

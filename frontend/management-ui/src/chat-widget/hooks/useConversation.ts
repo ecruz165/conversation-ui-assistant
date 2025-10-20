@@ -206,7 +206,7 @@ export const useConversation = (
         connect();
       }
     },
-    [getSessionId, connect]
+    [getSessionId, connect, blobToBase64]
   );
 
   // Clear conversation

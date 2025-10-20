@@ -54,15 +54,15 @@ const mockApi = {
     } as NavigationLink;
   },
 
-  deleteLink: async (linkId: string): Promise<void> => {
+  deleteLink: async (_linkId: string): Promise<void> => {
     await new Promise((resolve) => setTimeout(resolve, 500));
   },
 
-  bulkUpdateActive: async (linkIds: string[], isActive: boolean): Promise<void> => {
+  bulkUpdateActive: async (_linkIds: string[], _isActive: boolean): Promise<void> => {
     await new Promise((resolve) => setTimeout(resolve, 500));
   },
 
-  bulkDelete: async (linkIds: string[]): Promise<void> => {
+  bulkDelete: async (_linkIds: string[]): Promise<void> => {
     await new Promise((resolve) => setTimeout(resolve, 500));
   },
 };
@@ -106,13 +106,13 @@ export function useCreateLink() {
 
       return { previousLinks };
     },
-    onError: (err, { websiteId }, context) => {
+    onError: (_err, { websiteId }, context) => {
       // Rollback on error
       if (context?.previousLinks) {
         queryClient.setQueryData(["navigationLinks", websiteId], context.previousLinks);
       }
     },
-    onSuccess: (data, { websiteId }) => {
+    onSuccess: (_data, { websiteId }) => {
       // Refetch to ensure consistency
       queryClient.invalidateQueries({ queryKey: ["navigationLinks", websiteId] });
     },
@@ -147,12 +147,12 @@ export function useUpdateLink() {
 
       return { previousLinks, websiteId };
     },
-    onError: (err, variables, context) => {
+    onError: (_err, _variables, context) => {
       if (context?.previousLinks && context?.websiteId) {
         queryClient.setQueryData(["navigationLinks", context.websiteId], context.previousLinks);
       }
     },
-    onSuccess: (data, variables, context) => {
+    onSuccess: (_data, _variables, context) => {
       if (context?.websiteId) {
         queryClient.invalidateQueries({ queryKey: ["navigationLinks", context.websiteId] });
       }
@@ -185,12 +185,12 @@ export function useDeleteLink() {
 
       return { previousLinks, websiteId };
     },
-    onError: (err, variables, context) => {
+    onError: (_err, _variables, context) => {
       if (context?.previousLinks && context?.websiteId) {
         queryClient.setQueryData(["navigationLinks", context.websiteId], context.previousLinks);
       }
     },
-    onSuccess: (data, variables, context) => {
+    onSuccess: (_data, _variables, context) => {
       if (context?.websiteId) {
         queryClient.invalidateQueries({ queryKey: ["navigationLinks", context.websiteId] });
       }
@@ -228,12 +228,12 @@ export function useBulkUpdateActive() {
 
       return { previousLinks, websiteId };
     },
-    onError: (err, variables, context) => {
+    onError: (_err, _variables, context) => {
       if (context?.previousLinks && context?.websiteId) {
         queryClient.setQueryData(["navigationLinks", context.websiteId], context.previousLinks);
       }
     },
-    onSuccess: (data, variables, context) => {
+    onSuccess: (_data, _variables, context) => {
       if (context?.websiteId) {
         queryClient.invalidateQueries({ queryKey: ["navigationLinks", context.websiteId] });
       }
@@ -266,12 +266,12 @@ export function useBulkDelete() {
 
       return { previousLinks, websiteId };
     },
-    onError: (err, variables, context) => {
+    onError: (_err, _variables, context) => {
       if (context?.previousLinks && context?.websiteId) {
         queryClient.setQueryData(["navigationLinks", context.websiteId], context.previousLinks);
       }
     },
-    onSuccess: (data, variables, context) => {
+    onSuccess: (_data, _variables, context) => {
       if (context?.websiteId) {
         queryClient.invalidateQueries({ queryKey: ["navigationLinks", context.websiteId] });
       }

@@ -597,7 +597,7 @@ export function SyntheticQueryManager() {
               type="number"
               label="Number of Queries"
               value={generateCount}
-              onChange={(e) => setGenerateCount(Number.parseInt(e.target.value))}
+              onChange={(e) => setGenerateCount(Number.parseInt(e.target.value, 10))}
               inputProps={{ min: 1, max: 50 }}
               helperText="Generate between 1 and 50 queries"
             />

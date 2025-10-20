@@ -27,9 +27,7 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
-  Divider,
   IconButton,
-  LinearProgress,
   Paper,
   Popover,
   Tab,
@@ -38,10 +36,11 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
-import React, { useState } from "react";
-import { MultiModalRadarChart, ScoreBreakdownBars } from "./visualizations";
+import type React from "react";
+import { useState } from "react";
+import type { EnhancedPageEmbedding, NavigationLink } from "~/types";
 import { ImageWithPlaceholder } from "./ImageWithPlaceholder";
-import type { NavigationLink, EnhancedPageEmbedding } from "~/types";
+import { MultiModalRadarChart, ScoreBreakdownBars } from "./visualizations";
 
 interface LinkDetailDialogProps {
   open: boolean;
@@ -150,7 +149,7 @@ export function LinkDetailDialog({ open, onClose, link, onEdit }: LinkDetailDial
     }
   };
 
-  const getStatusIcon = (status?: string) => {
+  const _getStatusIcon = (status?: string) => {
     switch (status) {
       case "completed":
         return <CheckCircle color="success" fontSize="small" />;
@@ -165,7 +164,7 @@ export function LinkDetailDialog({ open, onClose, link, onEdit }: LinkDetailDial
     }
   };
 
-  const getStatusLabel = (status?: string) => {
+  const _getStatusLabel = (status?: string) => {
     switch (status) {
       case "completed":
         return "Completed";

@@ -19,13 +19,12 @@ import {
   MenuItem,
   Paper,
   Select,
-  TextField,
   ToggleButton,
   ToggleButtonGroup,
   Typography,
 } from "@mui/material";
-import { useRef, useMemo, useState } from "react";
 import { useVirtualizer } from "@tanstack/react-virtual";
+import { useMemo, useRef, useState } from "react";
 import { useAnalysisHistory } from "~/hooks";
 import type { ScreenshotAnalysisResult } from "~/types";
 
@@ -432,7 +431,7 @@ export function AnalysisHistoryViewer() {
   const websiteId = "website-1"; // Should come from route params in real app
 
   // State
-  const [page, setPage] = useState(0);
+  const [page, _setPage] = useState(0);
   const [pageSize] = useState(20);
   const [filterModel, setFilterModel] = useState<string>("all");
   const [filterDateRange, setFilterDateRange] = useState<"all" | "7d" | "30d" | "90d">("all");

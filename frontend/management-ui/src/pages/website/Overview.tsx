@@ -17,7 +17,7 @@ import {
   Typography,
 } from "@mui/material";
 import { useQueryClient } from "@tanstack/react-query";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { api } from "~/api/service";
 import { ErrorBoundary } from "~/components/ErrorBoundary";
@@ -65,7 +65,7 @@ export function WebsiteOverview() {
             : api.getNavigationLinks(websiteId),
       });
     }
-  }, [website, websiteId, queryClient]);
+  }, [website, queryClient]);
 
   const handleEdit = () => {
     setIsEditing(true);
@@ -143,7 +143,10 @@ export function WebsiteOverview() {
         {/* Page Title */}
         <Box className="bg-gradient-to-r from-primary-700 to-primary-900 px-page md:px-6 lg:px-8 py-12">
           <Box className="max-w-7xl mx-auto">
-            <PageTitle title={`Edit ${website.name}`} subtitle={website.domains.primary} />
+            <PageTitle
+              title={`Edit ${website?.name || "Website"}`}
+              subtitle={website?.domains?.primary || ""}
+            />
           </Box>
         </Box>
 
@@ -415,7 +418,7 @@ export function WebsiteOverview() {
                       <div className="h-8 bg-gray-200 rounded w-28 animate-pulse"></div>
                     ) : (
                       <Typography variant="body1" className="text-gray-900 h-8 flex items-center">
-                        {website.contact.phone}
+                        {website?.contact?.phone}
                       </Typography>
                     )}
                   </Box>
@@ -429,7 +432,7 @@ export function WebsiteOverview() {
                       <div className="h-8 bg-gray-200 rounded w-36 animate-pulse"></div>
                     ) : (
                       <Typography variant="body1" className="text-gray-900 h-8 flex items-center">
-                        {website.contact.department}
+                        {website?.contact?.department}
                       </Typography>
                     )}
                   </Box>
