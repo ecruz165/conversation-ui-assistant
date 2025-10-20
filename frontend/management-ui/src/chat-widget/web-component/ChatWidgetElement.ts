@@ -137,15 +137,13 @@ class ChatWidgetElement extends HTMLElement {
 
     // Render React component inside web component
     this.root.render(
-      React.createElement(
-        ConversationProvider,
-        {
-          apiEndpoint,
-          websocketUrl,
-          onError: props.onError,
-          children: React.createElement(ChatWidget, props),
-        }
-      )
+      React.createElement(ConversationProvider, {
+        apiEndpoint,
+        websocketUrl,
+        onError: props.onError,
+        // biome-ignore lint/correctness/noChildrenProp: React.createElement requires children as prop for TypeScript compatibility
+        children: React.createElement(ChatWidget, props),
+      })
     );
   }
 }

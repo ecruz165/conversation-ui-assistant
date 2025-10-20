@@ -20,9 +20,12 @@ describe("Keyboard Navigation", () => {
     test("can be activated with Enter key", async () => {
       const user = userEvent.setup();
       let clicked = false;
-      render(<AccessibleButton onClick={() => (clicked = true)}>Test Button</AccessibleButton>);
+      const handleClick = () => {
+        clicked = true;
+      };
+      render(<AccessibleButton onClick={handleClick}>Test Button</AccessibleButton>);
 
-      const button = screen.getByRole("button", { name: /test button/i });
+      const _button = screen.getByRole("button", { name: /test button/i });
 
       // Tab to focus and press Enter
       await user.tab();
@@ -33,9 +36,12 @@ describe("Keyboard Navigation", () => {
     test("can be activated with Space key", async () => {
       const user = userEvent.setup();
       let clicked = false;
-      render(<AccessibleButton onClick={() => (clicked = true)}>Test Button</AccessibleButton>);
+      const handleClick = () => {
+        clicked = true;
+      };
+      render(<AccessibleButton onClick={handleClick}>Test Button</AccessibleButton>);
 
-      const button = screen.getByRole("button", { name: /test button/i });
+      const _button = screen.getByRole("button", { name: /test button/i });
 
       // Tab to focus and press Space
       await user.tab();
@@ -47,8 +53,11 @@ describe("Keyboard Navigation", () => {
   describe("InteractiveDiv", () => {
     test("can be focused with Tab key", async () => {
       const user = userEvent.setup();
+      const handleClick = () => {
+        /* intentionally empty for focus test */
+      };
       render(
-        <InteractiveDiv onClick={() => {}} ariaLabel="Test Interactive">
+        <InteractiveDiv onClick={handleClick} ariaLabel="Test Interactive">
           Interactive Content
         </InteractiveDiv>
       );
@@ -63,13 +72,16 @@ describe("Keyboard Navigation", () => {
     test("can be activated with Enter key", async () => {
       const user = userEvent.setup();
       let clicked = false;
+      const handleClick = () => {
+        clicked = true;
+      };
       render(
-        <InteractiveDiv onClick={() => (clicked = true)} ariaLabel="Test Interactive">
+        <InteractiveDiv onClick={handleClick} ariaLabel="Test Interactive">
           Interactive Content
         </InteractiveDiv>
       );
 
-      const element = screen.getByRole("button", { name: /test interactive/i });
+      const _element = screen.getByRole("button", { name: /test interactive/i });
 
       // Tab to focus and press Enter
       await user.tab();
@@ -80,13 +92,16 @@ describe("Keyboard Navigation", () => {
     test("can be activated with Space key", async () => {
       const user = userEvent.setup();
       let clicked = false;
+      const handleClick = () => {
+        clicked = true;
+      };
       render(
-        <InteractiveDiv onClick={() => (clicked = true)} ariaLabel="Test Interactive">
+        <InteractiveDiv onClick={handleClick} ariaLabel="Test Interactive">
           Interactive Content
         </InteractiveDiv>
       );
 
-      const element = screen.getByRole("button", { name: /test interactive/i });
+      const _element = screen.getByRole("button", { name: /test interactive/i });
 
       // Tab to focus and press Space
       await user.tab();
@@ -98,11 +113,14 @@ describe("Keyboard Navigation", () => {
   describe("Focus Order", () => {
     test("maintains correct tab order for multiple interactive elements", async () => {
       const user = userEvent.setup();
+      const handleClick = () => {
+        /* intentionally empty for focus order test */
+      };
       render(
         <div>
           <AccessibleButton>First</AccessibleButton>
           <AccessibleButton>Second</AccessibleButton>
-          <InteractiveDiv onClick={() => {}} ariaLabel="Third">
+          <InteractiveDiv onClick={handleClick} ariaLabel="Third">
             Third
           </InteractiveDiv>
         </div>
