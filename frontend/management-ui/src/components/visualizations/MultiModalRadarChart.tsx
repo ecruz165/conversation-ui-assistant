@@ -71,7 +71,7 @@ export const MultiModalRadarChart = memo(function MultiModalRadarChart({
             const levelRadius = ((i + 1) / levels) * radius;
             return (
               <circle
-                key={`level-${i}`}
+                key={`level-${levels}-${i}`}
                 cx={center}
                 cy={center}
                 r={levelRadius}
@@ -83,11 +83,11 @@ export const MultiModalRadarChart = memo(function MultiModalRadarChart({
           })}
 
           {/* Axis lines */}
-          {data.map((_d, i) => {
+          {data.map((d, i) => {
             const endPoint = calculatePoint(1, i, data.length);
             return (
               <line
-                key={`axis-${i}`}
+                key={`axis-${d.axis}`}
                 x1={center}
                 y1={center}
                 x2={endPoint.x}
@@ -112,7 +112,7 @@ export const MultiModalRadarChart = memo(function MultiModalRadarChart({
             const point = calculatePoint(d.value, i, data.length);
             return (
               <circle
-                key={`point-${i}`}
+                key={`point-${d.axis}`}
                 cx={point.x}
                 cy={point.y}
                 r="4"
@@ -129,7 +129,7 @@ export const MultiModalRadarChart = memo(function MultiModalRadarChart({
             const percentage = Math.round(d.value * 100);
 
             return (
-              <g key={`label-${i}`}>
+              <g key={`label-${d.axis}`}>
                 <text
                   x={labelPos.x}
                   y={labelPos.y}

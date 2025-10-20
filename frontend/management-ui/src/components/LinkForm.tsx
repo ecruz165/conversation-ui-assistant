@@ -275,8 +275,8 @@ export function LinkForm({ open, onClose, onSubmit, initialData, mode = "create"
                 AI will collect these values from user before navigation:
               </Typography>
               <Box className="flex flex-wrap gap-1">
-                {detectedParameters.map((param, index) => (
-                  <Chip key={index} label={param} size="small" color="primary" variant="outlined" />
+                {detectedParameters.map((param) => (
+                  <Chip key={param} label={param} size="small" color="primary" variant="outlined" />
                 ))}
               </Box>
             </Alert>
@@ -385,7 +385,7 @@ export function LinkForm({ open, onClose, onSubmit, initialData, mode = "create"
             <Box className="flex flex-wrap gap-2">
               {keywords.map((keyword, index) => (
                 <Chip
-                  key={index}
+                  key={keyword}
                   label={keyword}
                   onDelete={() => handleRemoveKeyword(index)}
                   size="small"
@@ -500,7 +500,7 @@ export function LinkForm({ open, onClose, onSubmit, initialData, mode = "create"
                     Defined Fields:
                   </Typography>
                   {formFields.map((field, index) => (
-                    <Paper key={index} variant="outlined" className="p-2">
+                    <Paper key={`${field.label}-${field.slot}`} variant="outlined" className="p-2">
                       <Box className="flex justify-between items-start">
                         <Box className="flex-1">
                           <Box className="flex items-center gap-2 mb-1">
