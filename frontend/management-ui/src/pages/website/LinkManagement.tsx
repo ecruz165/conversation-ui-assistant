@@ -47,8 +47,10 @@ import {
   getFilteredRowModel,
   getGroupedRowModel,
   getSortedRowModel,
+  type Row,
   type RowSelectionState,
   type SortingState,
+  type Table,
   useReactTable,
 } from "@tanstack/react-table";
 import { AnimatePresence, motion } from "motion/react";
@@ -189,7 +191,7 @@ export function LinkManagement() {
       ? [
           {
             id: "select",
-            header: ({ table }) => (
+            header: ({ table }: { table: Table<NavigationLink> }) => (
               <motion.div
                 initial={{ scale: 0, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
@@ -203,7 +205,7 @@ export function LinkManagement() {
                 />
               </motion.div>
             ),
-            cell: ({ row }) => (
+            cell: ({ row }: { row: Row<NavigationLink> }) => (
               <motion.div
                 initial={{ scale: 0, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}

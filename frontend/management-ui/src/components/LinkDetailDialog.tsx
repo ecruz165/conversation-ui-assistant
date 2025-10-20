@@ -966,7 +966,7 @@ export function LinkDetailDialog({ open, onClose, link, onEdit }: LinkDetailDial
                         Functionality Embedding
                       </Typography>
                       <Box className="flex items-center gap-2 mt-1">
-                        {link.multiModalEmbedding?.enhanced?.functionalityEmbedding?.length > 0 ? (
+                        {(link.multiModalEmbedding?.enhanced?.functionalityEmbedding?.length ?? 0) > 0 ? (
                           <>
                             <CheckCircle color="success" fontSize="small" />
                             <Typography variant="body2">Generated</Typography>
@@ -986,7 +986,7 @@ export function LinkDetailDialog({ open, onClose, link, onEdit }: LinkDetailDial
                         Content Embedding
                       </Typography>
                       <Box className="flex items-center gap-2 mt-1">
-                        {link.multiModalEmbedding?.enhanced?.contentEmbedding?.length > 0 ? (
+                        {(link.multiModalEmbedding?.enhanced?.contentEmbedding?.length ?? 0) > 0 ? (
                           <>
                             <CheckCircle color="success" fontSize="small" />
                             <Typography variant="body2">Generated</Typography>
@@ -1006,7 +1006,7 @@ export function LinkDetailDialog({ open, onClose, link, onEdit }: LinkDetailDial
                         Purpose Embedding
                       </Typography>
                       <Box className="flex items-center gap-2 mt-1">
-                        {link.multiModalEmbedding?.enhanced?.purposeEmbedding?.length > 0 ? (
+                        {(link.multiModalEmbedding?.enhanced?.purposeEmbedding?.length ?? 0) > 0 ? (
                           <>
                             <CheckCircle color="success" fontSize="small" />
                             <Typography variant="body2">Generated</Typography>
@@ -1026,7 +1026,7 @@ export function LinkDetailDialog({ open, onClose, link, onEdit }: LinkDetailDial
                         Action Embedding
                       </Typography>
                       <Box className="flex items-center gap-2 mt-1">
-                        {link.multiModalEmbedding?.enhanced?.actionEmbedding?.length > 0 ? (
+                        {(link.multiModalEmbedding?.enhanced?.actionEmbedding?.length ?? 0) > 0 ? (
                           <>
                             <CheckCircle color="success" fontSize="small" />
                             <Typography variant="body2">Generated</Typography>
@@ -1046,7 +1046,7 @@ export function LinkDetailDialog({ open, onClose, link, onEdit }: LinkDetailDial
                         Data Context Embedding
                       </Typography>
                       <Box className="flex items-center gap-2 mt-1">
-                        {link.multiModalEmbedding?.enhanced?.dataContextEmbedding?.length > 0 ? (
+                        {(link.multiModalEmbedding?.enhanced?.dataContextEmbedding?.length ?? 0) > 0 ? (
                           <>
                             <CheckCircle color="success" fontSize="small" />
                             <Typography variant="body2">Generated</Typography>
@@ -1066,7 +1066,7 @@ export function LinkDetailDialog({ open, onClose, link, onEdit }: LinkDetailDial
                         User Task Embedding
                       </Typography>
                       <Box className="flex items-center gap-2 mt-1">
-                        {link.multiModalEmbedding?.enhanced?.userTaskEmbedding?.length > 0 ? (
+                        {(link.multiModalEmbedding?.enhanced?.userTaskEmbedding?.length ?? 0) > 0 ? (
                           <>
                             <CheckCircle color="success" fontSize="small" />
                             <Typography variant="body2">Generated</Typography>

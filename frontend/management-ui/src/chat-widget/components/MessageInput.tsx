@@ -332,7 +332,9 @@ const MessageInput: React.FC<MessageInputProps> = ({
       }
     `;
     document.head.appendChild(style);
-    return () => document.head.removeChild(style);
+    return () => {
+      document.head.removeChild(style);
+    };
   }, []);
 
   return (
@@ -468,7 +470,7 @@ const MessageInput: React.FC<MessageInputProps> = ({
         {/* Send Button */}
         <button
           type="button"
-          onClick={handleSend}
+          onClick={() => handleSend()}
           disabled={!canSend}
           style={{
             padding: "8px",

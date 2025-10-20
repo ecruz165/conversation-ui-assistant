@@ -59,11 +59,10 @@ interface MultiModalScoreBreakdownProps {
 }
 
 function MultiModalScoreBreakdown({ result }: MultiModalScoreBreakdownProps) {
-  // Prefer enhanced scores if available, fall back to legacy modalityScores
-  const hasEnhancedScores = result.enhancedScores && result.enhancedScores.length > 0;
-  const hasLegacyScores = result.modalityScores && result.modalityScores.length > 0;
+  // Use embeddingScores from PageMatch
+  const hasEmbeddingScores = result.embeddingScores && result.embeddingScores.length > 0;
 
-  if (!hasEnhancedScores && !hasLegacyScores) {
+  if (!hasEmbeddingScores) {
     return null;
   }
 
@@ -71,92 +70,49 @@ function MultiModalScoreBreakdown({ result }: MultiModalScoreBreakdownProps) {
     <Box className="mt-4">
       <Typography variant="subtitle2" className="font-semibold mb-2 flex items-center gap-1">
         <TrendingUpIcon fontSize="small" />
-        {hasEnhancedScores ? "Enhanced 6-Embedding Breakdown" : "Multi-Modal Score Breakdown"}
+        Enhanced 6-Embedding Breakdown
       </Typography>
       <Box className="space-y-2">
         {/* Enhanced 6-embedding scores */}
-        {hasEnhancedScores &&
-          result.enhancedScores?.map((enhancedScore) => {
-            const percentage = Math.round(enhancedScore.score * 100);
-            const weightPercentage = Math.round(enhancedScore.weight * 100);
-            const contributionPercentage = Math.round(enhancedScore.contribution * 100);
+        {result.embeddingScores.map((embeddingScore) => {
+          const percentage = Math.round(embeddingScore.score * 100);
+          const weightPercentage = Math.round(embeddingScore.weight * 100);
+          const contributionPercentage = Math.round(embeddingScore.contribution * 100);
 
-            return (
-              <Box key={enhancedScore.type}>
-                <Box className="flex justify-between items-center mb-1">
-                  <Box className="flex items-center gap-2">
-                    <Typography variant="caption" className="font-medium">
-                      {enhancedScore.label}
-                    </Typography>
-                    <Chip
-                      label={`${weightPercentage}% weight → ${contributionPercentage}% contrib.`}
-                      size="small"
-                      variant="outlined"
-                      sx={{ height: 20, fontSize: "0.7rem" }}
-                    />
-                  </Box>
-                  <Typography variant="caption" className="font-bold">
-                    {percentage}%
+          return (
+            <Box key={embeddingScore.type}>
+              <Box className="flex justify-between items-center mb-1">
+                <Box className="flex items-center gap-2">
+                  <Typography variant="caption" className="font-medium">
+                    {embeddingScore.label}
                   </Typography>
+                  <Chip
+                    label={`${weightPercentage}% weight → ${contributionPercentage}% contrib.`}
+                    size="small"
+                    variant="outlined"
+                    sx={{ height: 20, fontSize: "0.7rem" }}
+                  />
                 </Box>
-                <LinearProgress
-                  variant="determinate"
-                  value={percentage}
-                  sx={{
-                    height: 6,
-                    borderRadius: 3,
-                    backgroundColor: "#e0e0e0",
-                    "& .MuiLinearProgress-bar": {
-                      backgroundColor: getMatchScoreColor(enhancedScore.score),
-                      borderRadius: 3,
-                    },
-                  }}
-                />
+                <Typography variant="caption" className="font-bold">
+                  {percentage}%
+                </Typography>
               </Box>
-            );
-          })}
-
-        {/* Legacy 3-modality scores */}
-        {!hasEnhancedScores &&
-          hasLegacyScores &&
-          result.modalityScores?.map((modalityScore) => {
-            const percentage = Math.round(modalityScore.score * 100);
-            const contribution = Math.round(modalityScore.contributionWeight * 100);
-
-            return (
-              <Box key={modalityScore.modality}>
-                <Box className="flex justify-between items-center mb-1">
-                  <Box className="flex items-center gap-2">
-                    <Typography variant="caption" className="font-medium capitalize">
-                      {modalityScore.modality}
-                    </Typography>
-                    <Chip
-                      label={`${contribution}% weight`}
-                      size="small"
-                      variant="outlined"
-                      sx={{ height: 20, fontSize: "0.7rem" }}
-                    />
-                  </Box>
-                  <Typography variant="caption" className="font-bold">
-                    {percentage}%
-                  </Typography>
-                </Box>
-                <LinearProgress
-                  variant="determinate"
-                  value={percentage}
-                  sx={{
-                    height: 6,
+              <LinearProgress
+                variant="determinate"
+                value={percentage}
+                sx={{
+                  height: 6,
+                  borderRadius: 3,
+                  backgroundColor: "#e0e0e0",
+                  "& .MuiLinearProgress-bar": {
+                    backgroundColor: getMatchScoreColor(embeddingScore.score),
                     borderRadius: 3,
-                    backgroundColor: "#e0e0e0",
-                    "& .MuiLinearProgress-bar": {
-                      backgroundColor: getMatchScoreColor(modalityScore.score),
-                      borderRadius: 3,
-                    },
-                  }}
-                />
-              </Box>
-            );
-          })}
+                  },
+                }}
+              />
+            </Box>
+          );
+        })}
       </Box>
     </Box>
   );
@@ -692,9 +648,7 @@ export function EmbeddingTest() {
     embeddingTestMutation.mutate(
       {
         query: trimmed,
-        useMultiModal: true, // Always use multi-modal search
-        useEnhancedEmbeddings: true, // Always use enhanced embeddings
-        enhancedWeights: enhancedWeights,
+        weights: enhancedWeights,
       },
       {
         onSuccess: () => {

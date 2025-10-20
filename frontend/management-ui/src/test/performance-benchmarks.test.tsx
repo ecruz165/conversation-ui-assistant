@@ -11,8 +11,11 @@ const mockTheme: Theme = {
     background: "#ffffff",
     surface: "#f5f5f5",
     error: "#d32f2f",
+    success: "#4caf50",
     text: "#000000",
     textSecondary: "#757575",
+    border: "#e0e0e0",
+    shadow: "rgba(0, 0, 0, 0.1)",
   },
   spacing: {
     xs: "4px",
@@ -22,6 +25,7 @@ const mockTheme: Theme = {
     xl: "32px",
   },
   typography: {
+    fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
     fontSize: {
       xs: "12px",
       sm: "14px",
@@ -29,12 +33,22 @@ const mockTheme: Theme = {
       lg: "18px",
       xl: "20px",
     },
+    fontWeight: {
+      normal: 400,
+      medium: 500,
+      bold: 700,
+    },
   },
   borderRadius: "8px",
   shadows: {
     sm: "0 1px 3px rgba(0,0,0,0.12)",
     md: "0 4px 6px rgba(0,0,0,0.16)",
     lg: "0 10px 20px rgba(0,0,0,0.19)",
+  },
+  transitions: {
+    fast: "150ms ease-in-out",
+    normal: "300ms ease-in-out",
+    slow: "500ms ease-in-out",
   },
 };
 
