@@ -190,8 +190,8 @@ const ChatWidget: React.FC<ChatWidgetProps> = ({
                 )}
               </div>
               <div style={{ display: "flex", gap: currentTheme.spacing.xs }}>
-                {/** biome-ignore lint/a11y/useButtonType: <explanation> */}
                 <button
+                  type="button"
                   onClick={() => setIsMinimized(!isMinimized)}
                   style={{
                     background: "none",
@@ -208,8 +208,8 @@ const ChatWidget: React.FC<ChatWidgetProps> = ({
                 >
                   <Minimize2 size={16} />
                 </button>
-                {/** biome-ignore lint/a11y/useButtonType: <explanation> */}
                 <button
+                  type="button"
                   onClick={() => setIsOpen(false)}
                   style={{
                     background: "none",

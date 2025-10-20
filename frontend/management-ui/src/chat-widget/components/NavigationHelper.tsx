@@ -135,6 +135,7 @@ const NavigationHelper: React.FC<NavigationHelperProps> = ({
         >
           {suggestions.map((suggestion) => (
             <button
+              type="button"
               key={suggestion}
               onClick={() => handleSuggestionClick(suggestion)}
               disabled={isLoading}

@@ -434,8 +434,8 @@ const MessageInput: React.FC<MessageInputProps> = ({
         )}
 
         {/* Voice Input Button */}
-        {/** biome-ignore lint/a11y/useButtonType: <explanation> */}
         <button
+          type="button"
           onClick={toggleVoiceInput}
           disabled={disabled}
           style={{
@@ -457,8 +457,8 @@ const MessageInput: React.FC<MessageInputProps> = ({
         </button>
 
         {/* Send Button */}
-        {/** biome-ignore lint/a11y/useButtonType: <explanation> */}
         <button
+          type="button"
           onClick={handleSend}
           disabled={!canSend}
           style={{
@@ -504,8 +504,8 @@ const MessageInput: React.FC<MessageInputProps> = ({
         }}
       >
         {["Help", "Navigation", "Search"].map((suggestion) => (
-          // biome-ignore lint/a11y/useButtonType: <explanation>
           <button
+            type="button"
             key={suggestion}
             onClick={() => {
               if (!disabled) {
