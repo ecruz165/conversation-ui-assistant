@@ -30,8 +30,8 @@ import {
   Typography,
 } from "@mui/material";
 import type React from "react";
-import { useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useId, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { Layout } from "~/components/Layout";
 import { PageTabs } from "~/components/PageTabs";
 import { PageTitle } from "~/components/PageTitle";
@@ -99,21 +99,27 @@ const mockCrawlHistory: CrawlHistoryEntry[] = [
   },
 ];
 
-const tabs = [
-  { label: "Overview", value: "overview", path: "/website/overview" },
-  { label: "Crawl Management", value: "crawl-management", path: "/website/crawl-management" },
-  { label: "Link Management", value: "links", path: "/website/links" },
-  { label: "Embeddings Tester", value: "embedding-test", path: "/website/embedding-test" },
-  { label: "Widget Code", value: "code", path: "/website/code" },
+const getTabs = (websiteId: string) => [
+  { label: "Overview", value: "overview", path: `/${websiteId}/overview` },
+  { label: "Crawl Management", value: "crawl-management", path: `/${websiteId}/crawl-management` },
+  { label: "Link Management", value: "link-management", path: `/${websiteId}/link-management` },
+  {
+    label: "Embeddings Tester",
+    value: "embeddings-tester",
+    path: `/${websiteId}/embeddings-tester`,
+  },
+  { label: "Widget Code", value: "widget-code", path: `/${websiteId}/widget-code` },
 ];
 
 const ACTION_BUTTON_STYLE = { minWidth: 192 };
 const SECTION_DESCRIPTION_CLASS = "text-gray-600 mb-4 pb-2";
 
 export function CrawlManagement() {
-  const websiteId = "mock-website-1";
-  const { data: website, isLoading } = useWebsite(websiteId);
+  const { websiteId } = useParams<{ websiteId: string }>();
+  const { data: website, isLoading } = useWebsite(websiteId || "");
   const navigate = useNavigate();
+  const frequencyLabelId = useId();
+  const dayOfWeekLabelId = useId();
 
   // Schedule form state
   const [frequency, setFrequency] = useState<CrawlFrequency>("manual");
@@ -212,7 +218,7 @@ export function CrawlManagement() {
   // Handle crawl depth change
   const handleCrawlDepthChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = Number.parseInt(e.target.value, 10);
-    if (!isNaN(value)) {
+    if (!Number.isNaN(value)) {
       setCrawlDepth(value);
       setDepthError(validateCrawlDepth(value));
     }
@@ -221,7 +227,7 @@ export function CrawlManagement() {
   // Handle max pages change
   const handleMaxPagesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = Number.parseInt(e.target.value, 10);
-    if (!isNaN(value)) {
+    if (!Number.isNaN(value)) {
       setMaxPages(value);
       setMaxPagesError(validateMaxPages(value));
     }
@@ -396,7 +402,7 @@ export function CrawlManagement() {
       </Box>
 
       {/* Tabs */}
-      <PageTabs tabs={tabs} />
+      <PageTabs tabs={getTabs(websiteId || "")} />
 
       {/* Content */}
       <Box className="max-w-7xl mx-auto px-page md:px-6 lg:px-8 py-8 space-y-6">
@@ -430,9 +436,9 @@ export function CrawlManagement() {
           <Box className="space-y-4">
             {/* Frequency Selector */}
             <FormControl fullWidth>
-              <InputLabel id="frequency-label">Crawl Frequency</InputLabel>
+              <InputLabel id={frequencyLabelId}>Crawl Frequency</InputLabel>
               <Select
-                labelId="frequency-label"
+                labelId={frequencyLabelId}
                 value={frequency}
                 onChange={(e) => setFrequency(e.target.value as CrawlFrequency)}
                 label="Crawl Frequency"
@@ -448,9 +454,9 @@ export function CrawlManagement() {
             {/* Day of Week Selector - Shown for Weekly, Bi-weekly, and Monthly */}
             {(frequency === "weekly" || frequency === "biweekly" || frequency === "monthly") && (
               <FormControl fullWidth>
-                <InputLabel id="day-of-week-label">Day of Week</InputLabel>
+                <InputLabel id={dayOfWeekLabelId}>Day of Week</InputLabel>
                 <Select
-                  labelId="day-of-week-label"
+                  labelId={dayOfWeekLabelId}
                   value={dayOfWeek}
                   onChange={(e) => setDayOfWeek(e.target.value as number)}
                   label="Day of Week"
@@ -468,19 +474,17 @@ export function CrawlManagement() {
 
             {/* Time Picker - Hidden when Manual Only */}
             {frequency !== "manual" && (
-              <>
-                <TextField
-                  fullWidth
-                  type="time"
-                  label="Scheduled Time"
-                  value={scheduledTime}
-                  onChange={(e) => setScheduledTime(e.target.value)}
-                  InputLabelProps={{
-                    shrink: true,
-                  }}
-                  helperText={`Time in ${timezone} (${formatTime12Hour(scheduledTime)})`}
-                />
-              </>
+              <TextField
+                fullWidth
+                type="time"
+                label="Scheduled Time"
+                value={scheduledTime}
+                onChange={(e) => setScheduledTime(e.target.value)}
+                InputLabelProps={{
+                  shrink: true,
+                }}
+                helperText={`Time in ${timezone} (${formatTime12Hour(scheduledTime)})`}
+              />
             )}
 
             {/* Save Button */}

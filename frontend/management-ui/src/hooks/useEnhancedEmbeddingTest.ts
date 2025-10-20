@@ -7,7 +7,7 @@ import type { EmbeddingTestQuery, EmbeddingTestResult } from "~/types";
 // Mock API for enhanced embedding tests
 const mockApi = {
   testEnhancedEmbedding: async (
-    websiteId: string,
+    _websiteId: string,
     query: EmbeddingTestQuery
   ): Promise<EmbeddingTestResult> => {
     await new Promise((resolve) => setTimeout(resolve, 1500));
@@ -22,7 +22,7 @@ const mockApi = {
     // Filter by minConfidence if provided
     if (query.minConfidence) {
       mockResults.results = mockResults.results.filter(
-        (result) => result.matchScore >= query.minConfidence!
+        (result) => result.matchScore >= (query.minConfidence ?? 0)
       );
       mockResults.totalMatches = mockResults.results.length;
     }
@@ -36,7 +36,7 @@ const mockApi = {
   },
 
   compareEmbeddings: async (
-    websiteId: string,
+    _websiteId: string,
     data: {
       pageId: string;
       comparisonType: "text-vs-visual" | "old-vs-new" | "multiple";

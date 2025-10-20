@@ -1,7 +1,7 @@
 /// <reference types="vite/client" />
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { createRootRoute, HeadContent, Link, Scripts } from "@tanstack/react-router";
+import { createRootRoute, HeadContent, Scripts } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 import type * as React from "react";
 import { DefaultCatchBoundary } from "~/components/DefaultCatchBoundary";
@@ -128,7 +128,6 @@ export const Route = createRootRoute({
     //       },
     //     },
     //   }),
-    test: (test) => {},
   },
   beforeLoad: ({ serverContext }) => {
     serverContext?.fromFetch;

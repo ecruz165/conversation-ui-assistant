@@ -28,7 +28,7 @@ export function WeightedScoreExplanation({
 
         <Box className="space-y-3">
           {/* Individual Contributions */}
-          {modalityScores.map((modalityScore, idx) => {
+          {modalityScores.map((modalityScore) => {
             const contribution = calculateWeightedContribution(
               modalityScore.score,
               modalityScore.contributionWeight
@@ -36,7 +36,7 @@ export function WeightedScoreExplanation({
             const contributionPercentage = Math.round(contribution * 100);
 
             return (
-              <Box key={idx}>
+              <Box key={modalityScore.modality}>
                 <Box className="flex justify-between items-center mb-1">
                   <Box className="flex items-center gap-2">
                     <Typography variant="caption" className="font-medium capitalize">

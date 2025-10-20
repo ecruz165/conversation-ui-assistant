@@ -17,17 +17,42 @@
     "lint:fix": "biome check --write src/",
     "format": "biome format --write src/",
     "format:check": "biome format src/",
-    "test": "echo \"No tests specified\" && exit 0"
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:ui": "vitest --ui",
+    "test:a11y": "vitest run --grep 'accessibility|a11y'",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "size": "size-limit",
+    "prepare": "husky"
+  },
+  "size-limit": [
+    {
+      "name": "Main bundle",
+      "path": "dist/assets/index-*.js",
+      "limit": "600 KB"
+    },
+    {
+      "name": "CSS bundle",
+      "path": "dist/assets/index-*.css",
+      "limit": "30 KB"
+    }
+  ],
+  "lint-staged": {
+    "*.{ts,tsx,js,jsx}": [
+      "biome check --write",
+      "biome format --write"
+    ]
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
     "@mui/icons-material": "^7.3.4",
     "@mui/material": "^7.3.4",
-    "@tanstack/react-query": "^5.90.3",
-    "@tanstack/react-router": "^1.132.2",
-    "@tanstack/react-router-devtools": "^1.132.2",
-    "@tanstack/react-start": "^1.132.4",
+    "@tanstack/react-query": "^5.90.5",
+    "@tanstack/react-router": "^1.133.15",
+    "@tanstack/react-router-devtools": "^1.133.15",
+    "@tanstack/react-start": "^1.133.15",
     "@tanstack/react-table": "^8.21.3",
     "@tanstack/react-virtual": "^3.13.12",
     "@types/react-syntax-highlighter": "^15.5.13",
@@ -37,26 +62,41 @@
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-hook-form": "^7.65.0",
-    "react-router-dom": "^7.9.3",
+    "react-router-dom": "^7.9.4",
     "react-syntax-highlighter": "^15.6.6",
     "react-virtualized-auto-sizer": "^1.0.26",
     "react-window": "^2.2.1",
     "socket.io-client": "^4.8.1",
-    "tailwind-merge": "^2.6.0",
-    "zod": "^3.24.2",
+    "tailwind-merge": "^3.3.1",
+    "zod": "^4.1.12",
     "zustand": "^5.0.8"
   },
   "devDependencies": {
-    "@playwright/test": "^1.56.0",
-    "@types/node": "^22.5.4",
+    "@axe-core/playwright": "^4.10.2",
+    "@axe-core/react": "^4.10.2",
+    "@playwright/test": "^1.56.1",
+    "@size-limit/file": "^11.2.0",
+    "@testing-library/dom": "^10.4.1",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.0",
+    "@testing-library/user-event": "^14.6.1",
+    "@types/jest-axe": "^3.5.9",
+    "@types/node": "^24.8.1",
     "@types/react": "^19.2.2",
     "@types/react-dom": "^19.2.2",
-    "@vitejs/plugin-react": "^4.6.0",
-    "autoprefixer": "^10.4.20",
-    "postcss": "^8.5.1",
-    "tailwindcss": "^3.4.17",
-    "typescript": "^5.7.2",
-    "vite": "^7.1.1",
-    "vite-tsconfig-paths": "^5.1.4"
+    "@vitejs/plugin-react": "^5.0.4",
+    "autoprefixer": "^10.4.21",
+    "axe-playwright": "^2.2.2",
+    "husky": "^9.1.7",
+    "jest-axe": "^10.0.0",
+    "jsdom": "^27.0.1",
+    "lint-staged": "^16.2.4",
+    "postcss": "^8.5.6",
+    "size-limit": "^11.2.0",
+    "tailwindcss": "^3.4.18",
+    "typescript": "^5.9.3",
+    "vite": "^7.1.10",
+    "vite-tsconfig-paths": "^5.1.4",
+    "vitest": "^3.2.4"
   }
 }

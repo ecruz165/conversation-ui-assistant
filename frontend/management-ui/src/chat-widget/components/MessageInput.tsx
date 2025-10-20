@@ -1,6 +1,53 @@
 import { Mic, MicOff, Send } from "lucide-react";
-import React, { type KeyboardEvent, useEffect, useRef, useState } from "react";
+import React, { type KeyboardEvent, useCallback, useEffect, useRef, useState } from "react";
 import type { Theme } from "../types";
+
+// Speech Recognition API types
+interface SpeechRecognitionEvent extends Event {
+  results: SpeechRecognitionResultList;
+  resultIndex: number;
+}
+
+interface SpeechRecognitionResultList {
+  length: number;
+  item(index: number): SpeechRecognitionResult;
+  [index: number]: SpeechRecognitionResult;
+}
+
+interface SpeechRecognitionResult {
+  isFinal: boolean;
+  length: number;
+  item(index: number): SpeechRecognitionAlternative;
+  [index: number]: SpeechRecognitionAlternative;
+}
+
+interface SpeechRecognitionAlternative {
+  transcript: string;
+  confidence: number;
+}
+
+interface SpeechRecognitionErrorEvent extends Event {
+  error: string;
+  message: string;
+}
+
+interface SpeechRecognition extends EventTarget {
+  continuous: boolean;
+  interimResults: boolean;
+  lang: string;
+  start(): void;
+  stop(): void;
+  abort(): void;
+  onstart: ((this: SpeechRecognition, ev: Event) => void) | null;
+  onresult: ((this: SpeechRecognition, ev: SpeechRecognitionEvent) => void) | null;
+  onerror: ((this: SpeechRecognition, ev: SpeechRecognitionErrorEvent) => void) | null;
+  onend: ((this: SpeechRecognition, ev: Event) => void) | null;
+}
+
+interface ExtendedWindow {
+  SpeechRecognition?: new () => SpeechRecognition;
+  webkitSpeechRecognition?: new () => SpeechRecognition;
+}
 
 interface MessageInputProps {
   onSendMessage: (message: string, audioBlob?: Blob) => void;
@@ -23,10 +70,10 @@ const MessageInput: React.FC<MessageInputProps> = ({
   const [message, setMessage] = useState("");
   const [isListening, setIsListening] = useState(false);
   const [transcript, setTranscript] = useState("");
-  const [isTranscribing, setIsTranscribing] = useState(false);
+  const [_isTranscribing, setIsTranscribing] = useState(false);
   const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const recognitionRef = useRef<any>(null);
+  const recognitionRef = useRef<SpeechRecognition | null>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
   const streamRef = useRef<MediaStream | null>(null);
@@ -101,7 +148,7 @@ const MessageInput: React.FC<MessageInputProps> = ({
     }
   };
 
-  const stopAudioRecording = () => {
+  const stopAudioRecording = useCallback(() => {
     if (mediaRecorderRef.current && mediaRecorderRef.current.state === "recording") {
       mediaRecorderRef.current.stop();
     }
@@ -111,14 +158,18 @@ const MessageInput: React.FC<MessageInputProps> = ({
       }
       streamRef.current = null;
     }
-  };
+  }, []);
 
   // Initialize speech recognition
   useEffect(() => {
     if ("webkitSpeechRecognition" in window || "SpeechRecognition" in window) {
-      const SpeechRecognition =
-        (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-      recognitionRef.current = new SpeechRecognition();
+      const SpeechRecognitionConstructor =
+        (window as unknown as ExtendedWindow).SpeechRecognition ||
+        (window as unknown as ExtendedWindow).webkitSpeechRecognition;
+
+      if (!SpeechRecognitionConstructor) return;
+
+      recognitionRef.current = new SpeechRecognitionConstructor();
 
       const recognition = recognitionRef.current;
       recognition.continuous = true;
@@ -130,7 +181,7 @@ const MessageInput: React.FC<MessageInputProps> = ({
         setIsTranscribing(true);
       };
 
-      recognition.onresult = (event: any) => {
+      recognition.onresult = (event: SpeechRecognitionEvent) => {
         let interimTranscript = "";
         let finalTranscript = "";
 
@@ -163,7 +214,7 @@ const MessageInput: React.FC<MessageInputProps> = ({
         }
       };
 
-      recognition.onerror = (event: any) => {
+      recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
         console.error("🚫 Speech recognition error:", event.error);
         setIsListening(false);
         setIsTranscribing(false);
@@ -281,7 +332,9 @@ const MessageInput: React.FC<MessageInputProps> = ({
       }
     `;
     document.head.appendChild(style);
-    return () => document.head.removeChild(style);
+    return () => {
+      document.head.removeChild(style);
+    };
   }, []);
 
   return (
@@ -392,8 +445,8 @@ const MessageInput: React.FC<MessageInputProps> = ({
         )}
 
         {/* Voice Input Button */}
-        {/** biome-ignore lint/a11y/useButtonType: <explanation> */}
         <button
+          type="button"
           onClick={toggleVoiceInput}
           disabled={disabled}
           style={{
@@ -415,9 +468,9 @@ const MessageInput: React.FC<MessageInputProps> = ({
         </button>
 
         {/* Send Button */}
-        {/** biome-ignore lint/a11y/useButtonType: <explanation> */}
         <button
-          onClick={handleSend}
+          type="button"
+          onClick={() => handleSend()}
           disabled={!canSend}
           style={{
             padding: "8px",
@@ -462,8 +515,8 @@ const MessageInput: React.FC<MessageInputProps> = ({
         }}
       >
         {["Help", "Navigation", "Search"].map((suggestion) => (
-          // biome-ignore lint/a11y/useButtonType: <explanation>
           <button
+            type="button"
             key={suggestion}
             onClick={() => {
               if (!disabled) {

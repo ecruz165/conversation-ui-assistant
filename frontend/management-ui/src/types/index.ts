@@ -2,11 +2,11 @@
 
 // Re-export screenshot analysis types
 export type {
+  BatchScreenshotAnalysisRequest,
+  BatchScreenshotAnalysisResult,
   PageRegion,
   ScreenshotAnalysisRequest,
   ScreenshotAnalysisResult,
-  BatchScreenshotAnalysisRequest,
-  BatchScreenshotAnalysisResult,
 } from "./screenshot-analysis";
 
 // Multi-modal embedding types

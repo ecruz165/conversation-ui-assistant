@@ -15,7 +15,7 @@ interface MultiModalScoreBreakdownProps {
 }
 
 export function MultiModalScoreBreakdown({ result }: MultiModalScoreBreakdownProps) {
-  if (!result.modalityScores || result.modalityScores.length === 0) {
+  if (!result.embeddingScores || result.embeddingScores.length === 0) {
     return null;
   }
 
@@ -23,22 +23,23 @@ export function MultiModalScoreBreakdown({ result }: MultiModalScoreBreakdownPro
     <Box className="mt-4">
       <Typography variant="subtitle2" className="font-semibold mb-2 flex items-center gap-1">
         <TrendingUpIcon fontSize="small" />
-        Multi-Modal Score Breakdown
+        Enhanced 6-Embedding Breakdown
       </Typography>
       <Box className="space-y-2">
-        {result.modalityScores.map((modalityScore) => {
-          const percentage = Math.round(modalityScore.score * 100);
-          const contribution = Math.round(modalityScore.contributionWeight * 100);
+        {result.embeddingScores.map((embeddingScore) => {
+          const percentage = Math.round(embeddingScore.score * 100);
+          const weightPercentage = Math.round(embeddingScore.weight * 100);
+          const contributionPercentage = Math.round(embeddingScore.contribution * 100);
 
           return (
-            <Box key={modalityScore.modality}>
+            <Box key={embeddingScore.type}>
               <Box className="flex justify-between items-center mb-1">
                 <Box className="flex items-center gap-2">
-                  <Typography variant="caption" className="font-medium capitalize">
-                    {modalityScore.modality}
+                  <Typography variant="caption" className="font-medium">
+                    {embeddingScore.label}
                   </Typography>
                   <Chip
-                    label={`${contribution}% weight`}
+                    label={`${weightPercentage}% weight → ${contributionPercentage}% contrib.`}
                     size="small"
                     variant="outlined"
                     sx={{ height: 20, fontSize: "0.7rem" }}
@@ -56,7 +57,7 @@ export function MultiModalScoreBreakdown({ result }: MultiModalScoreBreakdownPro
                   borderRadius: 3,
                   backgroundColor: "#e0e0e0",
                   "& .MuiLinearProgress-bar": {
-                    backgroundColor: getMatchScoreColor(modalityScore.score),
+                    backgroundColor: getMatchScoreColor(embeddingScore.score),
                     borderRadius: 3,
                   },
                 }}

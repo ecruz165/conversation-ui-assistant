@@ -5,7 +5,7 @@ import { UserErrorComponent } from "src/components/UserError";
 export const Route = createFileRoute("/users/$userId")({
   loader: async ({ params: { userId } }) => {
     try {
-      const res = await fetch("/api/users/" + userId);
+      const res = await fetch(`/api/users/${userId}`);
       if (!res.ok) {
         throw new Error("Unexpected status code");
       }

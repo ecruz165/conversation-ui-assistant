@@ -3,6 +3,18 @@ import type { ConversationState, Message, UseConversationReturn } from "../types
 
 const DEFAULT_WEBSOCKET_URL = "ws://localhost:8081/ws/chat";
 
+interface WebSocketMessage {
+  type: "message" | "status" | "error";
+  content: string;
+  sessionId: string;
+  audio?: {
+    data: string;
+    mimeType: string;
+    size: number;
+  };
+  timestamp?: number;
+}
+
 /**
  * Hook for managing conversation state and WebSocket connection
  * Connects to the reactive navigation service with Netty
@@ -121,7 +133,7 @@ export const useConversation = (
   }, [websocketUrl]);
 
   // Convert blob to base64
-  const blobToBase64 = (blob: Blob): Promise<string> => {
+  const blobToBase64 = useCallback((blob: Blob): Promise<string> => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.onload = () => {
@@ -133,7 +145,7 @@ export const useConversation = (
       reader.onerror = reject;
       reader.readAsDataURL(blob);
     });
-  };
+  }, []);
 
   // Send message via WebSocket
   const sendMessage = useCallback(
@@ -161,7 +173,7 @@ export const useConversation = (
       // Send via WebSocket if connected
       if (wsRef.current?.readyState === WebSocket.OPEN) {
         try {
-          const message: any = {
+          const message: WebSocketMessage = {
             type: "message",
             content: content.trim(),
             sessionId: currentSessionId,
@@ -206,7 +218,7 @@ export const useConversation = (
         connect();
       }
     },
-    [getSessionId, connect]
+    [getSessionId, connect, blobToBase64]
   );
 
   // Clear conversation

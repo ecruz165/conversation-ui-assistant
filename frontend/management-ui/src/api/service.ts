@@ -9,6 +9,7 @@ import type {
   ScreenshotAnalysisRequest,
   ScreenshotAnalysisResult,
   StartCrawlResponse,
+  SyntheticQuery,
   SystemMetrics,
   Website,
 } from "~/types";
@@ -199,6 +200,27 @@ class ApiService {
     return this.fetchJson(`${this.baseUrl}/websites/${websiteId}/crawl/${crawlId}/status`);
   }
 
+  // Search Configuration endpoints
+  async updateSearchConfiguration(
+    websiteId: string,
+    data: {
+      weights: {
+        functionality: number;
+        content: number;
+        purpose: number;
+        action: number;
+        dataContext: number;
+        userTask: number;
+      };
+      description?: string;
+    }
+  ): Promise<{ success: boolean; updatedAt: string }> {
+    return this.fetchJson(`${this.baseUrl}/websites/${websiteId}/search-config`, {
+      method: "PUT",
+      body: JSON.stringify(data),
+    });
+  }
+
   // Screenshot Analysis endpoints
   async uploadScreenshotForAnalysis(
     websiteId: string,
@@ -283,18 +305,7 @@ class ApiService {
   }
 
   // Synthetic Queries endpoints
-  async getSyntheticQueries(
-    websiteId: string,
-    pageId?: string
-  ): Promise<
-    Array<{
-      id: string;
-      query: string;
-      expectedPageId: string;
-      validated: boolean;
-      matchScore?: number;
-    }>
-  > {
+  async getSyntheticQueries(websiteId: string, pageId?: string): Promise<SyntheticQuery[]> {
     const url = pageId
       ? `${this.baseUrl}/websites/${websiteId}/synthetic-queries?pageId=${pageId}`
       : `${this.baseUrl}/websites/${websiteId}/synthetic-queries`;

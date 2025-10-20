@@ -15,7 +15,7 @@ import {
 } from "@mui/material";
 import type React from "react";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism";
 import { Layout } from "~/components/Layout";
@@ -24,12 +24,16 @@ import { useWebsite } from "~/hooks/useWebsite";
 
 type IntegrationMethod = "script" | "npm" | "webcomponent";
 
-const tabs = [
-  { label: "Overview", value: "overview", path: "/website/overview" },
-  { label: "Crawl Management", value: "crawl-management", path: "/website/crawl-management" },
-  { label: "Link Management", value: "links", path: "/website/links" },
-  { label: "Embeddings Tester", value: "embedding-test", path: "/website/embedding-test" },
-  { label: "Widget Code", value: "code", path: "/website/code" },
+const getTabs = (websiteId: string) => [
+  { label: "Overview", value: "overview", path: `/${websiteId}/overview` },
+  { label: "Crawl Management", value: "crawl-management", path: `/${websiteId}/crawl-management` },
+  { label: "Link Management", value: "link-management", path: `/${websiteId}/link-management` },
+  {
+    label: "Embeddings Tester",
+    value: "embeddings-tester",
+    path: `/${websiteId}/embeddings-tester`,
+  },
+  { label: "Widget Code", value: "widget-code", path: `/${websiteId}/widget-code` },
 ];
 
 const SECTION_TITLE_CLASS = "mb-2 font-semibold text-gray-900";
@@ -108,8 +112,8 @@ function generateAngularCode(websiteId: string, apiKey: string): string {
 }
 
 export function WidgetCode() {
-  const websiteId = "mock-website-1";
-  const { data: website, isLoading } = useWebsite(websiteId);
+  const { websiteId } = useParams<{ websiteId: string }>();
+  const { data: website, isLoading } = useWebsite(websiteId || "");
   const navigate = useNavigate();
   const [integrationMethod, setIntegrationMethod] = useState<IntegrationMethod>("script");
   const [snackbar, setSnackbar] = useState<{
@@ -133,6 +137,15 @@ export function WidgetCode() {
   const handleCloseSnackbar = () => {
     setSnackbar({ ...snackbar, open: false });
   };
+
+  // Guard: Ensure websiteId exists (after all hooks)
+  if (!websiteId) {
+    return (
+      <Layout>
+        <Alert severity="error">Website ID is required</Alert>
+      </Layout>
+    );
+  }
 
   // Generate code based on selected method
   const getGeneratedCode = () => {
@@ -169,7 +182,7 @@ export function WidgetCode() {
         message: "Code copied to clipboard!",
         severity: "success",
       });
-    } catch (err) {
+    } catch (_err) {
       setSnackbar({
         open: true,
         message: "Failed to copy code",
@@ -227,7 +240,7 @@ export function WidgetCode() {
       </Box>
 
       {/* Tabs */}
-      <PageTabs tabs={tabs} />
+      <PageTabs tabs={getTabs(websiteId || "")} />
 
       {/* Content */}
       <Box className="max-w-7xl mx-auto px-page md:px-6 lg:px-8 py-8 space-y-6">

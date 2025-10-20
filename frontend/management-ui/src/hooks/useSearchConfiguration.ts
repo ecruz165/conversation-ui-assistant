@@ -1,12 +1,16 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "~/api/service";
 import { mockConfig } from "~/config";
+import type { Website } from "~/types";
 
 export interface UpdateSearchConfigurationData {
-  defaultModalityWeights: {
-    text: number;
-    visual: number;
-    metadata: number;
+  weights: {
+    functionality: number;
+    content: number;
+    purpose: number;
+    action: number;
+    dataContext: number;
+    userTask: number;
   };
   description?: string;
 }
@@ -40,12 +44,12 @@ export function useUpdateSearchConfiguration(websiteId: string) {
         : api.updateSearchConfiguration(websiteId, data),
     onSuccess: (_, variables) => {
       // Update the website cache with new search configuration
-      queryClient.setQueryData(["website", websiteId], (oldData: any) => {
+      queryClient.setQueryData(["website", websiteId], (oldData: Website | undefined) => {
         if (!oldData) return oldData;
         return {
           ...oldData,
           searchConfiguration: {
-            defaultModalityWeights: variables.defaultModalityWeights,
+            weights: variables.weights,
             description: variables.description,
             updatedAt: new Date().toISOString(),
           },

@@ -2,7 +2,7 @@ import { useMutation } from "@tanstack/react-query";
 import { api } from "~/api/service";
 import { mockConfig } from "~/config";
 import { mockApi } from "~/mocks/api";
-import type { EmbeddingTestQuery, EmbeddingTestResult } from "~/types";
+import type { EmbeddingTestQuery } from "~/types";
 
 interface UseEmbeddingTestParams {
   websiteId: string;

@@ -1,7 +1,7 @@
-import { AnimatePresence, motion } from "motion/react";
 import { Bot, Loader2, User } from "lucide-react";
+import { AnimatePresence, motion } from "motion/react";
 import type React from "react";
-import { useEffect, useRef } from "react";
+import { memo, useEffect, useRef } from "react";
 import type { Message, Theme } from "../types";
 
 interface MessageListProps {
@@ -11,21 +11,18 @@ interface MessageListProps {
 }
 
 /**
- * Component for displaying a list of chat messages
+ * Helper function to format timestamp
  */
-const MessageList: React.FC<MessageListProps> = ({ messages, isLoading, theme }) => {
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+const formatTime = (timestamp: Date) => {
+  return timestamp.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+};
 
-  // Auto-scroll to bottom when new messages arrive
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages, isLoading]);
-
-  const formatTime = (timestamp: Date) => {
-    return timestamp.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-  };
-
-  const MessageBubble: React.FC<{ message: Message; index: number }> = ({ message, index }) => {
+/**
+ * Message bubble component (extracted to prevent recreation on every render)
+ * Memoized with custom comparison to avoid unnecessary re-renders
+ */
+const MessageBubble = memo<{ message: Message; index: number; theme: Theme }>(
+  ({ message, index, theme }) => {
     const isUser = message.sender === "user";
     const isError = message.type === "error";
 
@@ -164,26 +161,36 @@ const MessageList: React.FC<MessageListProps> = ({ messages, isLoading, theme })
                     >
                       Suggestions:
                     </div>
-                    {message.metadata.suggestions.map((suggestion, idx) => (
-                      <div
-                        key={idx}
-                        style={{
-                          fontSize: theme.typography.fontSize.xs,
-                          opacity: 0.9,
-                          padding: "2px 6px",
-                          backgroundColor: "rgba(255, 255, 255, 0.1)",
-                          borderRadius: "4px",
-                          marginBottom: "2px",
-                          cursor: "pointer",
-                        }}
-                        onClick={() => {
-                          // Handle suggestion click - could emit an event or call a callback
-                          console.log("Suggestion clicked:", suggestion);
-                        }}
-                      >
-                        • {suggestion}
-                      </div>
-                    ))}
+                    {message.metadata.suggestions.map((suggestion, idx) => {
+                      const handleSuggestionClick = () => {
+                        // Handle suggestion click - could emit an event or call a callback
+                        console.log("Suggestion clicked:", suggestion);
+                      };
+
+                      return (
+                        <button
+                          key={`${message.id}-suggestion-${idx}-${suggestion}`}
+                          type="button"
+                          style={{
+                            fontSize: theme.typography.fontSize.xs,
+                            opacity: 0.9,
+                            padding: "2px 6px",
+                            backgroundColor: "rgba(255, 255, 255, 0.1)",
+                            borderRadius: "4px",
+                            marginBottom: "2px",
+                            cursor: "pointer",
+                            border: "none",
+                            color: "inherit",
+                            display: "block",
+                            textAlign: "left",
+                            width: "100%",
+                          }}
+                          onClick={handleSuggestionClick}
+                        >
+                          • {suggestion}
+                        </button>
+                      );
+                    })}
                   </div>
                 )}
               </div>
@@ -192,78 +199,103 @@ const MessageList: React.FC<MessageListProps> = ({ messages, isLoading, theme })
         </div>
       </motion.div>
     );
-  };
+  },
+  (prevProps, nextProps) => {
+    // Only re-render if message ID or theme changes
+    return prevProps.message.id === nextProps.message.id && prevProps.theme === nextProps.theme;
+  }
+);
 
-  const LoadingIndicator: React.FC = () => (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -20 }}
+MessageBubble.displayName = "MessageBubble";
+
+/**
+ * Loading indicator component (extracted to prevent recreation on every render)
+ * Memoized to avoid unnecessary re-renders
+ */
+const LoadingIndicator = memo<{ theme: Theme }>(({ theme }) => (
+  <motion.div
+    initial={{ opacity: 0, y: 20 }}
+    animate={{ opacity: 1, y: 0 }}
+    exit={{ opacity: 0, y: -20 }}
+    style={{
+      display: "flex",
+      justifyContent: "flex-start",
+      marginBottom: theme.spacing.sm,
+      padding: `0 ${theme.spacing.md}`,
+    }}
+  >
+    <div
       style={{
         display: "flex",
-        justifyContent: "flex-start",
-        marginBottom: theme.spacing.sm,
-        padding: `0 ${theme.spacing.md}`,
+        alignItems: "flex-start",
+        gap: theme.spacing.xs,
       }}
     >
+      {/* Bot Avatar */}
       <div
         style={{
+          width: "32px",
+          height: "32px",
+          borderRadius: "50%",
+          backgroundColor: theme.colors.secondary,
           display: "flex",
-          alignItems: "flex-start",
+          alignItems: "center",
+          justifyContent: "center",
+          flexShrink: 0,
+          marginTop: "2px",
+        }}
+      >
+        <Bot size={16} color="white" />
+      </div>
+
+      {/* Loading bubble */}
+      <div
+        style={{
+          backgroundColor: theme.colors.surface,
+          color: theme.colors.text,
+          padding: `${theme.spacing.sm} ${theme.spacing.md}`,
+          borderRadius: theme.borderRadius,
+          boxShadow: theme.shadows.sm,
+          position: "relative",
+          display: "flex",
+          alignItems: "center",
           gap: theme.spacing.xs,
         }}
       >
-        {/* Bot Avatar */}
+        {/* Message bubble arrow */}
         <div
           style={{
-            width: "32px",
-            height: "32px",
-            borderRadius: "50%",
-            backgroundColor: theme.colors.secondary,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            flexShrink: 0,
-            marginTop: "2px",
+            position: "absolute",
+            top: "12px",
+            left: "-6px",
+            width: "0",
+            height: "0",
+            borderTop: `6px solid ${theme.colors.surface}`,
+            borderRight: "6px solid transparent",
+            borderBottom: "6px solid transparent",
           }}
-        >
-          <Bot size={16} color="white" />
-        </div>
+        />
 
-        {/* Loading bubble */}
-        <div
-          style={{
-            backgroundColor: theme.colors.surface,
-            color: theme.colors.text,
-            padding: `${theme.spacing.sm} ${theme.spacing.md}`,
-            borderRadius: theme.borderRadius,
-            boxShadow: theme.shadows.sm,
-            position: "relative",
-            display: "flex",
-            alignItems: "center",
-            gap: theme.spacing.xs,
-          }}
-        >
-          {/* Message bubble arrow */}
-          <div
-            style={{
-              position: "absolute",
-              top: "12px",
-              left: "-6px",
-              width: "0",
-              height: "0",
-              borderTop: `6px solid ${theme.colors.surface}`,
-              borderRight: "6px solid transparent",
-              borderBottom: "6px solid transparent",
-            }}
-          />
-
-          <Loader2 size={16} className="animate-spin" />
-          <span style={{ fontSize: theme.typography.fontSize.sm }}>Thinking...</span>
-        </div>
+        <Loader2 size={16} className="animate-spin" />
+        <span style={{ fontSize: theme.typography.fontSize.sm }}>Thinking...</span>
       </div>
-    </motion.div>
-  );
+    </div>
+  </motion.div>
+));
+
+LoadingIndicator.displayName = "LoadingIndicator";
+
+/**
+ * Component for displaying a list of chat messages
+ * Optimized with memoized child components for better performance
+ */
+const MessageList: React.FC<MessageListProps> = ({ messages, isLoading, theme }) => {
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Auto-scroll to bottom when new messages arrive
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, []);
 
   return (
     <div
@@ -294,12 +326,12 @@ const MessageList: React.FC<MessageListProps> = ({ messages, isLoading, theme })
       {/* Messages */}
       <AnimatePresence>
         {messages.map((message, index) => (
-          <MessageBubble key={message.id} message={message} index={index} />
+          <MessageBubble key={message.id} message={message} index={index} theme={theme} />
         ))}
       </AnimatePresence>
 
       {/* Loading indicator */}
-      <AnimatePresence>{isLoading && <LoadingIndicator />}</AnimatePresence>
+      <AnimatePresence>{isLoading && <LoadingIndicator theme={theme} />}</AnimatePresence>
 
       {/* Scroll anchor */}
       <div ref={messagesEndRef} />

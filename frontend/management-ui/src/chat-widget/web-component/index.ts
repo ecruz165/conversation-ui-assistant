@@ -16,19 +16,24 @@ export type * from "../types";
 // Re-export for module usage
 export { default as ChatWidgetElement } from "./ChatWidgetElement";
 
+// Extend Window interface for type safety
+declare global {
+  interface Window {
+    ChatWidgetElement?: typeof ChatWidgetElement;
+    createChatWidget?: (container: HTMLElement, props?: Record<string, string>) => Element;
+  }
+}
+
 // The web component is automatically registered when this module loads
 // due to the customElements.define() call in ChatWidgetElement.ts
 
 // For debugging and introspection
 if (typeof window !== "undefined") {
   // Make the component class available globally for debugging
-  (window as any).ChatWidgetElement = ChatWidgetElement;
+  window.ChatWidgetElement = ChatWidgetElement;
 
   // Add a simple API to create widgets programmatically
-  (window as any).createChatWidget = (
-    container: HTMLElement,
-    props: Record<string, string> = {}
-  ) => {
+  window.createChatWidget = (container: HTMLElement, props: Record<string, string> = {}) => {
     const widget = document.createElement("chat-widget");
 
     // Set attributes from props

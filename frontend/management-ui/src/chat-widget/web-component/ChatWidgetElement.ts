@@ -54,7 +54,7 @@ class ChatWidgetElement extends HTMLElement {
     }
   }
 
-  attributeChangedCallback(name: string, oldValue: string | null, newValue: string | null): void {
+  attributeChangedCallback(_name: string, oldValue: string | null, newValue: string | null): void {
     if (oldValue !== newValue) {
       this.render();
     }
@@ -69,9 +69,9 @@ class ChatWidgetElement extends HTMLElement {
         this.getAttribute("welcome-message") ||
         "Hi! I'm here to help you navigate. What are you looking for?",
       placeholder: this.getAttribute("placeholder") || "Ask me anything...",
-      maxHeight: Number.parseInt(this.getAttribute("max-height") || "500"),
-      width: Number.parseInt(this.getAttribute("width") || "350"),
-      zIndex: Number.parseInt(this.getAttribute("z-index") || "1000"),
+      maxHeight: Number.parseInt(this.getAttribute("max-height") || "500", 10),
+      width: Number.parseInt(this.getAttribute("width") || "350", 10),
+      zIndex: Number.parseInt(this.getAttribute("z-index") || "1000", 10),
       onNavigationAction: (action) => {
         // Dispatch custom event for navigation actions
         this.dispatchEvent(
@@ -132,20 +132,18 @@ class ChatWidgetElement extends HTMLElement {
     }
 
     const apiEndpoint = this.getAttribute("api-endpoint") || "http://localhost:8080";
-    const websocketUrl = this.getAttribute("websocket-url");
+    const websocketUrl = this.getAttribute("websocket-url") ?? undefined;
     const props = this.getProps();
 
     // Render React component inside web component
     this.root.render(
-      React.createElement(
-        ConversationProvider,
-        {
-          apiEndpoint,
-          websocketUrl,
-          onError: props.onError,
-        },
-        React.createElement(ChatWidget, props)
-      )
+      React.createElement(ConversationProvider, {
+        apiEndpoint,
+        websocketUrl,
+        onError: props.onError,
+        // biome-ignore lint/correctness/noChildrenProp: React.createElement requires children as prop for TypeScript compatibility
+        children: React.createElement(ChatWidget, props),
+      })
     );
   }
 }

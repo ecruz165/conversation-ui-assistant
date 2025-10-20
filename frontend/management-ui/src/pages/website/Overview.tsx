@@ -17,8 +17,8 @@ import {
   Typography,
 } from "@mui/material";
 import { useQueryClient } from "@tanstack/react-query";
-import React, { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { api } from "~/api/service";
 import { ErrorBoundary } from "~/components/ErrorBoundary";
 import { Layout } from "~/components/Layout";
@@ -33,20 +33,23 @@ import { useWebsite } from "~/hooks/useWebsite";
 import { mockApi } from "~/mocks/api";
 import type { Website } from "~/types";
 
-const tabs = [
-  { label: "Overview", value: "overview", path: "/website/overview" },
-  { label: "Crawl Management", value: "crawl-management", path: "/website/crawl-management" },
-  { label: "Link Management", value: "links", path: "/website/links" },
-  { label: "Embeddings Tester", value: "embedding-test", path: "/website/embedding-test" },
-  { label: "Widget Code", value: "code", path: "/website/code" },
+const getTabs = (websiteId: string) => [
+  { label: "Overview", value: "overview", path: `/${websiteId}/overview` },
+  { label: "Crawl Management", value: "crawl-management", path: `/${websiteId}/crawl-management` },
+  { label: "Link Management", value: "link-management", path: `/${websiteId}/link-management` },
+  {
+    label: "Embeddings Tester",
+    value: "embeddings-tester",
+    path: `/${websiteId}/embeddings-tester`,
+  },
+  { label: "Widget Code", value: "widget-code", path: `/${websiteId}/widget-code` },
 ];
 
 const ACTION_BUTTON_STYLE = { minWidth: 192 };
 
 export function WebsiteOverview() {
-  // For now, use the first mock website ID
-  const websiteId = "mock-website-1";
-  const { data: website, isLoading } = useWebsite(websiteId);
+  const { websiteId } = useParams<{ websiteId: string }>();
+  const { data: website, isLoading } = useWebsite(websiteId || "");
   const { data: metrics } = useSystemMetrics();
   const [isEditing, setIsEditing] = useState(false);
   const [showAppKey, setShowAppKey] = useState(false);
@@ -56,7 +59,7 @@ export function WebsiteOverview() {
 
   // Prefetch navigation links for faster navigation to Link Management tab
   useEffect(() => {
-    if (website) {
+    if (website && websiteId) {
       queryClient.prefetchQuery({
         queryKey: ["navigationLinks", websiteId],
         queryFn: () =>
@@ -143,12 +146,15 @@ export function WebsiteOverview() {
         {/* Page Title */}
         <Box className="bg-gradient-to-r from-primary-700 to-primary-900 px-page md:px-6 lg:px-8 py-12">
           <Box className="max-w-7xl mx-auto">
-            <PageTitle title={`Edit ${website.name}`} subtitle={website.domains.primary} />
+            <PageTitle
+              title={`Edit ${website?.name || "Website"}`}
+              subtitle={website?.domains?.primary || ""}
+            />
           </Box>
         </Box>
 
         {/* Tabs */}
-        <PageTabs tabs={tabs} />
+        <PageTabs tabs={getTabs(websiteId || "")} />
 
         {/* Edit Form */}
         <WebsiteRegistrationForm
@@ -186,7 +192,7 @@ export function WebsiteOverview() {
         </Box>
 
         {/* Tabs */}
-        <PageTabs tabs={tabs} />
+        <PageTabs tabs={getTabs(websiteId || "")} />
 
         {/* Content */}
         <Box className="max-w-7xl mx-auto px-page md:px-6 lg:px-8 py-8 space-y-6">
@@ -223,7 +229,7 @@ export function WebsiteOverview() {
                 >
                   <Box>
                     <MetricCard
-                      label={`Crawl Status: ${website?.crawlStatus?.status === "completed" ? "Success" : website?.crawlStatus?.status || "Pending"}`}
+                      label="Last Successful Crawl"
                       value={
                         website?.crawlStatus?.lastCrawl
                           ? (() => {
@@ -415,7 +421,7 @@ export function WebsiteOverview() {
                       <div className="h-8 bg-gray-200 rounded w-28 animate-pulse"></div>
                     ) : (
                       <Typography variant="body1" className="text-gray-900 h-8 flex items-center">
-                        {website.contact.phone}
+                        {website?.contact?.phone}
                       </Typography>
                     )}
                   </Box>
@@ -429,7 +435,7 @@ export function WebsiteOverview() {
                       <div className="h-8 bg-gray-200 rounded w-36 animate-pulse"></div>
                     ) : (
                       <Typography variant="body1" className="text-gray-900 h-8 flex items-center">
-                        {website.contact.department}
+                        {website?.contact?.department}
                       </Typography>
                     )}
                   </Box>
@@ -473,7 +479,7 @@ export function WebsiteOverview() {
               <Button
                 variant="outlined"
                 component={Link}
-                to="/website/embedding-test"
+                to={`/${websiteId}/embeddings-tester`}
                 sx={ACTION_BUTTON_STYLE}
               >
                 Test & Configure

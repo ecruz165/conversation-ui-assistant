@@ -14,7 +14,6 @@ import {
   CardContent,
   Chip,
   CircularProgress,
-  Divider,
   FormControl,
   IconButton,
   InputLabel,
@@ -25,25 +24,29 @@ import {
   Typography,
 } from "@mui/material";
 import React, { useCallback, useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { Layout } from "~/components/Layout";
 import { PageTabs } from "~/components/PageTabs";
 import { PageTitle } from "~/components/PageTitle";
 import { useAnalysisJobStatus, useUploadScreenshot } from "~/hooks/useScreenshotAnalysis";
 import { useWebsite } from "~/hooks/useWebsite";
-import type { PageRegion, ScreenshotAnalysisResult } from "~/types";
+import type { PageRegion } from "~/types";
 
-const tabs = [
-  { label: "Overview", value: "overview", path: "/website/overview" },
-  { label: "Crawl Management", value: "crawl-management", path: "/website/crawl-management" },
-  { label: "Link Management", value: "links", path: "/website/links" },
-  { label: "Embeddings Tester", value: "embedding-test", path: "/website/embedding-test" },
+const getTabs = (websiteId: string) => [
+  { label: "Overview", value: "overview", path: `/${websiteId}/overview` },
+  { label: "Crawl Management", value: "crawl-management", path: `/${websiteId}/crawl-management` },
+  { label: "Link Management", value: "link-management", path: `/${websiteId}/link-management` },
+  {
+    label: "Embeddings Tester",
+    value: "embeddings-tester",
+    path: `/${websiteId}/embeddings-tester`,
+  },
   {
     label: "Screenshot Analysis",
     value: "screenshot-analysis",
-    path: "/website/screenshot-analysis",
+    path: `/${websiteId}/screenshot-analysis`,
   },
-  { label: "Widget Code", value: "code", path: "/website/code" },
+  { label: "Widget Code", value: "widget-code", path: `/${websiteId}/widget-code` },
 ];
 
 // Region Overlay Component - highlights detected regions on screenshot
@@ -54,7 +57,7 @@ interface RegionOverlayProps {
   onRegionClick?: (region: PageRegion) => void;
 }
 
-function RegionOverlay({ regions, imageWidth, imageHeight, onRegionClick }: RegionOverlayProps) {
+function _RegionOverlay({ regions, imageWidth, imageHeight, onRegionClick }: RegionOverlayProps) {
   return (
     <Box sx={{ position: "relative", display: "inline-block" }}>
       {regions.map((region) => (
@@ -180,8 +183,8 @@ function FileUploadZone({ onFileSelect, disabled }: FileUploadZoneProps) {
 }
 
 export function ScreenshotAnalysis() {
-  const websiteId = "mock-website-1";
-  const { data: website, isLoading: websiteLoading } = useWebsite(websiteId);
+  const { websiteId } = useParams<{ websiteId: string }>();
+  const { data: website, isLoading: websiteLoading } = useWebsite(websiteId || "");
   const navigate = useNavigate();
 
   // State
@@ -191,12 +194,12 @@ export function ScreenshotAnalysis() {
     "gpt-4-vision"
   );
   const [analysisId, setAnalysisId] = useState<string | null>(null);
-  const [selectedRegion, setSelectedRegion] = useState<PageRegion | null>(null);
+  const [_selectedRegion, setSelectedRegion] = useState<PageRegion | null>(null);
 
   // Hooks
-  const uploadMutation = useUploadScreenshot(websiteId);
+  const uploadMutation = useUploadScreenshot(websiteId || "");
   const { data: analysisResult, isLoading: isAnalyzing } = useAnalysisJobStatus(
-    websiteId,
+    websiteId || "",
     analysisId
   );
 
@@ -216,7 +219,7 @@ export function ScreenshotAnalysis() {
 
   // Handle screenshot upload and analysis
   const handleAnalyze = async () => {
-    if (!selectedFile) return;
+    if (!selectedFile || !websiteId) return;
 
     // Convert file to base64
     const reader = new FileReader();
@@ -257,6 +260,15 @@ export function ScreenshotAnalysis() {
   const handleClose = () => {
     navigate("/");
   };
+
+  // Guard: Ensure websiteId exists (after all hooks)
+  if (!websiteId) {
+    return (
+      <Layout>
+        <Alert severity="error">Website ID is required</Alert>
+      </Layout>
+    );
+  }
 
   if (websiteLoading) {
     return (
@@ -307,7 +319,7 @@ export function ScreenshotAnalysis() {
       </Box>
 
       {/* Tabs */}
-      <PageTabs tabs={tabs} />
+      <PageTabs tabs={getTabs(websiteId || "")} />
 
       {/* Content */}
       <Box className="max-w-7xl mx-auto px-page md:px-6 lg:px-8 py-8 space-y-6">
@@ -498,8 +510,8 @@ export function ScreenshotAnalysis() {
                         Headings ({analysisResult.textContent.headings.length})
                       </Typography>
                       <Box className="flex flex-wrap gap-2">
-                        {analysisResult.textContent.headings.map((heading, idx) => (
-                          <Chip key={idx} label={heading} variant="outlined" size="small" />
+                        {analysisResult.textContent.headings.map((heading) => (
+                          <Chip key={heading} label={heading} variant="outlined" size="small" />
                         ))}
                       </Box>
                     </Box>
@@ -510,8 +522,8 @@ export function ScreenshotAnalysis() {
                         Buttons ({analysisResult.textContent.buttons.length})
                       </Typography>
                       <Box className="flex flex-wrap gap-2">
-                        {analysisResult.textContent.buttons.map((button, idx) => (
-                          <Chip key={idx} label={button} color="primary" size="small" />
+                        {analysisResult.textContent.buttons.map((button) => (
+                          <Chip key={button} label={button} color="primary" size="small" />
                         ))}
                       </Box>
                     </Box>
@@ -541,9 +553,9 @@ export function ScreenshotAnalysis() {
                         Color Palette
                       </Typography>
                       <Box className="flex gap-2">
-                        {analysisResult.visualSummary.colorPalette.map((color, idx) => (
+                        {analysisResult.visualSummary.colorPalette.map((color) => (
                           <Box
-                            key={idx}
+                            key={color}
                             sx={{
                               width: 48,
                               height: 48,
@@ -573,3 +585,5 @@ export function ScreenshotAnalysis() {
     </Layout>
   );
 }
+
+export default ScreenshotAnalysis;

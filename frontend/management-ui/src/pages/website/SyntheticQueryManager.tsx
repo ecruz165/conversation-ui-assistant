@@ -42,6 +42,7 @@ import {
   Typography,
 } from "@mui/material";
 import { useState } from "react";
+import { useParams } from "react-router-dom";
 import {
   useGenerateSyntheticQueries,
   useSyntheticQueries,
@@ -50,7 +51,7 @@ import {
 import type { QueryType, SyntheticQuery } from "~/types";
 
 export function SyntheticQueryManager() {
-  const websiteId = "website-1"; // This should come from route params in real app
+  const { websiteId } = useParams<{ websiteId: string }>();
 
   // State management
   const [filterStatus, setFilterStatus] = useState<"all" | "validated" | "unvalidated">("all");
@@ -73,9 +74,9 @@ export function SyntheticQueryManager() {
   const [generatePageId, setGeneratePageId] = useState<string>("");
 
   // Hooks
-  const { data: queries = [], isLoading, refetch } = useSyntheticQueries(websiteId);
-  const generateMutation = useGenerateSyntheticQueries(websiteId);
-  const validateMutation = useValidateSyntheticQuery(websiteId);
+  const { data: queries = [], isLoading, refetch } = useSyntheticQueries(websiteId || "");
+  const generateMutation = useGenerateSyntheticQueries(websiteId || "");
+  const validateMutation = useValidateSyntheticQuery(websiteId || "");
 
   // Filter queries
   const filteredQueries = queries.filter((q) => {
@@ -597,7 +598,7 @@ export function SyntheticQueryManager() {
               type="number"
               label="Number of Queries"
               value={generateCount}
-              onChange={(e) => setGenerateCount(Number.parseInt(e.target.value))}
+              onChange={(e) => setGenerateCount(Number.parseInt(e.target.value, 10))}
               inputProps={{ min: 1, max: 50 }}
               helperText="Generate between 1 and 50 queries"
             />

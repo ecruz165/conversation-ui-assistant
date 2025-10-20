@@ -6,7 +6,7 @@ import type { ScreenshotAnalysisRequest, ScreenshotAnalysisResult } from "~/type
 // Mock API functions for development
 const mockApi = {
   uploadScreenshot: async (
-    websiteId: string,
+    _websiteId: string,
     request: ScreenshotAnalysisRequest
   ): Promise<ScreenshotAnalysisResult> => {
     await new Promise((resolve) => setTimeout(resolve, 2000)); // Simulate processing time
@@ -80,13 +80,18 @@ const mockApi = {
 
   getAnalysisStatus: async (
     websiteId: string,
-    analysisId: string
+    _analysisId: string
   ): Promise<ScreenshotAnalysisResult> => {
     await new Promise((resolve) => setTimeout(resolve, 300));
     // Return completed status with mock data
     return mockApi.uploadScreenshot(websiteId, {
       websiteId,
-      analysisOptions: { generateEmbeddings: true, detectRegions: true, extractText: true },
+      analysisOptions: {
+        generateEmbeddings: true,
+        detectRegions: true,
+        extractText: true,
+        analyzeAccessibility: false,
+      },
     });
   },
 
@@ -103,7 +108,12 @@ const mockApi = {
     await new Promise((resolve) => setTimeout(resolve, 500));
     const mockEntry = await mockApi.uploadScreenshot(websiteId, {
       websiteId,
-      analysisOptions: { generateEmbeddings: true, detectRegions: true, extractText: true },
+      analysisOptions: {
+        generateEmbeddings: true,
+        detectRegions: true,
+        extractText: true,
+        analyzeAccessibility: false,
+      },
     });
 
     return {
@@ -125,8 +135,11 @@ export function useUploadScreenshot(websiteId: string) {
         ? mockApi.uploadScreenshot(websiteId, request)
         : api.uploadScreenshotForAnalysis(websiteId, request),
     onSuccess: () => {
-      // Invalidate analysis history when new analysis completes
-      queryClient.invalidateQueries({ queryKey: ["analysisHistory", websiteId] });
+      // Invalidate all analysis history queries for this website (matches any page/pageSize)
+      queryClient.invalidateQueries({
+        queryKey: ["analysisHistory", websiteId],
+        exact: false, // This is the default, but being explicit helps clarity
+      });
     },
     retry: 1,
   });
@@ -138,8 +151,8 @@ export function useAnalysisJobStatus(websiteId: string, analysisId: string | nul
     queryKey: ["analysisJob", websiteId, analysisId],
     queryFn: () =>
       mockConfig.enabled
-        ? mockApi.getAnalysisStatus(websiteId, analysisId!)
-        : api.getAnalysisJobStatus(websiteId, analysisId!),
+        ? mockApi.getAnalysisStatus(websiteId, analysisId ?? "")
+        : api.getAnalysisJobStatus(websiteId, analysisId ?? ""),
     enabled: !!analysisId, // Only run when analysisId is available
     staleTime: 1000 * 60, // 1 minute for status checks
     refetchInterval: (query) => {
@@ -169,7 +182,7 @@ export function useAnalysisVersion(
 ) {
   return useQuery({
     queryKey: ["analysisVersion", websiteId, pageId, version],
-    queryFn: () => api.getAnalysisVersion(websiteId, pageId!, version!),
+    queryFn: () => api.getAnalysisVersion(websiteId, pageId ?? "", version ?? 0),
     enabled: !!pageId && !!version, // Only run when both are available
   });
 }

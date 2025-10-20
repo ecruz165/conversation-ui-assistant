@@ -4,7 +4,7 @@ import {
   Close as CloseIcon,
   Delete as DeleteIcon,
   Edit as EditIcon,
-  Error,
+  Error as ErrorIcon,
   HourglassEmpty,
   Pending,
   Search as SearchIcon,
@@ -16,7 +16,6 @@ import {
   Box,
   Button,
   Checkbox,
-  Chip,
   Dialog,
   DialogActions,
   DialogContent,
@@ -48,18 +47,20 @@ import {
   getFilteredRowModel,
   getGroupedRowModel,
   getSortedRowModel,
+  type Row,
   type RowSelectionState,
   type SortingState,
+  type Table,
   useReactTable,
 } from "@tanstack/react-table";
 import { AnimatePresence, motion } from "motion/react";
-import React, { useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useId, useMemo, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { Layout } from "~/components/Layout";
 import { LinkDetailDialog } from "~/components/LinkDetailDialog";
 import { LinkForm } from "~/components/LinkForm";
-import { useDebounce } from "~/hooks";
 import { PageTabs } from "~/components/PageTabs";
+import { useDebounce } from "~/hooks";
 import {
   useBulkDelete,
   useBulkUpdateActive,
@@ -71,19 +72,25 @@ import { useNavigationLinks } from "~/hooks/useNavigationLinks";
 import { useWebsite } from "~/hooks/useWebsite";
 import type { NavigationLink } from "~/types";
 
-const tabs = [
-  { label: "Overview", value: "overview", path: "/website/overview" },
-  { label: "Crawl Management", value: "crawl-management", path: "/website/crawl-management" },
-  { label: "Link Management", value: "links", path: "/website/links" },
-  { label: "Embeddings Tester", value: "embedding-test", path: "/website/embedding-test" },
-  { label: "Widget Code", value: "code", path: "/website/code" },
+const getTabs = (websiteId: string) => [
+  { label: "Overview", value: "overview", path: `/${websiteId}/overview` },
+  { label: "Crawl Management", value: "crawl-management", path: `/${websiteId}/crawl-management` },
+  { label: "Link Management", value: "link-management", path: `/${websiteId}/link-management` },
+  {
+    label: "Embeddings Tester",
+    value: "embeddings-tester",
+    path: `/${websiteId}/embeddings-tester`,
+  },
+  { label: "Widget Code", value: "widget-code", path: `/${websiteId}/widget-code` },
 ];
 
 export function LinkManagement() {
-  const websiteId = "mock-website-1";
-  const { data: website, isLoading: websiteLoading } = useWebsite(websiteId);
-  const { data: links = [], isLoading: linksLoading } = useNavigationLinks(websiteId);
+  const { websiteId } = useParams<{ websiteId: string }>();
+  const { data: website, isLoading: websiteLoading } = useWebsite(websiteId || "");
+  const { data: links = [], isLoading: linksLoading } = useNavigationLinks(websiteId || "");
   const navigate = useNavigate();
+  const dialogTitleId = useId();
+  const dialogDescriptionId = useId();
 
   const [formOpen, setFormOpen] = useState(false);
   const [detailOpen, setDetailOpen] = useState(false);
@@ -179,7 +186,7 @@ export function LinkManagement() {
       case "pending":
         return <Pending color="info" fontSize="small" />;
       case "failed":
-        return <Error color="error" fontSize="small" />;
+        return <ErrorIcon color="error" fontSize="small" />;
       default:
         return null;
     }
@@ -190,7 +197,7 @@ export function LinkManagement() {
       ? [
           {
             id: "select",
-            header: ({ table }) => (
+            header: ({ table }: { table: Table<NavigationLink> }) => (
               <motion.div
                 initial={{ scale: 0, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
@@ -204,7 +211,7 @@ export function LinkManagement() {
                 />
               </motion.div>
             ),
-            cell: ({ row }) => (
+            cell: ({ row }: { row: Row<NavigationLink> }) => (
               <motion.div
                 initial={{ scale: 0, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
@@ -266,16 +273,19 @@ export function LinkManagement() {
 
         return (
           <Typography variant="body2" className="font-mono text-xs">
-            {parts.map((part, index) => {
+            {parts.map((part) => {
               // Check if this part is a parameter
               if (part.match(/^\{[^}]+\}$/)) {
                 return (
-                  <span key={index} className="font-bold text-primary-600">
+                  <span
+                    key={`param-${part}-${Math.random()}`}
+                    className="font-bold text-primary-600"
+                  >
                     {part}
                   </span>
                 );
               }
-              return <span key={index}>{part}</span>;
+              return <span key={`text-${part}-${Math.random()}`}>{part}</span>;
             })}
           </Typography>
         );
@@ -359,7 +369,7 @@ export function LinkManagement() {
     getFilteredRowModel: getFilteredRowModel(),
     getGroupedRowModel: getGroupedRowModel(),
     getExpandedRowModel: getExpandedRowModel(),
-    globalFilterFn: (row, columnId, filterValue) => {
+    globalFilterFn: (row, _columnId, filterValue) => {
       const searchableFields = [row.original.displayName, row.original.targetUrl];
       return searchableFields.some((field) =>
         field?.toLowerCase().includes(filterValue.toLowerCase())
@@ -434,6 +444,15 @@ export function LinkManagement() {
   };
 
   const handleFormSubmit = async (data: Partial<NavigationLink>) => {
+    if (!websiteId) {
+      setSnackbar({
+        open: true,
+        message: "Website ID is required",
+        severity: "error",
+      });
+      return;
+    }
+
     if (editMode && selectedLink) {
       // Update existing link
       updateLink.mutate(
@@ -634,7 +653,7 @@ export function LinkManagement() {
       </Box>
 
       {/* Tabs */}
-      <PageTabs tabs={tabs} />
+      <PageTabs tabs={getTabs(websiteId || "")} />
 
       {/* Content */}
       <Box className="max-w-7xl mx-auto px-page md:px-6 lg:px-8 py-8">
@@ -904,12 +923,12 @@ export function LinkManagement() {
       <Dialog
         open={bulkDeleteDialogOpen}
         onClose={handleBulkDeleteCancel}
-        aria-labelledby="bulk-delete-dialog-title"
-        aria-describedby="bulk-delete-dialog-description"
+        aria-labelledby={dialogTitleId}
+        aria-describedby={dialogDescriptionId}
       >
-        <DialogTitle id="bulk-delete-dialog-title">Confirm Bulk Delete</DialogTitle>
+        <DialogTitle id={dialogTitleId}>Confirm Bulk Delete</DialogTitle>
         <DialogContent>
-          <DialogContentText id="bulk-delete-dialog-description">
+          <DialogContentText id={dialogDescriptionId}>
             Are you sure you want to delete {selectedCount} selected{" "}
             {selectedCount === 1 ? "link" : "links"}? This action cannot be undone.
           </DialogContentText>

@@ -104,7 +104,7 @@ const darkTheme: Theme = {
 export const getTheme = (themeType: string): Theme => {
   if (themeType === "auto") {
     // Check system preference
-    if (typeof window !== "undefined" && window.matchMedia) {
+    if (window?.matchMedia) {
       const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
       return prefersDark ? darkTheme : lightTheme;
     }

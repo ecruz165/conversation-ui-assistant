@@ -2,7 +2,7 @@ import { Accessibility, IntegrationInstructions, Navigation } from "@mui/icons-m
 import { CssBaseline } from "@mui/material";
 import { ThemeProvider } from "@mui/material/styles";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import React, { lazy, Suspense } from "react";
+import { lazy, Suspense } from "react";
 import { Link, Route, BrowserRouter as Router, Routes } from "react-router-dom";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import { Layout } from "./components/Layout";
@@ -46,12 +46,12 @@ function App() {
           <Routes>
             <Route path="/" element={<LandingPage />} />
             <Route path="/register" element={<RegisterWebsite />} />
-            <Route path="/website/overview" element={<WebsiteOverview />} />
-            <Route path="/website/links" element={<LinkManagement />} />
-            <Route path="/website/code" element={<WidgetCode />} />
-            <Route path="/website/embedding-test" element={<EmbeddingTest />} />
+            <Route path="/:websiteId/overview" element={<WebsiteOverview />} />
+            <Route path="/:websiteId/link-management" element={<LinkManagement />} />
+            <Route path="/:websiteId/widget-code" element={<WidgetCode />} />
+            <Route path="/:websiteId/embeddings-tester" element={<EmbeddingTest />} />
             <Route
-              path="/website/screenshot-analysis"
+              path="/:websiteId/screenshot-analysis"
               element={
                 <ErrorBoundary>
                   <Suspense fallback={<PageSkeleton />}>
@@ -60,9 +60,9 @@ function App() {
                 </ErrorBoundary>
               }
             />
-            <Route path="/website/analysis-history" element={<AnalysisHistoryViewer />} />
-            <Route path="/website/synthetic-queries" element={<SyntheticQueryManager />} />
-            <Route path="/website/crawl-management" element={<CrawlManagement />} />
+            <Route path="/:websiteId/analysis-history" element={<AnalysisHistoryViewer />} />
+            <Route path="/:websiteId/synthetic-queries" element={<SyntheticQueryManager />} />
+            <Route path="/:websiteId/crawl-management" element={<CrawlManagement />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Router>
@@ -143,7 +143,9 @@ function LandingPage() {
               <Link to="/register" className="btn-primary w-full text-center">
                 Register New Website
               </Link>
-              <button className="btn-secondary w-full">View Documentation</button>
+              <button type="button" className="btn-secondary w-full">
+                View Documentation
+              </button>
             </div>
           </div>
         </div>
@@ -163,7 +165,7 @@ function LandingPage() {
                 {websites.map((website) => (
                   <Link
                     key={website.id}
-                    to="/website/overview"
+                    to={`/${website.id}/overview`}
                     className="block p-4 border border-gray-200 rounded-lg hover:border-primary-500 transition-colors no-underline"
                   >
                     <h3 className="text-lg font-semibold text-gray-900">{website.name}</h3>

@@ -2,8 +2,8 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api } from "~/api/service";
 import { mockConfig } from "~/config";
 import type {
-  GenerateSyntheticQueriesData,
   GeneratedQuery,
+  GenerateSyntheticQueriesData,
   QueryType,
   SyntheticQuery,
   ValidateSyntheticQueryData,
@@ -12,7 +12,7 @@ import type {
 
 // Mock API for synthetic queries
 const mockApi = {
-  getSyntheticQueries: async (websiteId: string, pageId?: string): Promise<SyntheticQuery[]> => {
+  getSyntheticQueries: async (_websiteId: string, pageId?: string): Promise<SyntheticQuery[]> => {
     await new Promise((resolve) => setTimeout(resolve, 500));
 
     const allQueries: SyntheticQuery[] = [
@@ -96,7 +96,7 @@ const mockApi = {
   },
 
   generateSyntheticQueries: async (
-    websiteId: string,
+    _websiteId: string,
     data: GenerateSyntheticQueriesData
   ): Promise<GeneratedQuery[]> => {
     await new Promise((resolve) => setTimeout(resolve, 2000)); // Simulate AI generation time
@@ -138,7 +138,7 @@ const mockApi = {
   },
 
   validateSyntheticQuery: async (
-    websiteId: string,
+    _websiteId: string,
     data: ValidateSyntheticQueryData
   ): Promise<ValidateSyntheticQueryResult> => {
     await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -185,7 +185,7 @@ export function useGenerateSyntheticQueries(websiteId: string) {
       mockConfig.enabled
         ? mockApi.generateSyntheticQueries(websiteId, data)
         : api.generateSyntheticQueries(websiteId, data),
-    onSuccess: (data, variables) => {
+    onSuccess: (_data, variables) => {
       // Invalidate queries list to refetch with new generated queries
       queryClient.invalidateQueries({
         queryKey: ["syntheticQueries", websiteId, variables.pageId],

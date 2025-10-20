@@ -23,7 +23,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
 import type { Website } from "~/types";
 
@@ -131,7 +131,7 @@ export function WebsiteRegistrationForm({
       const saved = localStorage.getItem(FORM_STORAGE_KEY);
       if (saved) {
         try {
-          const data = JSON.parse(saved);
+          const _data = JSON.parse(saved);
           // Reset form with saved data (React Hook Form will handle this internally)
         } catch (e) {
           console.error("Failed to load saved form data", e);
@@ -504,7 +504,7 @@ export function WebsiteRegistrationForm({
                                 render={({ field: radioField }) => (
                                   <Radio
                                     checked={radioField.value}
-                                    onChange={(e) => {
+                                    onChange={(_e) => {
                                       // Set all domains to inactive first
                                       fields.forEach((_, i) => {
                                         setValue(
