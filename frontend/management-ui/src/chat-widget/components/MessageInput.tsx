@@ -1,5 +1,5 @@
 import { Mic, MicOff, Send } from "lucide-react";
-import React, { type KeyboardEvent, useEffect, useRef, useState } from "react";
+import React, { type KeyboardEvent, useCallback, useEffect, useRef, useState } from "react";
 import type { Theme } from "../types";
 
 interface MessageInputProps {
@@ -101,7 +101,7 @@ const MessageInput: React.FC<MessageInputProps> = ({
     }
   };
 
-  const stopAudioRecording = () => {
+  const stopAudioRecording = useCallback(() => {
     if (mediaRecorderRef.current && mediaRecorderRef.current.state === "recording") {
       mediaRecorderRef.current.stop();
     }
@@ -111,7 +111,7 @@ const MessageInput: React.FC<MessageInputProps> = ({
       }
       streamRef.current = null;
     }
-  };
+  }, []);
 
   // Initialize speech recognition
   useEffect(() => {

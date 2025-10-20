@@ -121,7 +121,7 @@ export const useConversation = (
   }, [websocketUrl]);
 
   // Convert blob to base64
-  const blobToBase64 = (blob: Blob): Promise<string> => {
+  const blobToBase64 = useCallback((blob: Blob): Promise<string> => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.onload = () => {
@@ -133,7 +133,7 @@ export const useConversation = (
       reader.onerror = reject;
       reader.readAsDataURL(blob);
     });
-  };
+  }, []);
 
   // Send message via WebSocket
   const sendMessage = useCallback(
