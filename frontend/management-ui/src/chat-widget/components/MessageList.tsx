@@ -23,178 +23,182 @@ const formatTime = (timestamp: Date) => {
  */
 const MessageBubble = memo<{ message: Message; index: number; theme: Theme }>(
   ({ message, index, theme }) => {
-  const isUser = message.sender === "user";
-  const isError = message.type === "error";
+    const isUser = message.sender === "user";
+    const isError = message.type === "error";
 
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -20 }}
-      transition={{ duration: 0.3, delay: index * 0.1 }}
-      style={{
-        display: "flex",
-        justifyContent: isUser ? "flex-end" : "flex-start",
-        marginBottom: theme.spacing.sm,
-        padding: `0 ${theme.spacing.md}`,
-      }}
-    >
-      <div
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -20 }}
+        transition={{ duration: 0.3, delay: index * 0.1 }}
         style={{
           display: "flex",
-          alignItems: "flex-start",
-          gap: theme.spacing.xs,
-          maxWidth: "80%",
-          flexDirection: isUser ? "row-reverse" : "row",
+          justifyContent: isUser ? "flex-end" : "flex-start",
+          marginBottom: theme.spacing.sm,
+          padding: `0 ${theme.spacing.md}`,
         }}
       >
-        {/* Avatar */}
         <div
           style={{
-            width: "32px",
-            height: "32px",
-            borderRadius: "50%",
-            backgroundColor: isUser ? theme.colors.primary : theme.colors.secondary,
             display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            flexShrink: 0,
-            marginTop: "2px",
+            alignItems: "flex-start",
+            gap: theme.spacing.xs,
+            maxWidth: "80%",
+            flexDirection: isUser ? "row-reverse" : "row",
           }}
         >
-          {isUser ? <User size={16} color="white" /> : <Bot size={16} color="white" />}
-        </div>
-
-        {/* Message Content */}
-        <div
-          style={{
-            backgroundColor: isError
-              ? theme.colors.error
-              : isUser
-                ? theme.colors.primary
-                : theme.colors.surface,
-            color: isError || isUser ? "white" : theme.colors.text,
-            padding: `${theme.spacing.sm} ${theme.spacing.md}`,
-            borderRadius: theme.borderRadius,
-            boxShadow: theme.shadows.sm,
-            position: "relative",
-            wordBreak: "break-word",
-            fontSize: theme.typography.fontSize.sm,
-            lineHeight: "1.4",
-          }}
-        >
-          {/* Message bubble arrow */}
+          {/* Avatar */}
           <div
             style={{
-              position: "absolute",
-              top: "12px",
-              [isUser ? "right" : "left"]: "-6px",
-              width: "0",
-              height: "0",
-              borderTop: `6px solid ${
-                isError ? theme.colors.error : isUser ? theme.colors.primary : theme.colors.surface
-              }`,
-              borderLeft: isUser ? "6px solid transparent" : "none",
-              borderRight: isUser ? "none" : "6px solid transparent",
-              borderBottom: "6px solid transparent",
-            }}
-          />
-
-          {/* Message text */}
-          <div style={{ marginBottom: theme.spacing.xs }}>{message.content}</div>
-
-          {/* Timestamp and Message Count */}
-          <div
-            style={{
-              fontSize: theme.typography.fontSize.xs,
-              opacity: 0.7,
-              textAlign: isUser ? "right" : "left",
+              width: "32px",
+              height: "32px",
+              borderRadius: "50%",
+              backgroundColor: isUser ? theme.colors.primary : theme.colors.secondary,
               display: "flex",
-              justifyContent: isUser ? "flex-end" : "flex-start",
               alignItems: "center",
-              gap: theme.spacing.xs,
+              justifyContent: "center",
+              flexShrink: 0,
+              marginTop: "2px",
             }}
           >
-            <span>{formatTime(message.timestamp)}</span>
-            {message.messageCount && message.sender === "assistant" && (
-              <span
-                style={{
-                  backgroundColor: "rgba(255, 255, 255, 0.2)",
-                  padding: "2px 6px",
-                  borderRadius: "10px",
-                  fontSize: "10px",
-                  fontWeight: "bold",
-                }}
-              >
-                #{message.messageCount}
-              </span>
-            )}
+            {isUser ? <User size={16} color="white" /> : <Bot size={16} color="white" />}
           </div>
 
-          {/* Metadata (confidence, suggestions, etc.) */}
-          {message.metadata && (
-            <div style={{ marginTop: theme.spacing.xs }}>
-              {message.metadata.confidence && message.metadata.confidence < 0.8 && (
-                <div
+          {/* Message Content */}
+          <div
+            style={{
+              backgroundColor: isError
+                ? theme.colors.error
+                : isUser
+                  ? theme.colors.primary
+                  : theme.colors.surface,
+              color: isError || isUser ? "white" : theme.colors.text,
+              padding: `${theme.spacing.sm} ${theme.spacing.md}`,
+              borderRadius: theme.borderRadius,
+              boxShadow: theme.shadows.sm,
+              position: "relative",
+              wordBreak: "break-word",
+              fontSize: theme.typography.fontSize.sm,
+              lineHeight: "1.4",
+            }}
+          >
+            {/* Message bubble arrow */}
+            <div
+              style={{
+                position: "absolute",
+                top: "12px",
+                [isUser ? "right" : "left"]: "-6px",
+                width: "0",
+                height: "0",
+                borderTop: `6px solid ${
+                  isError
+                    ? theme.colors.error
+                    : isUser
+                      ? theme.colors.primary
+                      : theme.colors.surface
+                }`,
+                borderLeft: isUser ? "6px solid transparent" : "none",
+                borderRight: isUser ? "none" : "6px solid transparent",
+                borderBottom: "6px solid transparent",
+              }}
+            />
+
+            {/* Message text */}
+            <div style={{ marginBottom: theme.spacing.xs }}>{message.content}</div>
+
+            {/* Timestamp and Message Count */}
+            <div
+              style={{
+                fontSize: theme.typography.fontSize.xs,
+                opacity: 0.7,
+                textAlign: isUser ? "right" : "left",
+                display: "flex",
+                justifyContent: isUser ? "flex-end" : "flex-start",
+                alignItems: "center",
+                gap: theme.spacing.xs,
+              }}
+            >
+              <span>{formatTime(message.timestamp)}</span>
+              {message.messageCount && message.sender === "assistant" && (
+                <span
                   style={{
-                    fontSize: theme.typography.fontSize.xs,
-                    opacity: 0.8,
-                    fontStyle: "italic",
+                    backgroundColor: "rgba(255, 255, 255, 0.2)",
+                    padding: "2px 6px",
+                    borderRadius: "10px",
+                    fontSize: "10px",
+                    fontWeight: "bold",
                   }}
                 >
-                  (Low confidence: {Math.round(message.metadata.confidence * 100)}%)
-                </div>
+                  #{message.messageCount}
+                </span>
               )}
+            </div>
 
-              {message.metadata.suggestions && message.metadata.suggestions.length > 0 && (
-                <div style={{ marginTop: theme.spacing.xs }}>
+            {/* Metadata (confidence, suggestions, etc.) */}
+            {message.metadata && (
+              <div style={{ marginTop: theme.spacing.xs }}>
+                {message.metadata.confidence && message.metadata.confidence < 0.8 && (
                   <div
                     style={{
                       fontSize: theme.typography.fontSize.xs,
                       opacity: 0.8,
-                      marginBottom: "4px",
+                      fontStyle: "italic",
                     }}
                   >
-                    Suggestions:
+                    (Low confidence: {Math.round(message.metadata.confidence * 100)}%)
                   </div>
-                  {message.metadata.suggestions.map((suggestion, idx) => {
-                    const handleSuggestionClick = () => {
-                      // Handle suggestion click - could emit an event or call a callback
-                      console.log("Suggestion clicked:", suggestion);
-                    };
+                )}
 
-                    return (
-                      <button
-                        key={`${message.id}-suggestion-${idx}-${suggestion}`}
-                        type="button"
-                        style={{
-                          fontSize: theme.typography.fontSize.xs,
-                          opacity: 0.9,
-                          padding: "2px 6px",
-                          backgroundColor: "rgba(255, 255, 255, 0.1)",
-                          borderRadius: "4px",
-                          marginBottom: "2px",
-                          cursor: "pointer",
-                          border: "none",
-                          color: "inherit",
-                          display: "block",
-                          textAlign: "left",
-                          width: "100%",
-                        }}
-                        onClick={handleSuggestionClick}
-                      >
-                        • {suggestion}
-                      </button>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-          )}
+                {message.metadata.suggestions && message.metadata.suggestions.length > 0 && (
+                  <div style={{ marginTop: theme.spacing.xs }}>
+                    <div
+                      style={{
+                        fontSize: theme.typography.fontSize.xs,
+                        opacity: 0.8,
+                        marginBottom: "4px",
+                      }}
+                    >
+                      Suggestions:
+                    </div>
+                    {message.metadata.suggestions.map((suggestion, idx) => {
+                      const handleSuggestionClick = () => {
+                        // Handle suggestion click - could emit an event or call a callback
+                        console.log("Suggestion clicked:", suggestion);
+                      };
+
+                      return (
+                        <button
+                          key={`${message.id}-suggestion-${idx}-${suggestion}`}
+                          type="button"
+                          style={{
+                            fontSize: theme.typography.fontSize.xs,
+                            opacity: 0.9,
+                            padding: "2px 6px",
+                            backgroundColor: "rgba(255, 255, 255, 0.1)",
+                            borderRadius: "4px",
+                            marginBottom: "2px",
+                            cursor: "pointer",
+                            border: "none",
+                            color: "inherit",
+                            display: "block",
+                            textAlign: "left",
+                            width: "100%",
+                          }}
+                          onClick={handleSuggestionClick}
+                        >
+                          • {suggestion}
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
         </div>
-      </div>
-    </motion.div>
-  );
+      </motion.div>
+    );
   },
   (prevProps, nextProps) => {
     // Only re-render if message ID or theme changes

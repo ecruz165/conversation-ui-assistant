@@ -186,9 +186,9 @@ export function LinkDetailDialog({ open, onClose, link, onEdit }: LinkDetailDial
     // Quality score based on dimensionality
     // Higher dimensions generally indicate better quality embeddings
     if (embeddingLength >= 1536) return 0.95; // OpenAI ada-002 or similar high-quality
-    if (embeddingLength >= 768) return 0.85;  // BERT-style models
-    if (embeddingLength >= 384) return 0.75;  // Smaller but still good
-    if (embeddingLength >= 128) return 0.65;  // Minimal quality
+    if (embeddingLength >= 768) return 0.85; // BERT-style models
+    if (embeddingLength >= 384) return 0.75; // Smaller but still good
+    if (embeddingLength >= 128) return 0.65; // Minimal quality
     return 0.5; // Very low dimension, questionable quality
   };
 

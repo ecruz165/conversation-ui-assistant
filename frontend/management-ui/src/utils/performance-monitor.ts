@@ -55,9 +55,7 @@ export const measureComponentPerformance = (componentName: string): (() => void)
 
           // Log slow renders (> 16ms = potential 60fps issue)
           if (measure.duration > 16) {
-            console.warn(
-              `⚠️ Slow render: ${componentName} took ${measure.duration.toFixed(2)}ms`
-            );
+            console.warn(`⚠️ Slow render: ${componentName} took ${measure.duration.toFixed(2)}ms`);
           }
 
           // Cleanup performance marks

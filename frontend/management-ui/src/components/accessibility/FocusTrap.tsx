@@ -12,11 +12,7 @@ interface FocusTrapProps {
  * Useful for modals, dropdowns, and other overlay components
  * Automatically returns focus to the element that triggered the trap when deactivated
  */
-export const FocusTrap: React.FC<FocusTrapProps> = ({
-  children,
-  active = true,
-  onEscape,
-}) => {
+export const FocusTrap: React.FC<FocusTrapProps> = ({ children, active = true, onEscape }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const previousActiveElement = useRef<HTMLElement | null>(null);
 

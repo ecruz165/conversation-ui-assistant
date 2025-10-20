@@ -1,6 +1,6 @@
-import { describe, test, expect } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { describe, expect, test } from "vitest";
 import { AccessibleButton } from "~/components/accessibility/AccessibleButton";
 import { InteractiveDiv } from "~/components/accessibility/InteractiveDiv";
 

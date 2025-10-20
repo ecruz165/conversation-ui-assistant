@@ -1,6 +1,6 @@
 import "@testing-library/jest-dom/vitest";
-import { afterEach, beforeAll, vi } from "vitest";
 import { cleanup } from "@testing-library/react";
+import { afterEach, beforeAll, vi } from "vitest";
 
 // Mock scrollIntoView (not implemented in jsdom)
 beforeAll(() => {

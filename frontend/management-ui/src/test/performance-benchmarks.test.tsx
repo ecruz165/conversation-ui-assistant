@@ -1,5 +1,5 @@
-import { describe, test, expect } from "vitest";
 import { render } from "@testing-library/react";
+import { describe, expect, test } from "vitest";
 import MessageList from "~/chat-widget/components/MessageList";
 import type { Message, Theme } from "~/chat-widget/types";
 

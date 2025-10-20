@@ -849,126 +849,120 @@ export function EmbeddingTest() {
                   mb: 3,
                 }}
               >
-                          <WeightCard
-                            label="Functionality"
-                            tooltip="What users can do - page capabilities and features"
-                            value={enhancedWeights.functionality}
-                            weightKey="functionality"
-                            onChange={adjustEnhancedWeights}
-                            expanded={expandedWeightCard === "functionality"}
-                            onToggle={() =>
-                              setExpandedWeightCard(
-                                expandedWeightCard === "functionality" ? null : "functionality"
-                              )
-                            }
-                            disabled={isSearching}
-                          />
-                          <WeightCard
-                            label="Content"
-                            tooltip="What users can see - visible content and layout"
-                            value={enhancedWeights.content}
-                            weightKey="content"
-                            onChange={adjustEnhancedWeights}
-                            expanded={expandedWeightCard === "content"}
-                            onToggle={() =>
-                              setExpandedWeightCard(
-                                expandedWeightCard === "content" ? null : "content"
-                              )
-                            }
-                            disabled={isSearching}
-                          />
-                          <WeightCard
-                            label="Purpose"
-                            tooltip="Purpose and intent of the page"
-                            value={enhancedWeights.purpose}
-                            weightKey="purpose"
-                            onChange={adjustEnhancedWeights}
-                            expanded={expandedWeightCard === "purpose"}
-                            onToggle={() =>
-                              setExpandedWeightCard(
-                                expandedWeightCard === "purpose" ? null : "purpose"
-                              )
-                            }
-                            disabled={isSearching}
-                          />
-                          <WeightCard
-                            label="Actions"
-                            tooltip="Specific actions - CTAs and buttons"
-                            value={enhancedWeights.action}
-                            weightKey="action"
-                            onChange={adjustEnhancedWeights}
-                            expanded={expandedWeightCard === "action"}
-                            onToggle={() =>
-                              setExpandedWeightCard(
-                                expandedWeightCard === "action" ? null : "action"
-                              )
-                            }
-                            disabled={isSearching}
-                          />
-                          <WeightCard
-                            label="Data Context"
-                            tooltip="Data entities and domain objects present"
-                            value={enhancedWeights.dataContext}
-                            weightKey="dataContext"
-                            onChange={adjustEnhancedWeights}
-                            expanded={expandedWeightCard === "dataContext"}
-                            onToggle={() =>
-                              setExpandedWeightCard(
-                                expandedWeightCard === "dataContext" ? null : "dataContext"
-                              )
-                            }
-                            disabled={isSearching}
-                          />
-                          <WeightCard
-                            label="User Tasks"
-                            tooltip="Common user tasks and workflows"
-                            value={enhancedWeights.userTask}
-                            weightKey="userTask"
-                            onChange={adjustEnhancedWeights}
-                            expanded={expandedWeightCard === "userTask"}
-                            onToggle={() =>
-                              setExpandedWeightCard(
-                                expandedWeightCard === "userTask" ? null : "userTask"
-                              )
-                            }
-                            disabled={isSearching}
-                          />
-                        </Box>
+                <WeightCard
+                  label="Functionality"
+                  tooltip="What users can do - page capabilities and features"
+                  value={enhancedWeights.functionality}
+                  weightKey="functionality"
+                  onChange={adjustEnhancedWeights}
+                  expanded={expandedWeightCard === "functionality"}
+                  onToggle={() =>
+                    setExpandedWeightCard(
+                      expandedWeightCard === "functionality" ? null : "functionality"
+                    )
+                  }
+                  disabled={isSearching}
+                />
+                <WeightCard
+                  label="Content"
+                  tooltip="What users can see - visible content and layout"
+                  value={enhancedWeights.content}
+                  weightKey="content"
+                  onChange={adjustEnhancedWeights}
+                  expanded={expandedWeightCard === "content"}
+                  onToggle={() =>
+                    setExpandedWeightCard(expandedWeightCard === "content" ? null : "content")
+                  }
+                  disabled={isSearching}
+                />
+                <WeightCard
+                  label="Purpose"
+                  tooltip="Purpose and intent of the page"
+                  value={enhancedWeights.purpose}
+                  weightKey="purpose"
+                  onChange={adjustEnhancedWeights}
+                  expanded={expandedWeightCard === "purpose"}
+                  onToggle={() =>
+                    setExpandedWeightCard(expandedWeightCard === "purpose" ? null : "purpose")
+                  }
+                  disabled={isSearching}
+                />
+                <WeightCard
+                  label="Actions"
+                  tooltip="Specific actions - CTAs and buttons"
+                  value={enhancedWeights.action}
+                  weightKey="action"
+                  onChange={adjustEnhancedWeights}
+                  expanded={expandedWeightCard === "action"}
+                  onToggle={() =>
+                    setExpandedWeightCard(expandedWeightCard === "action" ? null : "action")
+                  }
+                  disabled={isSearching}
+                />
+                <WeightCard
+                  label="Data Context"
+                  tooltip="Data entities and domain objects present"
+                  value={enhancedWeights.dataContext}
+                  weightKey="dataContext"
+                  onChange={adjustEnhancedWeights}
+                  expanded={expandedWeightCard === "dataContext"}
+                  onToggle={() =>
+                    setExpandedWeightCard(
+                      expandedWeightCard === "dataContext" ? null : "dataContext"
+                    )
+                  }
+                  disabled={isSearching}
+                />
+                <WeightCard
+                  label="User Tasks"
+                  tooltip="Common user tasks and workflows"
+                  value={enhancedWeights.userTask}
+                  weightKey="userTask"
+                  onChange={adjustEnhancedWeights}
+                  expanded={expandedWeightCard === "userTask"}
+                  onToggle={() =>
+                    setExpandedWeightCard(expandedWeightCard === "userTask" ? null : "userTask")
+                  }
+                  disabled={isSearching}
+                />
+              </Box>
 
-                        {(expandedWeightCard || hasUnsavedEnhancedChanges) && (
-                          <>
-                            {hasUnsavedEnhancedChanges && (
-                              <Alert severity="warning" sx={{ fontSize: "0.75rem", mb: 2 }}>
-                                You have unsaved changes to the enhanced embedding weights.
-                              </Alert>
-                            )}
-                            <Box className="flex gap-2">
-                              <Button
-                                variant="contained"
-                                color="primary"
-                                size="small"
-                                startIcon={<SaveIcon />}
-                                onClick={handleSaveConfiguration}
-                                disabled={!hasUnsavedEnhancedChanges || updateSearchConfigMutation.isPending || isSearching}
-                                fullWidth
-                              >
-                                {updateSearchConfigMutation.isPending
-                                  ? "Saving..."
-                                  : "Save Configuration"}
-                              </Button>
-                              <Button
-                                variant="outlined"
-                                size="small"
-                                startIcon={<RestartAltIcon />}
-                                onClick={handleResetToDefault}
-                                disabled={!hasUnsavedEnhancedChanges || isSearching}
-                                fullWidth
-                              >
-                                Reset to Default
-                              </Button>
-                            </Box>
-                          </>
-                        )}
+              {(expandedWeightCard || hasUnsavedEnhancedChanges) && (
+                <>
+                  {hasUnsavedEnhancedChanges && (
+                    <Alert severity="warning" sx={{ fontSize: "0.75rem", mb: 2 }}>
+                      You have unsaved changes to the enhanced embedding weights.
+                    </Alert>
+                  )}
+                  <Box className="flex gap-2">
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      size="small"
+                      startIcon={<SaveIcon />}
+                      onClick={handleSaveConfiguration}
+                      disabled={
+                        !hasUnsavedEnhancedChanges ||
+                        updateSearchConfigMutation.isPending ||
+                        isSearching
+                      }
+                      fullWidth
+                    >
+                      {updateSearchConfigMutation.isPending ? "Saving..." : "Save Configuration"}
+                    </Button>
+                    <Button
+                      variant="outlined"
+                      size="small"
+                      startIcon={<RestartAltIcon />}
+                      onClick={handleResetToDefault}
+                      disabled={!hasUnsavedEnhancedChanges || isSearching}
+                      fullWidth
+                    >
+                      Reset to Default
+                    </Button>
+                  </Box>
+                </>
+              )}
             </Box>
           </Box>
         </Paper>
@@ -1044,7 +1038,6 @@ export function EmbeddingTest() {
             </Box>
           </Paper>
         )}
-
       </Box>
 
       {/* Success Snackbar */}

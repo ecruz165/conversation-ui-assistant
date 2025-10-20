@@ -7,10 +7,7 @@ import { useCallback } from "react";
  * @param keys - Array of keys that should trigger the callback (defaults to Enter and Space)
  * @returns Object with handleKeyDown event handler
  */
-export const useKeyboardInteraction = (
-  onClick: () => void,
-  keys: string[] = ["Enter", " "]
-) => {
+export const useKeyboardInteraction = (onClick: () => void, keys: string[] = ["Enter", " "]) => {
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
       if (keys.includes(e.key)) {
