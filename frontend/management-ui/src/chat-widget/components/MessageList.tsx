@@ -163,26 +163,38 @@ const MessageBubble: React.FC<{ message: Message; index: number; theme: Theme }>
                   >
                     Suggestions:
                   </div>
-                  {message.metadata.suggestions.map((suggestion, idx) => (
-                    <div
-                      key={`${message.id}-suggestion-${idx}-${suggestion}`}
-                      style={{
-                        fontSize: theme.typography.fontSize.xs,
-                        opacity: 0.9,
-                        padding: "2px 6px",
-                        backgroundColor: "rgba(255, 255, 255, 0.1)",
-                        borderRadius: "4px",
-                        marginBottom: "2px",
-                        cursor: "pointer",
-                      }}
-                      onClick={() => {
-                        // Handle suggestion click - could emit an event or call a callback
-                        console.log("Suggestion clicked:", suggestion);
-                      }}
-                    >
-                      • {suggestion}
-                    </div>
-                  ))}
+                  {message.metadata.suggestions.map((suggestion, idx) => {
+                    const handleSuggestionClick = () => {
+                      // Handle suggestion click - could emit an event or call a callback
+                      console.log("Suggestion clicked:", suggestion);
+                    };
+
+                    return (
+                      <div
+                        key={`${message.id}-suggestion-${idx}-${suggestion}`}
+                        role="button"
+                        tabIndex={0}
+                        style={{
+                          fontSize: theme.typography.fontSize.xs,
+                          opacity: 0.9,
+                          padding: "2px 6px",
+                          backgroundColor: "rgba(255, 255, 255, 0.1)",
+                          borderRadius: "4px",
+                          marginBottom: "2px",
+                          cursor: "pointer",
+                        }}
+                        onClick={handleSuggestionClick}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" || e.key === " ") {
+                            e.preventDefault();
+                            handleSuggestionClick();
+                          }
+                        }}
+                      >
+                        • {suggestion}
+                      </div>
+                    );
+                  })}
                 </div>
               )}
             </div>
