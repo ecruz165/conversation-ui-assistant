@@ -132,7 +132,7 @@ class ChatWidgetElement extends HTMLElement {
     }
 
     const apiEndpoint = this.getAttribute("api-endpoint") || "http://localhost:8080";
-    const websocketUrl = this.getAttribute("websocket-url");
+    const websocketUrl = this.getAttribute("websocket-url") ?? undefined;
     const props = this.getProps();
 
     // Render React component inside web component
@@ -143,8 +143,8 @@ class ChatWidgetElement extends HTMLElement {
           apiEndpoint,
           websocketUrl,
           onError: props.onError,
-        },
-        React.createElement(ChatWidget, props)
+          children: React.createElement(ChatWidget, props),
+        }
       )
     );
   }
