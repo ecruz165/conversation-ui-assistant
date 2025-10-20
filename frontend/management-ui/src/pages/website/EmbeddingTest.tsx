@@ -526,8 +526,12 @@ export function EmbeddingTest() {
   // Load default weights from website configuration on mount
   useEffect(() => {
     if (website?.searchConfiguration?.weights) {
-      // Map enhanced weights structure to legacy modality weights
       const weights = website.searchConfiguration.weights;
+
+      // Set enhanced weights directly
+      setEnhancedWeights(weights);
+
+      // Map enhanced weights structure to legacy modality weights
       setModalityWeights({
         text: (weights.functionality + weights.content + weights.purpose) / 3,
         visual: (weights.action + weights.dataContext) / 2,
@@ -536,7 +540,7 @@ export function EmbeddingTest() {
     }
   }, [website]);
 
-  // Check if current weights differ from saved defaults
+  // Check if current weights differ from saved defaults (legacy 3-modality)
   const hasUnsavedChanges = useMemo(() => {
     if (!website?.searchConfiguration?.weights) {
       // No saved defaults, so any non-standard weights are "unsaved"
@@ -563,6 +567,33 @@ export function EmbeddingTest() {
     );
   }, [modalityWeights, website?.searchConfiguration?.weights]);
 
+  // Check if current enhanced weights differ from saved defaults (6-embedding)
+  const hasUnsavedEnhancedChanges = useMemo(() => {
+    if (!website?.searchConfiguration?.weights) {
+      // No saved defaults, compare to initial enhanced weights
+      return (
+        Math.abs(enhancedWeights.functionality - 0.2) > 0.001 ||
+        Math.abs(enhancedWeights.content - 0.15) > 0.001 ||
+        Math.abs(enhancedWeights.purpose - 0.25) > 0.001 ||
+        Math.abs(enhancedWeights.action - 0.1) > 0.001 ||
+        Math.abs(enhancedWeights.dataContext - 0.2) > 0.001 ||
+        Math.abs(enhancedWeights.userTask - 0.1) > 0.001
+      );
+    }
+
+    const saved = website.searchConfiguration.weights;
+    const threshold = 0.001; // Account for floating point precision
+
+    return (
+      Math.abs(enhancedWeights.functionality - saved.functionality) > threshold ||
+      Math.abs(enhancedWeights.content - saved.content) > threshold ||
+      Math.abs(enhancedWeights.purpose - saved.purpose) > threshold ||
+      Math.abs(enhancedWeights.action - saved.action) > threshold ||
+      Math.abs(enhancedWeights.dataContext - saved.dataContext) > threshold ||
+      Math.abs(enhancedWeights.userTask - saved.userTask) > threshold
+    );
+  }, [enhancedWeights, website?.searchConfiguration?.weights]);
+
   // Handler for saving current weights as default
   const handleSaveAsDefault = () => {
     // Convert legacy modality weights to enhanced 6-embedding weights for storage
@@ -588,7 +619,22 @@ export function EmbeddingTest() {
     );
   };
 
-  // Handler for resetting to default weights
+  // Handler for saving enhanced weights as default
+  const handleSaveEnhancedAsDefault = () => {
+    updateSearchConfigMutation.mutate(
+      {
+        weights: enhancedWeights,
+        description: `Custom enhanced weights for ${website?.type || "website"}`,
+      },
+      {
+        onSuccess: () => {
+          setShowSaveSnackbar(true);
+        },
+      }
+    );
+  };
+
+  // Handler for resetting to default weights (legacy)
   const handleResetToDefault = () => {
     if (website?.searchConfiguration?.weights) {
       // Map enhanced weights to legacy
@@ -604,6 +650,24 @@ export function EmbeddingTest() {
         text: 0.5,
         visual: 0.3,
         metadata: 0.2,
+      });
+    }
+  };
+
+  // Handler for resetting enhanced weights to default
+  const handleResetEnhancedToDefault = () => {
+    if (website?.searchConfiguration?.weights) {
+      // Use saved configuration
+      setEnhancedWeights(website.searchConfiguration.weights);
+    } else {
+      // Fallback to standard enhanced defaults
+      setEnhancedWeights({
+        functionality: 0.2,
+        content: 0.15,
+        purpose: 0.25,
+        action: 0.1,
+        dataContext: 0.2,
+        userTask: 0.1,
       });
     }
   };
@@ -1021,6 +1085,40 @@ export function EmbeddingTest() {
                           specialized dimensions: functionality, content, purpose, actions, data
                           context, and user tasks.
                         </Alert>
+                        {hasUnsavedEnhancedChanges && (
+                          <Alert severity="warning" sx={{ fontSize: "0.75rem", mt: 2 }}>
+                            You have unsaved changes to the enhanced embedding weights.
+                          </Alert>
+                        )}
+                        <Box className="flex gap-2 mt-3">
+                          <Button
+                            variant={hasUnsavedEnhancedChanges ? "contained" : "outlined"}
+                            color={hasUnsavedEnhancedChanges ? "primary" : "inherit"}
+                            size="small"
+                            startIcon={<SaveIcon />}
+                            onClick={handleSaveEnhancedAsDefault}
+                            disabled={
+                              !hasUnsavedEnhancedChanges ||
+                              updateSearchConfigMutation.isPending ||
+                              isSearching
+                            }
+                            fullWidth
+                          >
+                            {updateSearchConfigMutation.isPending
+                              ? "Saving..."
+                              : "Save Configuration"}
+                          </Button>
+                          <Button
+                            variant="outlined"
+                            size="small"
+                            startIcon={<RestartAltIcon />}
+                            onClick={handleResetEnhancedToDefault}
+                            disabled={!hasUnsavedEnhancedChanges || isSearching}
+                            fullWidth
+                          >
+                            Reset to Default
+                          </Button>
+                        </Box>
                       </Box>
                     ) : (
                       /* Legacy 3-modality controls */
