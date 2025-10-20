@@ -55,7 +55,17 @@ export const MultiModalRadarChart = memo(function MultiModalRadarChart({
         Multi-Modal Score Radar
       </Typography>
       <Box sx={{ display: "flex", justifyContent: "center" }}>
-        <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+        <svg
+          width={size}
+          height={size}
+          viewBox={`0 0 ${size} ${size}`}
+          role="img"
+          aria-labelledby="radar-chart-title"
+        >
+          <title id="radar-chart-title">
+            Multi-modal embedding scores radar chart:{" "}
+            {data.map((d) => `${d.axis} ${Math.round(d.value * 100)}%`).join(", ")}
+          </title>
           {/* Background circles (levels) */}
           {Array.from({ length: levels }, (_, i) => {
             const levelRadius = ((i + 1) / levels) * radius;
