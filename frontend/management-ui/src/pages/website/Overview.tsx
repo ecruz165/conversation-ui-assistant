@@ -476,7 +476,7 @@ export function WebsiteOverview() {
               <Button
                 variant="outlined"
                 component={Link}
-                to="/website/embedding-test"
+                to="/website/embeddings-tester"
                 sx={ACTION_BUTTON_STYLE}
               >
                 Test & Configure
