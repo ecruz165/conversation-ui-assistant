@@ -200,6 +200,27 @@ class ApiService {
     return this.fetchJson(`${this.baseUrl}/websites/${websiteId}/crawl/${crawlId}/status`);
   }
 
+  // Search Configuration endpoints
+  async updateSearchConfiguration(
+    websiteId: string,
+    data: {
+      weights: {
+        functionality: number;
+        content: number;
+        purpose: number;
+        action: number;
+        dataContext: number;
+        userTask: number;
+      };
+      description?: string;
+    }
+  ): Promise<{ success: boolean; updatedAt: string }> {
+    return this.fetchJson(`${this.baseUrl}/websites/${websiteId}/search-config`, {
+      method: "PUT",
+      body: JSON.stringify(data),
+    });
+  }
+
   // Screenshot Analysis endpoints
   async uploadScreenshotForAnalysis(
     websiteId: string,

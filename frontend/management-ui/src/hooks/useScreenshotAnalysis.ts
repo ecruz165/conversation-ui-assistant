@@ -86,7 +86,10 @@ const mockApi = {
     // Return completed status with mock data
     return mockApi.uploadScreenshot(websiteId, {
       websiteId,
-      analysisOptions: { generateEmbeddings: true, detectRegions: true, extractText: true },
+      analysisOptions: {
+          generateEmbeddings: true, detectRegions: true, extractText: true,
+          analyzeAccessibility: false
+      },
     });
   },
 
@@ -103,7 +106,10 @@ const mockApi = {
     await new Promise((resolve) => setTimeout(resolve, 500));
     const mockEntry = await mockApi.uploadScreenshot(websiteId, {
       websiteId,
-      analysisOptions: { generateEmbeddings: true, detectRegions: true, extractText: true },
+      analysisOptions: {
+          generateEmbeddings: true, detectRegions: true, extractText: true,
+          analyzeAccessibility: false
+      },
     });
 
     return {
@@ -125,8 +131,11 @@ export function useUploadScreenshot(websiteId: string) {
         ? mockApi.uploadScreenshot(websiteId, request)
         : api.uploadScreenshotForAnalysis(websiteId, request),
     onSuccess: () => {
-      // Invalidate analysis history when new analysis completes
-      queryClient.invalidateQueries({ queryKey: ["analysisHistory", websiteId] });
+      // Invalidate all analysis history queries for this website (matches any page/pageSize)
+      queryClient.invalidateQueries({
+        queryKey: ["analysisHistory", websiteId],
+        exact: false // This is the default, but being explicit helps clarity
+      });
     },
     retry: 1,
   });
