@@ -133,9 +133,9 @@ const NavigationHelper: React.FC<NavigationHelperProps> = ({
             flexWrap: "wrap",
           }}
         >
-          {suggestions.map((suggestion, index) => (
+          {suggestions.map((suggestion) => (
             <button
-              key={index}
+              key={suggestion}
               onClick={() => handleSuggestionClick(suggestion)}
               disabled={isLoading}
               style={{

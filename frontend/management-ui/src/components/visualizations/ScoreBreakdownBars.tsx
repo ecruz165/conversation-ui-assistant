@@ -28,14 +28,14 @@ export const ScoreBreakdownBars = memo(function ScoreBreakdownBars({
 }: ScoreBreakdownBarsProps) {
   return (
     <Box className="space-y-3">
-      {scores.map((scoreData, idx) => {
+      {scores.map((scoreData) => {
         const maxScore = scoreData.maxScore || 1;
         const percentage = Math.round((scoreData.score / maxScore) * 100);
         const normalizedScore = scoreData.score / maxScore; // Normalize to 0-1
         const barColor = colorful ? getScoreColor(normalizedScore) : "#1976d2";
 
         return (
-          <Box key={idx}>
+          <Box key={scoreData.label}>
             <Box className="flex justify-between items-center mb-1">
               <Typography variant="body2" className="font-medium">
                 {scoreData.label}

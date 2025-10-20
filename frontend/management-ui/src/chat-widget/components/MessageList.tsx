@@ -166,7 +166,7 @@ const MessageList: React.FC<MessageListProps> = ({ messages, isLoading, theme })
                     </div>
                     {message.metadata.suggestions.map((suggestion, idx) => (
                       <div
-                        key={idx}
+                        key={`${message.id}-suggestion-${idx}-${suggestion}`}
                         style={{
                           fontSize: theme.typography.fontSize.xs,
                           opacity: 0.9,
