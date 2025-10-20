@@ -94,11 +94,7 @@ const MessageBubble: React.FC<{ message: Message; index: number; theme: Theme }>
               width: "0",
               height: "0",
               borderTop: `6px solid ${
-                isError
-                  ? theme.colors.error
-                  : isUser
-                    ? theme.colors.primary
-                    : theme.colors.surface
+                isError ? theme.colors.error : isUser ? theme.colors.primary : theme.colors.surface
               }`,
               borderLeft: isUser ? "6px solid transparent" : "none",
               borderRight: isUser ? "none" : "6px solid transparent",
@@ -170,10 +166,9 @@ const MessageBubble: React.FC<{ message: Message; index: number; theme: Theme }>
                     };
 
                     return (
-                      <div
+                      <button
                         key={`${message.id}-suggestion-${idx}-${suggestion}`}
-                        role="button"
-                        tabIndex={0}
+                        type="button"
                         style={{
                           fontSize: theme.typography.fontSize.xs,
                           opacity: 0.9,
@@ -182,17 +177,16 @@ const MessageBubble: React.FC<{ message: Message; index: number; theme: Theme }>
                           borderRadius: "4px",
                           marginBottom: "2px",
                           cursor: "pointer",
+                          border: "none",
+                          color: "inherit",
+                          display: "block",
+                          textAlign: "left",
+                          width: "100%",
                         }}
                         onClick={handleSuggestionClick}
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter" || e.key === " ") {
-                            e.preventDefault();
-                            handleSuggestionClick();
-                          }
-                        }}
                       >
                         • {suggestion}
-                      </div>
+                      </button>
                     );
                   })}
                 </div>

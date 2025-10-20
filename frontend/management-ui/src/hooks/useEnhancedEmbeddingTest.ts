@@ -22,7 +22,7 @@ const mockApi = {
     // Filter by minConfidence if provided
     if (query.minConfidence) {
       mockResults.results = mockResults.results.filter(
-        (result) => result.matchScore >= query.minConfidence!
+        (result) => result.matchScore >= (query.minConfidence ?? 0)
       );
       mockResults.totalMatches = mockResults.results.length;
     }

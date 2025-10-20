@@ -143,7 +143,9 @@ function LandingPage() {
               <Link to="/register" className="btn-primary w-full text-center">
                 Register New Website
               </Link>
-              <button type="button" className="btn-secondary w-full">View Documentation</button>
+              <button type="button" className="btn-secondary w-full">
+                View Documentation
+              </button>
             </div>
           </div>
         </div>

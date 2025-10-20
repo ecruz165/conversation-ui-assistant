@@ -33,10 +33,7 @@ if (typeof window !== "undefined") {
   window.ChatWidgetElement = ChatWidgetElement;
 
   // Add a simple API to create widgets programmatically
-  window.createChatWidget = (
-    container: HTMLElement,
-    props: Record<string, string> = {}
-  ) => {
+  window.createChatWidget = (container: HTMLElement, props: Record<string, string> = {}) => {
     const widget = document.createElement("chat-widget");
 
     // Set attributes from props

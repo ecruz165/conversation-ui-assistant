@@ -138,8 +138,8 @@ export function useAnalysisJobStatus(websiteId: string, analysisId: string | nul
     queryKey: ["analysisJob", websiteId, analysisId],
     queryFn: () =>
       mockConfig.enabled
-        ? mockApi.getAnalysisStatus(websiteId, analysisId!)
-        : api.getAnalysisJobStatus(websiteId, analysisId!),
+        ? mockApi.getAnalysisStatus(websiteId, analysisId ?? "")
+        : api.getAnalysisJobStatus(websiteId, analysisId ?? ""),
     enabled: !!analysisId, // Only run when analysisId is available
     staleTime: 1000 * 60, // 1 minute for status checks
     refetchInterval: (query) => {
@@ -169,7 +169,7 @@ export function useAnalysisVersion(
 ) {
   return useQuery({
     queryKey: ["analysisVersion", websiteId, pageId, version],
-    queryFn: () => api.getAnalysisVersion(websiteId, pageId!, version!),
+    queryFn: () => api.getAnalysisVersion(websiteId, pageId ?? "", version ?? 0),
     enabled: !!pageId && !!version, // Only run when both are available
   });
 }
