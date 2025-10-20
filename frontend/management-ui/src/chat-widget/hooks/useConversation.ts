@@ -3,6 +3,18 @@ import type { ConversationState, Message, UseConversationReturn } from "../types
 
 const DEFAULT_WEBSOCKET_URL = "ws://localhost:8081/ws/chat";
 
+interface WebSocketMessage {
+  type: "message" | "status" | "error";
+  content: string;
+  sessionId: string;
+  audio?: {
+    data: string;
+    mimeType: string;
+    size: number;
+  };
+  timestamp?: number;
+}
+
 /**
  * Hook for managing conversation state and WebSocket connection
  * Connects to the reactive navigation service with Netty
@@ -161,7 +173,7 @@ export const useConversation = (
       // Send via WebSocket if connected
       if (wsRef.current?.readyState === WebSocket.OPEN) {
         try {
-          const message: any = {
+          const message: WebSocketMessage = {
             type: "message",
             content: content.trim(),
             sessionId: currentSessionId,

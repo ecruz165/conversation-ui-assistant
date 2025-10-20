@@ -44,6 +44,11 @@ interface SpeechRecognition extends EventTarget {
   onend: ((this: SpeechRecognition, ev: Event) => void) | null;
 }
 
+interface ExtendedWindow {
+  SpeechRecognition?: new () => SpeechRecognition;
+  webkitSpeechRecognition?: new () => SpeechRecognition;
+}
+
 interface MessageInputProps {
   onSendMessage: (message: string, audioBlob?: Blob) => void;
   placeholder?: string;
@@ -159,8 +164,12 @@ const MessageInput: React.FC<MessageInputProps> = ({
   useEffect(() => {
     if ("webkitSpeechRecognition" in window || "SpeechRecognition" in window) {
       const SpeechRecognitionConstructor =
-        (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-      recognitionRef.current = new SpeechRecognitionConstructor() as SpeechRecognition;
+        (window as unknown as ExtendedWindow).SpeechRecognition ||
+        (window as unknown as ExtendedWindow).webkitSpeechRecognition;
+
+      if (!SpeechRecognitionConstructor) return;
+
+      recognitionRef.current = new SpeechRecognitionConstructor();
 
       const recognition = recognitionRef.current;
       recognition.continuous = true;
