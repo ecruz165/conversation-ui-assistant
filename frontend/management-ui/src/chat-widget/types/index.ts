@@ -5,7 +5,7 @@ export interface Message {
   content: string;
   sender: "user" | "assistant";
   timestamp: Date;
-  type?: "text" | "navigation" | "error";
+  type?: "text" | "voice" | "navigation" | "error";
   messageCount?: number;
   metadata?: {
     navigationTarget?: string;
@@ -14,10 +14,44 @@ export interface Message {
   };
 }
 
+// Navigation action data types
+export interface NavigationScrollData {
+  position: number;
+  element?: string;
+  behavior?: ScrollBehavior;
+}
+
+export interface NavigationHighlightData {
+  selector: string;
+  duration?: number;
+  color?: string;
+}
+
+export interface NavigationFocusData {
+  elementId: string;
+  options?: FocusOptions;
+}
+
+export interface NavigationNavigateData {
+  url?: string;
+  params?: Record<string, string>;
+  query?: string;
+  timestamp?: number;
+  navigationTarget?: string;
+  confidence?: number;
+  suggestions?: string[];
+}
+
+export type NavigationActionData =
+  | NavigationScrollData
+  | NavigationHighlightData
+  | NavigationFocusData
+  | NavigationNavigateData;
+
 export interface NavigationAction {
   type: "navigate" | "scroll" | "highlight" | "focus";
   target: string;
-  data?: any;
+  data?: NavigationActionData;
 }
 
 export interface ConversationState {
@@ -144,8 +178,36 @@ export interface SendMessageResponse {
   suggestions?: string[];
 }
 
+// WebSocket message data types
+export interface WebSocketChatData {
+  message: Message;
+  suggestions?: string[];
+}
+
+export interface WebSocketNavigationData {
+  actions: NavigationAction[];
+}
+
+export interface WebSocketErrorData {
+  code: string;
+  message: string;
+  details?: Record<string, unknown>;
+}
+
+export interface WebSocketConnectionData {
+  sessionId: string;
+  reconnected?: boolean;
+}
+
+export type WebSocketMessageData =
+  | WebSocketChatData
+  | WebSocketNavigationData
+  | WebSocketErrorData
+  | WebSocketConnectionData
+  | null;
+
 export interface WebSocketMessage {
   type: "message" | "navigation" | "error" | "connected" | "disconnected";
-  data: any;
+  data: WebSocketMessageData;
   timestamp: string;
 }
