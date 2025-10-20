@@ -31,12 +31,18 @@ const mockApi = {
   createLink: async (websiteId: string, data: Partial<NavigationLink>): Promise<NavigationLink> => {
     // Simulate API delay
     await new Promise((resolve) => setTimeout(resolve, 500));
+
+    // Validate required fields
+    if (!data.intent || !data.displayName || !data.targetUrl) {
+      throw new Error("Missing required fields: intent, displayName, and targetUrl are required");
+    }
+
     return {
       id: `link-${Date.now()}`,
       websiteId,
-      intent: data.intent!,
-      displayName: data.displayName!,
-      targetUrl: data.targetUrl!,
+      intent: data.intent,
+      displayName: data.displayName,
+      targetUrl: data.targetUrl,
       isBookmarkable: data.isBookmarkable ?? true,
       isActive: true,
       createdAt: new Date().toISOString(),
@@ -85,13 +91,18 @@ export function useCreateLink() {
         websiteId,
       ]);
 
+      // Validate required fields for optimistic update
+      if (!data.intent || !data.displayName || !data.targetUrl) {
+        throw new Error("Missing required fields: intent, displayName, and targetUrl are required");
+      }
+
       // Optimistically update
       const optimisticLink: NavigationLink = {
         id: `temp-${Date.now()}`,
         websiteId,
-        intent: data.intent!,
-        displayName: data.displayName!,
-        targetUrl: data.targetUrl!,
+        intent: data.intent,
+        displayName: data.displayName,
+        targetUrl: data.targetUrl,
         isBookmarkable: data.isBookmarkable ?? true,
         isActive: true,
         createdAt: new Date().toISOString(),
