@@ -1,7 +1,7 @@
 import { Bot, Loader2, User } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import type React from "react";
-import { useEffect, useRef } from "react";
+import { memo, useEffect, useRef } from "react";
 import type { Message, Theme } from "../types";
 
 interface MessageListProps {
@@ -19,12 +19,10 @@ const formatTime = (timestamp: Date) => {
 
 /**
  * Message bubble component (extracted to prevent recreation on every render)
+ * Memoized with custom comparison to avoid unnecessary re-renders
  */
-const MessageBubble: React.FC<{ message: Message; index: number; theme: Theme }> = ({
-  message,
-  index,
-  theme,
-}) => {
+const MessageBubble = memo<{ message: Message; index: number; theme: Theme }>(
+  ({ message, index, theme }) => {
   const isUser = message.sender === "user";
   const isError = message.type === "error";
 
@@ -197,12 +195,20 @@ const MessageBubble: React.FC<{ message: Message; index: number; theme: Theme }>
       </div>
     </motion.div>
   );
-};
+  },
+  (prevProps, nextProps) => {
+    // Only re-render if message ID or theme changes
+    return prevProps.message.id === nextProps.message.id && prevProps.theme === nextProps.theme;
+  }
+);
+
+MessageBubble.displayName = "MessageBubble";
 
 /**
  * Loading indicator component (extracted to prevent recreation on every render)
+ * Memoized to avoid unnecessary re-renders
  */
-const LoadingIndicator: React.FC<{ theme: Theme }> = ({ theme }) => (
+const LoadingIndicator = memo<{ theme: Theme }>(({ theme }) => (
   <motion.div
     initial={{ opacity: 0, y: 20 }}
     animate={{ opacity: 1, y: 0 }}
@@ -271,10 +277,13 @@ const LoadingIndicator: React.FC<{ theme: Theme }> = ({ theme }) => (
       </div>
     </div>
   </motion.div>
-);
+));
+
+LoadingIndicator.displayName = "LoadingIndicator";
 
 /**
  * Component for displaying a list of chat messages
+ * Optimized with memoized child components for better performance
  */
 const MessageList: React.FC<MessageListProps> = ({ messages, isLoading, theme }) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
