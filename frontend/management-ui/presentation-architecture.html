@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Access 360 Architecture</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            /* Capital Group brand gradient: Primary navy (900 to 700) */
+            background: linear-gradient(135deg, #003F72 0%, #006BA6 100%);
+            font-family: 'Nunito Sans', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 50px 60px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            /* 16:9 aspect ratio for presentation slides */
+            width: 90vw;
+            max-width: 1280px;
+            aspect-ratio: 16 / 9;
+            display: flex;
+            flex-direction: column;
+        }
+
+        h1 {
+            text-align: center;
+            color: #1f2937; /* Gray 800 - primary text */
+            margin-bottom: 30px;
+            font-size: 32px;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .architecture-diagram {
+            position: relative;
+            flex: 1;
+            min-height: 0;
+        }
+
+        .component {
+            position: absolute;
+            background: white;
+            border-radius: 12px;
+            padding: 16px 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            text-align: center;
+            min-width: 140px;
+            border: 3px solid;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .component:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+        }
+
+        .component-title {
+            font-weight: 700;
+            font-size: 14px;
+            margin-bottom: 6px;
+            color: #1f2937; /* Gray 800 */
+        }
+
+        .component-subtitle {
+            font-size: 11px;
+            color: #6b7280; /* Gray 500 - secondary text */
+            margin-bottom: 4px;
+        }
+
+        .component-port {
+            font-size: 9px;
+            color: #9ca3af; /* Gray 400 */
+            font-weight: 600;
+        }
+
+        /* Frontend Layer */
+        #management-ui {
+            top: 15%;
+            left: 10%;
+            transform: translateY(-50%);
+            border-color: #33A7CF; /* Primary 400 - frontend */
+            min-width: 160px;
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); /* Very light blue gradient */
+        }
+
+        #browser-container {
+            top: 15%;
+            right: 8%;
+            transform: translateY(-50%);
+            border-color: #8b5cf6; /* Purple - browser */
+            min-width: 200px;
+            padding: 20px;
+            border-width: 3px;
+        }
+
+        .browser-chrome {
+            background: #e5e7eb;
+            border-radius: 6px 6px 0 0;
+            padding: 8px;
+            margin: -16px -16px 12px -16px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .browser-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .dot-red { background: #ef4444; }
+        .dot-yellow { background: #f59e0b; }
+        .dot-green { background: #10b981; }
+
+        .browser-url {
+            flex: 1;
+            background: white;
+            border-radius: 4px;
+            padding: 4px 8px;
+            font-size: 8px;
+            color: #6b7280;
+            text-align: left;
+            margin-left: 8px;
+        }
+
+        #chat-widget {
+            position: relative;
+            border-color: #10b981; /* Success green - user interface */
+            min-width: 140px;
+            margin-top: 10px;
+            border-width: 2px;
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); /* Very light blue gradient */
+        }
+
+        /* Backend Layer */
+        #management-service {
+            bottom: 25%;
+            left: 10%;
+            transform: translateY(50%);
+            border-color: #007AB0; /* Primary 600 - backend service */
+            min-width: 160px;
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); /* Very light green gradient */
+        }
+
+        #navigation-service {
+            bottom: 25%;
+            right: 10%;
+            transform: translateY(50%);
+            border-color: #00558C; /* Primary 800 - reactive service */
+            min-width: 160px;
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); /* Very light green gradient */
+        }
+
+        /* Database */
+        #postgresql {
+            bottom: 8%;
+            left: 50%;
+            transform: translateX(-50%);
+            border-color: #6366f1; /* Indigo - database */
+            min-width: 180px;
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); /* Very light green gradient */
+        }
+
+        /* External Services */
+        #openai {
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border-color: #f59e0b; /* Warning orange - external API */
+            min-width: 200px;
+            padding: 24px 28px;
+            font-size: 1.1em;
+        }
+
+        #openai .component-title {
+            font-size: 18px;
+        }
+
+        #openai .component-subtitle {
+            font-size: 13px;
+        }
+
+        #openai .tech-label {
+            font-size: 11px;
+        }
+
+        /* Legend */
+        .legend {
+            position: absolute;
+            bottom: 4px;
+            left: 10px;
+            background: white;
+            border-radius: 8px;
+            padding: 12px 16px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            border: 2px solid #e5e7eb;
+        }
+
+        .legend-title {
+            font-size: 11px;
+            font-weight: 700;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 6px;
+            font-size: 11px;
+        }
+
+        .legend-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .legend-color {
+            width: 24px;
+            height: 16px;
+            border-radius: 3px;
+            border: 1px solid #d1d5db;
+        }
+
+        .legend-color.frontend {
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+        }
+
+        .legend-color.backend {
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+        }
+
+        .legend-label {
+            color: #374151;
+            font-weight: 600;
+        }
+
+        svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .arrow {
+            fill: none;
+            stroke: #9ca3af; /* Gray 400 - better contrast */
+            stroke-width: 2.5;
+            marker-end: url(#arrowhead);
+        }
+
+        .arrow-bidirectional {
+            fill: none;
+            stroke: #9ca3af;
+            stroke-width: 2.5;
+            marker-end: url(#arrowhead);
+            marker-start: url(#arrowhead-reverse);
+        }
+
+        .arrow-dashed {
+            fill: none;
+            stroke: #9ca3af;
+            stroke-width: 2.5;
+            stroke-dasharray: 8, 4;
+            marker-end: url(#arrowhead);
+        }
+
+        .data-packet {
+            fill: #33A7CF; /* Primary 400 - animated flow */
+            opacity: 0;
+        }
+
+        @keyframes flow1 {
+            0% { opacity: 0; offset-distance: 0%; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { opacity: 0; offset-distance: 100%; }
+        }
+
+        .data-packet.active {
+            animation: flow1 3s ease-in-out infinite;
+        }
+
+        .label {
+            font-size: 10px;
+            fill: #1f2937; /* Gray 800 */
+            font-weight: 700;
+        }
+
+        .label-bg {
+            fill: white;
+            rx: 4;
+            ry: 4;
+        }
+
+        .tech-label {
+            font-size: 9px;
+            color: #f59e0b;
+            font-weight: 600;
+            margin-top: 2px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>🏗️ Access 360 Architecture</h1>
+    <div class="architecture-diagram">
+        <svg id="svg">
+            <defs>
+                <marker id="arrowhead" markerWidth="4" markerHeight="4" refX="3.5" refY="2" orient="auto">
+                    <polygon points="0 0, 4 2, 0 4" fill="#9ca3af" />
+                </marker>
+                <marker id="arrowhead-reverse" markerWidth="4" markerHeight="4" refX="0.5" refY="2" orient="auto">
+                    <polygon points="4 0, 0 2, 4 4" fill="#9ca3af" />
+                </marker>
+            </defs>
+        </svg>
+
+        <!-- Legend -->
+        <div class="legend">
+            <div class="legend-title">Legend</div>
+            <div class="legend-item">
+                <div class="legend-color frontend"></div>
+                <div class="legend-label">Frontend Layer</div>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color backend"></div>
+                <div class="legend-label">Backend Layer</div>
+            </div>
+        </div>
+
+        <!-- Frontend Components -->
+        <div class="component" id="management-ui">
+            <div class="component-title">📊 Management UI</div>
+            <div class="component-subtitle">TanStack Start</div>
+            <div class="component-port">Port 3000</div>
+            <div class="tech-label">React 19 • TypeScript</div>
+        </div>
+
+        <div class="component" id="browser-container">
+            <div class="browser-chrome">
+                <div class="browser-dot dot-red"></div>
+                <div class="browser-dot dot-yellow"></div>
+                <div class="browser-dot dot-green"></div>
+                <div class="browser-url">https://tenant-app.com</div>
+            </div>
+            <div class="component-title">🌐 Tenant Application</div>
+            <div class="component-subtitle">Healthcare / E-commerce / etc.</div>
+            <div class="component-port">Port 3100+</div>
+
+            <div class="component" id="chat-widget">
+                <div class="component-title">💬 Chat Widget</div>
+                <div class="component-subtitle">&lt;chat-widget&gt;</div>
+                <div class="tech-label">Web Component</div>
+            </div>
+        </div>
+
+        <!-- Backend Services -->
+        <div class="component" id="management-service">
+            <div class="component-title">⚙️ Management Service</div>
+            <div class="component-subtitle">Spring MVC + JPA</div>
+            <div class="component-port">Port 8080</div>
+            <div class="tech-label">Java 21 • REST API</div>
+        </div>
+
+        <div class="component" id="navigation-service">
+            <div class="component-title">🎯 Navigation Service</div>
+            <div class="component-subtitle">Spring WebFlux + R2DBC</div>
+            <div class="component-port">Port 8081</div>
+            <div class="tech-label">Java 21 • Reactive • Vector Search</div>
+        </div>
+
+        <!-- Database -->
+        <div class="component" id="postgresql">
+            <div class="component-title">🗄️ PostgreSQL + pgvector</div>
+            <div class="component-subtitle">Shared Database</div>
+            <div class="component-port">Port 5432</div>
+            <div class="tech-label">JDBC + R2DBC</div>
+        </div>
+
+        <!-- External Services -->
+        <div class="component" id="openai">
+            <div class="component-title">🤖 OpenAI</div>
+            <div class="component-subtitle">AI Platform</div>
+            <div class="tech-label">Audio-to-Text • Image-to-Text</div>
+            <div class="tech-label">Text-to-Text • Text-to-Embeddings</div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const svg = document.getElementById('svg');
+
+    function createPath(x1, y1, x2, y2, label, id, pathType = 'arrow', labelPosition = 'top', straight = false) {
+        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        const midX = (x1 + x2) / 2;
+        const midY = (y1 + y2) / 2;
+
+        let d;
+        if (straight) {
+            d = `M ${x1} ${y1} L ${x2} ${y2}`;
+        } else {
+            d = `M ${x1} ${y1} Q ${midX} ${midY} ${x2} ${y2}`;
+        }
+        path.setAttribute('d', d);
+        path.setAttribute('class', pathType);
+        path.setAttribute('id', id);
+        svg.appendChild(path);
+
+        // Create text element first to measure it
+        const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        text.setAttribute('class', 'label');
+
+        let textX, textY;
+        if (labelPosition === 'left') {
+            textX = midX - 60;
+            textY = midY;
+        } else if (labelPosition === 'right') {
+            textX = midX + 60;
+            textY = midY;
+        } else if (labelPosition === 'top-right') {
+            textX = midX + 30;
+            textY = midY - 15;
+        } else if (labelPosition === 'bottom') {
+            textX = midX;
+            textY = midY + 20;
+        } else if (labelPosition === 'top-left') {
+            textX = midX - 30;
+            textY = midY - 15;
+        } else if (labelPosition === 'bottom-right') {
+            textX = midX + 30;
+            textY = midY + 15;
+        } else if (labelPosition === 'bottom-left') {
+            textX = midX - 30;
+            textY = midY + 15;
+        } else {
+            textX = midX;
+            textY = midY - 15;
+        }
+
+        text.setAttribute('x', textX);
+        text.setAttribute('y', textY);
+        text.setAttribute('text-anchor', 'middle');
+        text.textContent = label;
+
+        // Append text temporarily to measure it
+        svg.appendChild(text);
+
+        // Create white background rectangle for label
+        const bbox = text.getBBox();
+        const padding = 6;
+        const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+        rect.setAttribute('class', 'label-bg');
+        rect.setAttribute('x', bbox.x - padding);
+        rect.setAttribute('y', bbox.y - padding);
+        rect.setAttribute('width', bbox.width + (padding * 2));
+        rect.setAttribute('height', bbox.height + (padding * 2));
+
+        // Insert rectangle before text so text appears on top
+        svg.insertBefore(rect, text);
+
+        return path;
+    }
+
+    function createDataPacket(pathId, delay) {
+        const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        circle.setAttribute('class', 'data-packet');
+        circle.setAttribute('r', '5');
+        svg.appendChild(circle);
+
+        setTimeout(() => {
+            circle.classList.add('active');
+            animateAlongPath(circle, pathId);
+        }, delay);
+    }
+
+    function animateAlongPath(element, pathId) {
+        const path = document.getElementById(pathId);
+        const length = path.getTotalLength();
+
+        function animate(timestamp) {
+            const duration = 3000;
+            const progress = (timestamp % duration) / duration;
+            const point = path.getPointAtLength(progress * length);
+
+            element.setAttribute('cx', point.x);
+            element.setAttribute('cy', point.y);
+
+            const opacity = progress < 0.1 ? progress * 10 :
+                progress > 0.9 ? (1 - progress) * 10 : 1;
+            element.setAttribute('opacity', opacity);
+
+            requestAnimationFrame(animate);
+        }
+
+        requestAnimationFrame(animate);
+    }
+
+    // Get dynamic positions based on viewport
+    const diagram = document.querySelector('.architecture-diagram');
+    const rect = diagram.getBoundingClientRect();
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+
+    // Component positions (approximate centers)
+    const managementUiX = rect.width * 0.15;
+    const managementUiY = centerY * 0.3;
+
+    const browserX = rect.width * 0.85;
+    const browserY = centerY * 0.3;
+
+    const managementServiceX = rect.width * 0.15;
+    const managementServiceY = centerY * 1.5;
+
+    const navigationServiceX = rect.width * 0.85;
+    const navigationServiceY = centerY * 1.5;
+
+    const postgresX = centerX;
+    const postgresY = centerY * 1.85;
+
+    const openaiX = centerX;
+    const openaiY = centerY;
+
+    // Management UI to Browser (Web Component bundle)
+    createPath(managementUiX + 80, managementUiY, browserX - 100, browserY,
+        'Load Script', 'path1', 'arrow-dashed', 'top');
+
+    // Browser to Navigation Service (WebSocket from embedded widget) - straight down
+    createPath(browserX, browserY + 70, navigationServiceX, navigationServiceY - 50,
+        'WebSocket', 'path2', 'arrow-bidirectional', 'right', true);
+
+    // Management UI to Management Service (REST)
+    createPath(managementUiX, managementUiY + 40, managementServiceX, managementServiceY - 40,
+        'REST API', 'path3', 'arrow-bidirectional', 'left');
+
+    // Navigation Service to OpenAI (Multiple APIs)
+    createPath(navigationServiceX - 80, navigationServiceY - 30, openaiX + 70, openaiY + 40,
+        'Multi-Modal APIs', 'path4', 'arrow', 'top-right');
+
+    // Management Service to OpenAI (Multiple APIs)
+    createPath(managementServiceX + 80, managementServiceY - 30, openaiX - 70, openaiY + 40,
+        'Multi-Modal APIs', 'path5', 'arrow', 'top-left');
+
+    // Management Service to PostgreSQL (JDBC/JPA)
+    createPath(managementServiceX + 60, managementServiceY + 30, postgresX - 60, postgresY - 20,
+        'JDBC/JPA', 'path6', 'arrow-bidirectional', 'bottom-left');
+
+    // Navigation Service to PostgreSQL (R2DBC)
+    createPath(navigationServiceX - 60, navigationServiceY + 30, postgresX + 60, postgresY - 20,
+        'R2DBC', 'path7', 'arrow-bidirectional', 'bottom-right');
+
+    // Animate data packets
+    createDataPacket('path1', 0);
+    createDataPacket('path2', 500);
+    createDataPacket('path3', 1000);
+    createDataPacket('path4', 1500);
+    createDataPacket('path5', 2000);
+    createDataPacket('path6', 2500);
+    createDataPacket('path7', 3000);
+</script>
+</body>
+</html>
