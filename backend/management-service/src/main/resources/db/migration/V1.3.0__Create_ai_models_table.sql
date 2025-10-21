@@ -1,5 +1,5 @@
--- Create AI models configuration table
-CREATE TABLE ai_models (
+-- Create AI models configuration table (Idempotent)
+CREATE TABLE IF NOT EXISTS ai_models (
     id BIGSERIAL PRIMARY KEY,
     name VARCHAR(100) NOT NULL UNIQUE,
     provider VARCHAR(50) NOT NULL,
@@ -17,8 +17,8 @@ CREATE TABLE ai_models (
     CONSTRAINT ai_models_model_id_not_empty CHECK (LENGTH(TRIM(model_id)) > 0)
 );
 
--- Create user preferences table
-CREATE TABLE user_preferences (
+-- Create user preferences table (Idempotent)
+CREATE TABLE IF NOT EXISTS user_preferences (
     id BIGSERIAL PRIMARY KEY,
     user_id BIGINT NOT NULL,
     preferred_ai_model_id BIGINT,
@@ -37,8 +37,8 @@ CREATE TABLE user_preferences (
     CONSTRAINT user_preferences_unique_user UNIQUE (user_id)
 );
 
--- Create applications table for managing web applications being navigated
-CREATE TABLE applications (
+-- Create applications table for managing web applications being navigated (Idempotent)
+CREATE TABLE IF NOT EXISTS applications (
     id BIGSERIAL PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
     base_url VARCHAR(500) NOT NULL,
@@ -54,30 +54,33 @@ CREATE TABLE applications (
     CONSTRAINT applications_base_url_format CHECK (base_url ~* '^https?://.*')
 );
 
--- Create indexes for performance
-CREATE INDEX idx_ai_models_provider ON ai_models(provider);
-CREATE INDEX idx_ai_models_active ON ai_models(is_active);
-CREATE INDEX idx_ai_models_default ON ai_models(is_default);
-CREATE INDEX idx_ai_models_configuration ON ai_models USING GIN(configuration);
+-- Create indexes for performance (idempotent)
+CREATE INDEX IF NOT EXISTS idx_ai_models_provider ON ai_models(provider);
+CREATE INDEX IF NOT EXISTS idx_ai_models_active ON ai_models(is_active);
+CREATE INDEX IF NOT EXISTS idx_ai_models_default ON ai_models(is_default);
+CREATE INDEX IF NOT EXISTS idx_ai_models_configuration ON ai_models USING GIN(configuration);
 
-CREATE INDEX idx_user_preferences_user_id ON user_preferences(user_id);
-CREATE INDEX idx_user_preferences_ai_model_id ON user_preferences(preferred_ai_model_id);
+CREATE INDEX IF NOT EXISTS idx_user_preferences_user_id ON user_preferences(user_id);
+CREATE INDEX IF NOT EXISTS idx_user_preferences_ai_model_id ON user_preferences(preferred_ai_model_id);
 
-CREATE INDEX idx_applications_active ON applications(is_active);
-CREATE INDEX idx_applications_created_by ON applications(created_by);
-CREATE INDEX idx_applications_base_url ON applications(base_url);
+CREATE INDEX IF NOT EXISTS idx_applications_active ON applications(is_active);
+CREATE INDEX IF NOT EXISTS idx_applications_created_by ON applications(created_by);
+CREATE INDEX IF NOT EXISTS idx_applications_base_url ON applications(base_url);
 
--- Create triggers for updated_at
+-- Create triggers for updated_at (idempotent)
+DROP TRIGGER IF EXISTS update_ai_models_updated_at ON ai_models;
 CREATE TRIGGER update_ai_models_updated_at
     BEFORE UPDATE ON ai_models
     FOR EACH ROW
     EXECUTE FUNCTION update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_user_preferences_updated_at ON user_preferences;
 CREATE TRIGGER update_user_preferences_updated_at
     BEFORE UPDATE ON user_preferences
     FOR EACH ROW
     EXECUTE FUNCTION update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_applications_updated_at ON applications;
 CREATE TRIGGER update_applications_updated_at
     BEFORE UPDATE ON applications
     FOR EACH ROW

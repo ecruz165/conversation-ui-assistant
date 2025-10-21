@@ -1,5 +1,5 @@
--- Create conversations table for managing user conversation sessions
-CREATE TABLE conversations (
+-- Create conversations table for managing user conversation sessions (Idempotent)
+CREATE TABLE IF NOT EXISTS conversations (
     id BIGSERIAL PRIMARY KEY,
     user_id BIGINT NOT NULL,
     title VARCHAR(255),
@@ -14,8 +14,8 @@ CREATE TABLE conversations (
     CONSTRAINT conversations_status_check CHECK (status IN ('active', 'paused', 'completed', 'cancelled'))
 );
 
--- Create messages table for individual messages within conversations
-CREATE TABLE messages (
+-- Create messages table for individual messages within conversations (Idempotent)
+CREATE TABLE IF NOT EXISTS messages (
     id BIGSERIAL PRIMARY KEY,
     conversation_id BIGINT NOT NULL,
     role VARCHAR(20) NOT NULL,
@@ -29,24 +29,25 @@ CREATE TABLE messages (
     CONSTRAINT messages_content_not_empty CHECK (LENGTH(TRIM(content)) > 0)
 );
 
--- Create indexes for performance
-CREATE INDEX idx_conversations_user_id ON conversations(user_id);
-CREATE INDEX idx_conversations_status ON conversations(status);
-CREATE INDEX idx_conversations_created_at ON conversations(created_at);
-CREATE INDEX idx_conversations_context_data ON conversations USING GIN(context_data);
+-- Create indexes for performance (idempotent)
+CREATE INDEX IF NOT EXISTS idx_conversations_user_id ON conversations(user_id);
+CREATE INDEX IF NOT EXISTS idx_conversations_status ON conversations(status);
+CREATE INDEX IF NOT EXISTS idx_conversations_created_at ON conversations(created_at);
+CREATE INDEX IF NOT EXISTS idx_conversations_context_data ON conversations USING GIN(context_data);
 
-CREATE INDEX idx_messages_conversation_id ON messages(conversation_id);
-CREATE INDEX idx_messages_role ON messages(role);
-CREATE INDEX idx_messages_created_at ON messages(created_at);
-CREATE INDEX idx_messages_message_type ON messages(message_type);
+CREATE INDEX IF NOT EXISTS idx_messages_conversation_id ON messages(conversation_id);
+CREATE INDEX IF NOT EXISTS idx_messages_role ON messages(role);
+CREATE INDEX IF NOT EXISTS idx_messages_created_at ON messages(created_at);
+CREATE INDEX IF NOT EXISTS idx_messages_message_type ON messages(message_type);
 
--- Create trigger to automatically update conversations.updated_at
+-- Create trigger to automatically update conversations.updated_at (idempotent)
+DROP TRIGGER IF EXISTS update_conversations_updated_at ON conversations;
 CREATE TRIGGER update_conversations_updated_at
     BEFORE UPDATE ON conversations
     FOR EACH ROW
     EXECUTE FUNCTION update_updated_at_column();
 
--- Create function to update conversation updated_at when messages are added
+-- Create function to update conversation updated_at when messages are added (idempotent)
 CREATE OR REPLACE FUNCTION update_conversation_on_message_insert()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -57,7 +58,8 @@ BEGIN
 END;
 $$ language 'plpgsql';
 
--- Create trigger to update conversation when new message is added
+-- Create trigger to update conversation when new message is added (idempotent)
+DROP TRIGGER IF EXISTS update_conversation_on_message_insert ON messages;
 CREATE TRIGGER update_conversation_on_message_insert
     AFTER INSERT ON messages
     FOR EACH ROW

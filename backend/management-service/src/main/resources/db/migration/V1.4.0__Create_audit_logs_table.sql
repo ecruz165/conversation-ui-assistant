@@ -1,5 +1,5 @@
--- Create audit logs table for system auditing and monitoring
-CREATE TABLE audit_logs (
+-- Create audit logs table for system auditing and monitoring (Idempotent)
+CREATE TABLE IF NOT EXISTS audit_logs (
     id BIGSERIAL PRIMARY KEY,
     user_id BIGINT,
     action VARCHAR(100) NOT NULL,
@@ -15,8 +15,8 @@ CREATE TABLE audit_logs (
     CONSTRAINT audit_logs_action_not_empty CHECK (LENGTH(TRIM(action)) > 0)
 );
 
--- Create system settings table for application-wide configuration
-CREATE TABLE system_settings (
+-- Create system settings table for application-wide configuration (Idempotent)
+CREATE TABLE IF NOT EXISTS system_settings (
     id BIGSERIAL PRIMARY KEY,
     setting_key VARCHAR(100) NOT NULL UNIQUE,
     setting_value TEXT,
@@ -30,8 +30,8 @@ CREATE TABLE system_settings (
     CONSTRAINT system_settings_type_check CHECK (setting_type IN ('string', 'number', 'boolean', 'json'))
 );
 
--- Create user sessions table for session management
-CREATE TABLE user_sessions (
+-- Create user sessions table for session management (Idempotent)
+CREATE TABLE IF NOT EXISTS user_sessions (
     id BIGSERIAL PRIMARY KEY,
     user_id BIGINT NOT NULL,
     session_token VARCHAR(255) NOT NULL UNIQUE,
@@ -47,31 +47,32 @@ CREATE TABLE user_sessions (
     CONSTRAINT user_sessions_token_not_empty CHECK (LENGTH(TRIM(session_token)) > 0)
 );
 
--- Create indexes for performance
-CREATE INDEX idx_audit_logs_user_id ON audit_logs(user_id);
-CREATE INDEX idx_audit_logs_action ON audit_logs(action);
-CREATE INDEX idx_audit_logs_entity_type ON audit_logs(entity_type);
-CREATE INDEX idx_audit_logs_entity_id ON audit_logs(entity_id);
-CREATE INDEX idx_audit_logs_created_at ON audit_logs(created_at);
-CREATE INDEX idx_audit_logs_ip_address ON audit_logs(ip_address);
-CREATE INDEX idx_audit_logs_session_id ON audit_logs(session_id);
+-- Create indexes for performance (idempotent)
+CREATE INDEX IF NOT EXISTS idx_audit_logs_user_id ON audit_logs(user_id);
+CREATE INDEX IF NOT EXISTS idx_audit_logs_action ON audit_logs(action);
+CREATE INDEX IF NOT EXISTS idx_audit_logs_entity_type ON audit_logs(entity_type);
+CREATE INDEX IF NOT EXISTS idx_audit_logs_entity_id ON audit_logs(entity_id);
+CREATE INDEX IF NOT EXISTS idx_audit_logs_created_at ON audit_logs(created_at);
+CREATE INDEX IF NOT EXISTS idx_audit_logs_ip_address ON audit_logs(ip_address);
+CREATE INDEX IF NOT EXISTS idx_audit_logs_session_id ON audit_logs(session_id);
 
-CREATE INDEX idx_system_settings_key ON system_settings(setting_key);
-CREATE INDEX idx_system_settings_type ON system_settings(setting_type);
+CREATE INDEX IF NOT EXISTS idx_system_settings_key ON system_settings(setting_key);
+CREATE INDEX IF NOT EXISTS idx_system_settings_type ON system_settings(setting_type);
 
-CREATE INDEX idx_user_sessions_user_id ON user_sessions(user_id);
-CREATE INDEX idx_user_sessions_token ON user_sessions(session_token);
-CREATE INDEX idx_user_sessions_active ON user_sessions(is_active);
-CREATE INDEX idx_user_sessions_expires_at ON user_sessions(expires_at);
-CREATE INDEX idx_user_sessions_last_accessed ON user_sessions(last_accessed_at);
+CREATE INDEX IF NOT EXISTS idx_user_sessions_user_id ON user_sessions(user_id);
+CREATE INDEX IF NOT EXISTS idx_user_sessions_token ON user_sessions(session_token);
+CREATE INDEX IF NOT EXISTS idx_user_sessions_active ON user_sessions(is_active);
+CREATE INDEX IF NOT EXISTS idx_user_sessions_expires_at ON user_sessions(expires_at);
+CREATE INDEX IF NOT EXISTS idx_user_sessions_last_accessed ON user_sessions(last_accessed_at);
 
--- Create triggers for updated_at
+-- Create triggers for updated_at (idempotent)
+DROP TRIGGER IF EXISTS update_system_settings_updated_at ON system_settings;
 CREATE TRIGGER update_system_settings_updated_at
     BEFORE UPDATE ON system_settings
     FOR EACH ROW
     EXECUTE FUNCTION update_updated_at_column();
 
--- Create function to clean up expired sessions
+-- Create function to clean up expired sessions (idempotent)
 CREATE OR REPLACE FUNCTION cleanup_expired_sessions()
 RETURNS INTEGER AS $$
 DECLARE
