@@ -10,13 +10,13 @@
  * Only loads when VITE_DEVX_WDYR=true
  */
 
-import React from 'react';
-import { isDevXEnabled, devxLogger } from './config/devx.config';
+import React from "react";
+import { devxLogger, isDevXEnabled } from "./config/devx.config";
 
-if (isDevXEnabled('wdyr')) {
-  devxLogger.info('Initializing Why Did You Render');
+if (isDevXEnabled("wdyr")) {
+  devxLogger.info("Initializing Why Did You Render");
 
-  import('@welldone-software/why-did-you-render')
+  import("@welldone-software/why-did-you-render")
     .then((wdyr) => {
       wdyr.default(React, {
         // Track all pure components (disabled by default for performance)
@@ -69,19 +69,15 @@ if (isDevXEnabled('wdyr')) {
         // notifier: console.log,
       });
 
-      devxLogger.info('Why Did You Render initialized');
-      devxLogger.debug(
-        'To track a component, add: YourComponent.whyDidYouRender = true'
-      );
+      devxLogger.info("Why Did You Render initialized");
+      devxLogger.debug("To track a component, add: YourComponent.whyDidYouRender = true");
     })
     .catch((error) => {
-      devxLogger.error('Failed to load Why Did You Render:', error);
+      devxLogger.error("Failed to load Why Did You Render:", error);
       console.error(
-        'WDYR failed to load. Install with: npm install -D @welldone-software/why-did-you-render'
+        "WDYR failed to load. Install with: npm install -D @welldone-software/why-did-you-render"
       );
     });
 } else {
-  devxLogger.debug('Why Did You Render disabled');
+  devxLogger.debug("Why Did You Render disabled");
 }
-
-export {};

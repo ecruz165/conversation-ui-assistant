@@ -16,8 +16,8 @@
  * Note: FID (First Input Delay) was deprecated in web-vitals v4 and removed in v5
  */
 
-import type { Metric } from 'web-vitals';
-import { devxLogger } from '../config/devx.config';
+import type { Metric } from "web-vitals";
+import { devxLogger } from "../config/devx.config";
 
 export interface WebVitalsConfig {
   reportToConsole?: boolean;
@@ -34,7 +34,7 @@ export class WebVitalsTracker {
     this.config = {
       reportToConsole: config.reportToConsole ?? import.meta.env.DEV,
       reportToAnalytics: config.reportToAnalytics ?? import.meta.env.PROD,
-      analyticsEndpoint: config.analyticsEndpoint ?? '/api/analytics',
+      analyticsEndpoint: config.analyticsEndpoint ?? "/api/analytics",
       onMetric: config.onMetric ?? (() => {}),
     };
   }
@@ -47,7 +47,7 @@ export class WebVitalsTracker {
     try {
       // Dynamically import web-vitals to avoid bundling if not needed
       // Note: web-vitals v5.x removed onFID in favor of onINP
-      const { onCLS, onFCP, onLCP, onTTFB, onINP } = await import('web-vitals');
+      const { onCLS, onFCP, onLCP, onTTFB, onINP } = await import("web-vitals");
 
       // Track all Core Web Vitals (v5.x compatible)
       onCLS(this.handleMetric.bind(this));
@@ -56,11 +56,11 @@ export class WebVitalsTracker {
       onTTFB(this.handleMetric.bind(this));
       onINP(this.handleMetric.bind(this));
 
-      devxLogger.info('Web Vitals tracking initialized');
+      devxLogger.info("Web Vitals tracking initialized");
     } catch (error) {
-      devxLogger.error('Failed to initialize Web Vitals:', error);
+      devxLogger.error("Failed to initialize Web Vitals:", error);
       console.error(
-        'Web Vitals tracking failed to initialize. Install web-vitals with: npm install web-vitals'
+        "Web Vitals tracking failed to initialize. Install web-vitals with: npm install web-vitals"
       );
     }
   }
@@ -91,7 +91,7 @@ export class WebVitalsTracker {
    */
   private logMetricToConsole(metric: Metric): void {
     const rating = this.getMetricRating(metric);
-    const color = rating === 'good' ? '🟢' : rating === 'needs-improvement' ? '🟡' : '🔴';
+    const color = rating === "good" ? "🟢" : rating === "needs-improvement" ? "🟡" : "🔴";
 
     console.log(
       `${color} ${metric.name}: ${metric.value.toFixed(2)}${this.getMetricUnit(metric.name)} (${rating})`,
@@ -122,23 +122,23 @@ export class WebVitalsTracker {
       } else {
         // Fallback to fetch
         fetch(this.config.analyticsEndpoint, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
           body,
           keepalive: true, // Keep request alive even if page unloads
         }).catch((error) => {
-          devxLogger.debug('Failed to send metric to analytics:', error);
+          devxLogger.debug("Failed to send metric to analytics:", error);
         });
       }
     } catch (error) {
-      devxLogger.debug('Failed to send metric to analytics:', error);
+      devxLogger.debug("Failed to send metric to analytics:", error);
     }
   }
 
   /**
    * Get metric rating based on Core Web Vitals thresholds
    */
-  private getMetricRating(metric: Metric): 'good' | 'needs-improvement' | 'poor' {
+  private getMetricRating(metric: Metric): "good" | "needs-improvement" | "poor" {
     // Use the rating from web-vitals if available
     if (metric.rating) {
       return metric.rating;
@@ -156,17 +156,17 @@ export class WebVitalsTracker {
 
     const [goodThreshold, poorThreshold] = thresholds[metric.name] || [0, 0];
 
-    if (metric.value <= goodThreshold) return 'good';
-    if (metric.value <= poorThreshold) return 'needs-improvement';
-    return 'poor';
+    if (metric.value <= goodThreshold) return "good";
+    if (metric.value <= poorThreshold) return "needs-improvement";
+    return "poor";
   }
 
   /**
    * Get the appropriate unit for a metric
    */
   private getMetricUnit(metricName: string): string {
-    if (metricName === 'CLS') return '';
-    return 'ms';
+    if (metricName === "CLS") return "";
+    return "ms";
   }
 
   /**

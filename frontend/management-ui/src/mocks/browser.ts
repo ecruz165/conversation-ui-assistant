@@ -11,160 +11,163 @@
  * - Global controls for runtime enable/disable
  */
 
-import { http, HttpResponse } from 'msw';
-import { setupWorker } from 'msw/browser';
-import { mockApi } from './api';
+import { HttpResponse, http } from "msw";
+import { setupWorker } from "msw/browser";
+import { mockApi } from "./api";
 
 // Define MSW handlers for all API endpoints
 const handlers = [
   // System metrics
-  http.get('/api/metrics', async () => {
+  http.get("/api/metrics", async () => {
     try {
       const data = await mockApi.getSystemMetrics();
       return HttpResponse.json(data);
     } catch (error) {
       return HttpResponse.json(
-        { error: error instanceof Error ? error.message : 'Unknown error' },
+        { error: error instanceof Error ? error.message : "Unknown error" },
         { status: 500 }
       );
     }
   }),
 
   // Website endpoints
-  http.get('/api/websites', async () => {
+  http.get("/api/websites", async () => {
     try {
       const data = await mockApi.getWebsites();
       return HttpResponse.json(data);
     } catch (error) {
       return HttpResponse.json(
-        { error: error instanceof Error ? error.message : 'Unknown error' },
+        { error: error instanceof Error ? error.message : "Unknown error" },
         { status: 500 }
       );
     }
   }),
 
-  http.get('/api/websites/:id', async ({ params }) => {
+  http.get("/api/websites/:id", async ({ params }) => {
     try {
       const data = await mockApi.getWebsite(params.id as string);
       return HttpResponse.json(data);
     } catch (error) {
       return HttpResponse.json(
-        { error: error instanceof Error ? error.message : 'Unknown error' },
+        { error: error instanceof Error ? error.message : "Unknown error" },
         { status: 404 }
       );
     }
   }),
 
   // Navigation links
-  http.get('/api/websites/:websiteId/links', async ({ params }) => {
+  http.get("/api/websites/:websiteId/links", async ({ params }) => {
     try {
       const data = await mockApi.getNavigationLinks(params.websiteId as string);
       return HttpResponse.json(data);
     } catch (error) {
       return HttpResponse.json(
-        { error: error instanceof Error ? error.message : 'Unknown error' },
+        { error: error instanceof Error ? error.message : "Unknown error" },
         { status: 500 }
       );
     }
   }),
 
   // Embedding test
-  http.post('/api/websites/:websiteId/embeddings/test', async ({ params, request }) => {
+  http.post("/api/websites/:websiteId/embeddings/test", async ({ params, request }) => {
     try {
       const query = await request.json();
       const data = await mockApi.testEmbedding(params.websiteId as string, query as any);
       return HttpResponse.json(data);
     } catch (error) {
       return HttpResponse.json(
-        { error: error instanceof Error ? error.message : 'Unknown error' },
+        { error: error instanceof Error ? error.message : "Unknown error" },
         { status: 500 }
       );
     }
   }),
 
   // Crawl management - schedule
-  http.get('/api/websites/:websiteId/crawl/schedule', async ({ params }) => {
+  http.get("/api/websites/:websiteId/crawl/schedule", async ({ params }) => {
     try {
       const data = await mockApi.getCrawlSchedule(params.websiteId as string);
       return HttpResponse.json(data);
     } catch (error) {
       return HttpResponse.json(
-        { error: error instanceof Error ? error.message : 'Unknown error' },
+        { error: error instanceof Error ? error.message : "Unknown error" },
         { status: 500 }
       );
     }
   }),
 
-  http.put('/api/websites/:websiteId/crawl/schedule', async ({ params, request }) => {
+  http.put("/api/websites/:websiteId/crawl/schedule", async ({ params, request }) => {
     try {
       const schedule = await request.json();
       const data = await mockApi.updateCrawlSchedule(params.websiteId as string, schedule as any);
       return HttpResponse.json(data);
     } catch (error) {
       return HttpResponse.json(
-        { error: error instanceof Error ? error.message : 'Unknown error' },
+        { error: error instanceof Error ? error.message : "Unknown error" },
         { status: 500 }
       );
     }
   }),
 
   // Crawl management - configuration
-  http.get('/api/websites/:websiteId/crawl/config', async ({ params }) => {
+  http.get("/api/websites/:websiteId/crawl/config", async ({ params }) => {
     try {
       const data = await mockApi.getCrawlConfiguration(params.websiteId as string);
       return HttpResponse.json(data);
     } catch (error) {
       return HttpResponse.json(
-        { error: error instanceof Error ? error.message : 'Unknown error' },
+        { error: error instanceof Error ? error.message : "Unknown error" },
         { status: 500 }
       );
     }
   }),
 
-  http.put('/api/websites/:websiteId/crawl/config', async ({ params, request }) => {
+  http.put("/api/websites/:websiteId/crawl/config", async ({ params, request }) => {
     try {
       const config = await request.json();
-      const data = await mockApi.updateCrawlConfiguration(params.websiteId as string, config as any);
+      const data = await mockApi.updateCrawlConfiguration(
+        params.websiteId as string,
+        config as any
+      );
       return HttpResponse.json(data);
     } catch (error) {
       return HttpResponse.json(
-        { error: error instanceof Error ? error.message : 'Unknown error' },
+        { error: error instanceof Error ? error.message : "Unknown error" },
         { status: 500 }
       );
     }
   }),
 
   // Crawl management - history
-  http.get('/api/websites/:websiteId/crawl/history', async ({ params, request }) => {
+  http.get("/api/websites/:websiteId/crawl/history", async ({ params, request }) => {
     try {
       const url = new URL(request.url);
-      const page = parseInt(url.searchParams.get('page') || '0', 10);
-      const pageSize = parseInt(url.searchParams.get('pageSize') || '10', 10);
+      const page = Number.parseInt(url.searchParams.get("page") || "0", 10);
+      const pageSize = Number.parseInt(url.searchParams.get("pageSize") || "10", 10);
       const data = await mockApi.getCrawlHistory(params.websiteId as string, page, pageSize);
       return HttpResponse.json(data);
     } catch (error) {
       return HttpResponse.json(
-        { error: error instanceof Error ? error.message : 'Unknown error' },
+        { error: error instanceof Error ? error.message : "Unknown error" },
         { status: 500 }
       );
     }
   }),
 
   // Crawl management - start crawl
-  http.post('/api/websites/:websiteId/crawl/start', async ({ params }) => {
+  http.post("/api/websites/:websiteId/crawl/start", async ({ params }) => {
     try {
       const data = await mockApi.startCrawl(params.websiteId as string);
       return HttpResponse.json(data);
     } catch (error) {
       return HttpResponse.json(
-        { error: error instanceof Error ? error.message : 'Unknown error' },
+        { error: error instanceof Error ? error.message : "Unknown error" },
         { status: 500 }
       );
     }
   }),
 
   // Crawl management - crawl status
-  http.get('/api/websites/:websiteId/crawl/:crawlId/status', async ({ params }) => {
+  http.get("/api/websites/:websiteId/crawl/:crawlId/status", async ({ params }) => {
     try {
       const data = await mockApi.getCrawlStatus(
         params.websiteId as string,
@@ -173,7 +176,7 @@ const handlers = [
       return HttpResponse.json(data);
     } catch (error) {
       return HttpResponse.json(
-        { error: error instanceof Error ? error.message : 'Unknown error' },
+        { error: error instanceof Error ? error.message : "Unknown error" },
         { status: 500 }
       );
     }

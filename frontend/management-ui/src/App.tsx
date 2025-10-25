@@ -4,6 +4,7 @@ import { ThemeProvider } from "@mui/material/styles";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { lazy, Suspense } from "react";
 import { Link, Route, BrowserRouter as Router, Routes } from "react-router-dom";
+import { DevXControlPanel } from "./components/DevXControlPanel";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import { Layout } from "./components/Layout";
 import { MetricCard } from "./components/MetricCard";
@@ -66,6 +67,8 @@ function App() {
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Router>
+        {/* DevX Control Panel - only renders in development when enabled */}
+        <DevXControlPanel />
       </QueryClientProvider>
     </ThemeProvider>
   );

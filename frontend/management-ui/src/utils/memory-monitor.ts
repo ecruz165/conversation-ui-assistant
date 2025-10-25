@@ -11,7 +11,7 @@
  * - Memory usage reports
  */
 
-import { devxLogger } from '../config/devx.config';
+import { devxLogger } from "../config/devx.config";
 
 export interface MemorySnapshot {
   timestamp: number;
@@ -24,7 +24,7 @@ export interface MemorySnapshot {
 export interface MemoryReport {
   currentSnapshot: MemorySnapshot;
   snapshots: MemorySnapshot[];
-  trend: 'stable' | 'increasing' | 'decreasing';
+  trend: "stable" | "increasing" | "decreasing";
   possibleLeak: boolean;
   averageUsed: number;
   peakUsed: number;
@@ -44,11 +44,9 @@ export class MemoryMonitor {
   init(): void {
     // Check if Performance Memory API is available
     if (!this.isMemoryAPIAvailable()) {
-      devxLogger.warn(
-        'Performance Memory API not available. Memory monitoring disabled.'
-      );
+      devxLogger.warn("Performance Memory API not available. Memory monitoring disabled.");
       devxLogger.debug(
-        'Memory API is only available in Chromium-based browsers with --enable-precise-memory-info flag'
+        "Memory API is only available in Chromium-based browsers with --enable-precise-memory-info flag"
       );
       return;
     }
@@ -62,9 +60,7 @@ export class MemoryMonitor {
       this.checkForWarnings();
     }, this.reportIntervalMs);
 
-    devxLogger.debug(
-      `Memory monitoring started (interval: ${this.reportIntervalMs}ms)`
-    );
+    devxLogger.debug(`Memory monitoring started (interval: ${this.reportIntervalMs}ms)`);
   }
 
   /**
@@ -72,9 +68,7 @@ export class MemoryMonitor {
    */
   private isMemoryAPIAvailable(): boolean {
     return (
-      typeof performance !== 'undefined' &&
-      'memory' in performance &&
-      performance.memory !== null
+      typeof performance !== "undefined" && "memory" in performance && performance.memory !== null
     );
   }
 
@@ -119,7 +113,7 @@ export class MemoryMonitor {
     // Check for potential memory leak
     if (this.detectMemoryLeak()) {
       devxLogger.warn(
-        'Potential memory leak detected: Memory usage has increased significantly over time'
+        "Potential memory leak detected: Memory usage has increased significantly over time"
       );
     }
   }
@@ -133,10 +127,8 @@ export class MemoryMonitor {
     const firstTen = this.snapshots.slice(0, 10);
     const lastTen = this.snapshots.slice(-10);
 
-    const avgFirst =
-      firstTen.reduce((sum, s) => sum + s.usedJSHeapSize, 0) / firstTen.length;
-    const avgLast =
-      lastTen.reduce((sum, s) => sum + s.usedJSHeapSize, 0) / lastTen.length;
+    const avgFirst = firstTen.reduce((sum, s) => sum + s.usedJSHeapSize, 0) / firstTen.length;
+    const avgLast = lastTen.reduce((sum, s) => sum + s.usedJSHeapSize, 0) / lastTen.length;
 
     // Memory leak if latest average is 50% higher than initial average
     return avgLast > avgFirst * this.leakThreshold;
@@ -145,20 +137,18 @@ export class MemoryMonitor {
   /**
    * Calculate memory trend
    */
-  private calculateTrend(): 'stable' | 'increasing' | 'decreasing' {
-    if (this.snapshots.length < 5) return 'stable';
+  private calculateTrend(): "stable" | "increasing" | "decreasing" {
+    if (this.snapshots.length < 5) return "stable";
 
     const recent = this.snapshots.slice(-5);
     const increases = recent.reduce((count, snapshot, i) => {
       if (i === 0) return count;
-      return snapshot.usedJSHeapSize > recent[i - 1].usedJSHeapSize
-        ? count + 1
-        : count;
+      return snapshot.usedJSHeapSize > recent[i - 1].usedJSHeapSize ? count + 1 : count;
     }, 0);
 
-    if (increases >= 4) return 'increasing';
-    if (increases <= 1) return 'decreasing';
-    return 'stable';
+    if (increases >= 4) return "increasing";
+    if (increases <= 1) return "decreasing";
+    return "stable";
   }
 
   /**
@@ -192,15 +182,15 @@ export class MemoryMonitor {
    */
   getStats(): Record<string, string> {
     const current = this.getCurrentSnapshot();
-    if (!current) return { status: 'Memory API not available' };
+    if (!current) return { status: "Memory API not available" };
 
     return {
-      'Current Usage': this.formatBytes(current.usedJSHeapSize),
-      'Total Heap': this.formatBytes(current.totalJSHeapSize),
-      'Heap Limit': this.formatBytes(current.jsHeapSizeLimit),
-      'Usage %': `${current.usedPercentage.toFixed(2)}%`,
+      "Current Usage": this.formatBytes(current.usedJSHeapSize),
+      "Total Heap": this.formatBytes(current.totalJSHeapSize),
+      "Heap Limit": this.formatBytes(current.jsHeapSizeLimit),
+      "Usage %": `${current.usedPercentage.toFixed(2)}%`,
       Trend: this.calculateTrend(),
-      'Possible Leak': this.detectMemoryLeak() ? 'Yes' : 'No',
+      "Possible Leak": this.detectMemoryLeak() ? "Yes" : "No",
     };
   }
 
@@ -208,13 +198,13 @@ export class MemoryMonitor {
    * Format bytes to human-readable format
    */
   private formatBytes(bytes: number): string {
-    if (bytes === 0) return '0 B';
+    if (bytes === 0) return "0 B";
 
     const k = 1024;
-    const sizes = ['B', 'KB', 'MB', 'GB'];
+    const sizes = ["B", "KB", "MB", "GB"];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
 
-    return `${(bytes / Math.pow(k, i)).toFixed(2)} ${sizes[i]}`;
+    return `${(bytes / k ** i).toFixed(2)} ${sizes[i]}`;
   }
 
   /**
@@ -222,9 +212,9 @@ export class MemoryMonitor {
    */
   forceGC(): void {
     // Only available in Chrome with --js-flags="--expose-gc"
-    if (typeof (global as unknown as { gc?: () => void }).gc === 'function') {
+    if (typeof (global as unknown as { gc?: () => void }).gc === "function") {
       (global as unknown as { gc: () => void }).gc();
-      devxLogger.info('Garbage collection triggered');
+      devxLogger.info("Garbage collection triggered");
     } else {
       devxLogger.warn(
         'Garbage collection not available. Start Chrome with --js-flags="--expose-gc"'
@@ -237,7 +227,7 @@ export class MemoryMonitor {
    */
   clear(): void {
     this.snapshots = [];
-    devxLogger.debug('Memory snapshots cleared');
+    devxLogger.debug("Memory snapshots cleared");
   }
 
   /**
@@ -249,6 +239,6 @@ export class MemoryMonitor {
       this.interval = null;
     }
     this.snapshots = [];
-    devxLogger.debug('Memory monitor cleaned up');
+    devxLogger.debug("Memory monitor cleaned up");
   }
 }

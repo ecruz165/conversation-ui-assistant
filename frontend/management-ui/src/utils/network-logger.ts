@@ -13,7 +13,7 @@
  * - Statistics generation
  */
 
-import { devxLogger } from '../config/devx.config';
+import { devxLogger } from "../config/devx.config";
 
 export interface NetworkRequest {
   id: string;
@@ -51,7 +51,7 @@ export class NetworkLogger {
   init(): void {
     this.interceptFetch();
     this.interceptXHR();
-    devxLogger.debug('Network logger initialized');
+    devxLogger.debug("Network logger initialized");
   }
 
   /**
@@ -63,8 +63,8 @@ export class NetworkLogger {
     window.fetch = async function (...args: Parameters<typeof fetch>): Promise<Response> {
       const requestId = self.generateRequestId();
       const [input, init] = args;
-      const url = typeof input === 'string' ? input : input.url;
-      const method = init?.method || 'GET';
+      const url = typeof input === "string" ? input : input.url;
+      const method = init?.method || "GET";
 
       // Log request start
       const request: NetworkRequest = {
@@ -96,13 +96,13 @@ export class NetworkLogger {
         request.duration = request.endTime - request.startTime;
         request.status = response.status;
         request.statusText = response.statusText;
-        request.responseType = response.headers.get('content-type') || 'unknown';
+        request.responseType = response.headers.get("content-type") || "unknown";
 
         // Try to get response size
         try {
           const blob = await clonedResponse.blob();
           request.responseSize = blob.size;
-        } catch (e) {
+        } catch (_e) {
           // Silently fail if can't get size
         }
 
@@ -139,7 +139,7 @@ export class NetworkLogger {
       // Store request info on XHR object
       (this as XMLHttpRequest & { __requestId?: string }).__requestId = requestId;
 
-      const urlString = typeof url === 'string' ? url : url.toString();
+      const urlString = typeof url === "string" ? url : url.toString();
 
       const request: NetworkRequest = {
         id: requestId,
@@ -175,27 +175,27 @@ export class NetworkLogger {
       }
 
       // Add load event listener
-      this.addEventListener('load', () => {
+      this.addEventListener("load", () => {
         request.endTime = Date.now();
         request.duration = request.endTime - request.startTime;
         request.status = this.status;
         request.statusText = this.statusText;
-        request.responseType = this.getResponseHeader('content-type') || 'unknown';
+        request.responseType = this.getResponseHeader("content-type") || "unknown";
 
         // Get response size
-        const contentLength = this.getResponseHeader('content-length');
+        const contentLength = this.getResponseHeader("content-length");
         if (contentLength) {
-          request.responseSize = parseInt(contentLength, 10);
+          request.responseSize = Number.parseInt(contentLength, 10);
         }
 
         self.logResponse(request);
       });
 
       // Add error event listener
-      this.addEventListener('error', () => {
+      this.addEventListener("error", () => {
         request.endTime = Date.now();
         request.duration = request.endTime - request.startTime;
-        request.error = new Error('Network request failed');
+        request.error = new Error("Network request failed");
 
         devxLogger.error(`✗ ${request.method} ${request.url} failed`);
       });
@@ -210,8 +210,8 @@ export class NetworkLogger {
    */
   private logResponse(request: NetworkRequest): void {
     const statusColor = this.getStatusColor(request.status);
-    const timing = request.duration ? `${request.duration}ms` : 'N/A';
-    const size = request.responseSize ? this.formatBytes(request.responseSize) : 'N/A';
+    const timing = request.duration ? `${request.duration}ms` : "N/A";
+    const size = request.responseSize ? this.formatBytes(request.responseSize) : "N/A";
 
     devxLogger.debug(
       `${statusColor} ${request.method} ${request.url} - ${request.status} (${timing}, ${size})`
@@ -222,11 +222,11 @@ export class NetworkLogger {
    * Get color indicator for status code
    */
   private getStatusColor(status?: number): string {
-    if (!status) return '●';
-    if (status >= 200 && status < 300) return '✓';
-    if (status >= 300 && status < 400) return '↻';
-    if (status >= 400 && status < 500) return '⚠';
-    return '✗';
+    if (!status) return "●";
+    if (status >= 200 && status < 300) return "✓";
+    if (status >= 300 && status < 400) return "↻";
+    if (status >= 400 && status < 500) return "⚠";
+    return "✗";
   }
 
   /**
@@ -240,7 +240,7 @@ export class NetworkLogger {
    * Calculate size of request body
    */
   private calculateSize(body: unknown): number {
-    if (typeof body === 'string') {
+    if (typeof body === "string") {
       return new Blob([body]).size;
     }
     if (body instanceof Blob) {
@@ -273,13 +273,13 @@ export class NetworkLogger {
    * Format bytes to human-readable format
    */
   private formatBytes(bytes: number): string {
-    if (bytes === 0) return '0 B';
+    if (bytes === 0) return "0 B";
 
     const k = 1024;
-    const sizes = ['B', 'KB', 'MB', 'GB'];
+    const sizes = ["B", "KB", "MB", "GB"];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
 
-    return `${(bytes / Math.pow(k, i)).toFixed(2)} ${sizes[i]}`;
+    return `${(bytes / k ** i).toFixed(2)} ${sizes[i]}`;
   }
 
   /**
@@ -300,10 +300,7 @@ export class NetworkLogger {
       completedRequests.reduce((sum, r) => sum + (r.duration || 0), 0) /
       (completedRequests.length || 1);
 
-    const totalSize = completedRequests.reduce(
-      (sum, r) => sum + (r.responseSize || 0),
-      0
-    );
+    const totalSize = completedRequests.reduce((sum, r) => sum + (r.responseSize || 0), 0);
 
     const successCount = requests.filter(
       (r) => r.status && r.status >= 200 && r.status < 300
@@ -311,12 +308,12 @@ export class NetworkLogger {
     const errorCount = requests.filter((r) => r.error || (r.status && r.status >= 400)).length;
 
     return {
-      'Total Requests': requests.length,
-      'Completed': completedRequests.length,
-      'Success': successCount,
-      'Errors': errorCount,
-      'Avg Duration': `${avgDuration.toFixed(2)}ms`,
-      'Total Data': this.formatBytes(totalSize),
+      "Total Requests": requests.length,
+      Completed: completedRequests.length,
+      Success: successCount,
+      Errors: errorCount,
+      "Avg Duration": `${avgDuration.toFixed(2)}ms`,
+      "Total Data": this.formatBytes(totalSize),
     };
   }
 
@@ -326,7 +323,7 @@ export class NetworkLogger {
   clear(): void {
     this.requests.clear();
     this.requestCounter = 0;
-    devxLogger.debug('Network logger cleared');
+    devxLogger.debug("Network logger cleared");
   }
 
   /**
@@ -337,6 +334,6 @@ export class NetworkLogger {
     XMLHttpRequest.prototype.open = this.originalXHROpen;
     XMLHttpRequest.prototype.send = this.originalXHRSend;
     this.clear();
-    devxLogger.debug('Network logger cleaned up');
+    devxLogger.debug("Network logger cleaned up");
   }
 }

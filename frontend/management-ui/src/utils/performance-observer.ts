@@ -11,7 +11,7 @@
  * - Layout Shift: Visual stability
  */
 
-import { devxLogger } from '../config/devx.config';
+import { devxLogger } from "../config/devx.config";
 
 export interface PerformanceReport {
   slowResources: PerformanceResourceTiming[];
@@ -36,8 +36,8 @@ export class PerformanceMonitor {
   init(): void {
     try {
       // Check if Performance Observer is supported
-      if (typeof PerformanceObserver === 'undefined') {
-        devxLogger.warn('Performance Observer API not supported in this browser');
+      if (typeof PerformanceObserver === "undefined") {
+        devxLogger.warn("Performance Observer API not supported in this browser");
         return;
       }
 
@@ -59,9 +59,9 @@ export class PerformanceMonitor {
       // Log navigation timing
       this.logNavigationTiming();
 
-      devxLogger.info('Performance Observer initialized');
+      devxLogger.info("Performance Observer initialized");
     } catch (error) {
-      devxLogger.error('Failed to initialize Performance Observer:', error);
+      devxLogger.error("Failed to initialize Performance Observer:", error);
     }
   }
 
@@ -84,10 +84,10 @@ export class PerformanceMonitor {
         }
       });
 
-      observer.observe({ entryTypes: ['resource'] });
+      observer.observe({ entryTypes: ["resource"] });
       this.observers.push(observer);
     } catch (error) {
-      devxLogger.debug('Failed to observe resources:', error);
+      devxLogger.debug("Failed to observe resources:", error);
     }
   }
 
@@ -98,7 +98,10 @@ export class PerformanceMonitor {
     try {
       const observer = new PerformanceObserver((list) => {
         for (const entry of list.getEntries()) {
-          const layoutShift = entry as PerformanceEntry & { value: number; hadRecentInput: boolean };
+          const layoutShift = entry as PerformanceEntry & {
+            value: number;
+            hadRecentInput: boolean;
+          };
 
           // Only count shifts without recent user input
           if (!layoutShift.hadRecentInput && layoutShift.value > this.layoutShiftThreshold) {
@@ -108,10 +111,10 @@ export class PerformanceMonitor {
         }
       });
 
-      observer.observe({ entryTypes: ['layout-shift'] });
+      observer.observe({ entryTypes: ["layout-shift"] });
       this.observers.push(observer);
     } catch (error) {
-      devxLogger.debug('Failed to observe layout shifts:', error);
+      devxLogger.debug("Failed to observe layout shifts:", error);
     }
   }
 
@@ -127,10 +130,10 @@ export class PerformanceMonitor {
         }
       });
 
-      observer.observe({ entryTypes: ['paint'] });
+      observer.observe({ entryTypes: ["paint"] });
       this.observers.push(observer);
     } catch (error) {
-      devxLogger.debug('Failed to observe paint timing:', error);
+      devxLogger.debug("Failed to observe paint timing:", error);
     }
   }
 
@@ -147,10 +150,10 @@ export class PerformanceMonitor {
         }
       });
 
-      observer.observe({ entryTypes: ['largest-contentful-paint'] });
+      observer.observe({ entryTypes: ["largest-contentful-paint"] });
       this.observers.push(observer);
     } catch (error) {
-      devxLogger.debug('Failed to observe LCP:', error);
+      devxLogger.debug("Failed to observe LCP:", error);
     }
   }
 
@@ -166,11 +169,11 @@ export class PerformanceMonitor {
         }
       });
 
-      observer.observe({ entryTypes: ['longtask'] });
+      observer.observe({ entryTypes: ["longtask"] });
       this.observers.push(observer);
-    } catch (error) {
+    } catch (_error) {
       // Long task API may not be supported in all browsers
-      devxLogger.debug('Long task observer not supported');
+      devxLogger.debug("Long task observer not supported");
     }
   }
 
@@ -179,18 +182,20 @@ export class PerformanceMonitor {
    */
   private logNavigationTiming(): void {
     // Wait for page load to complete
-    window.addEventListener('load', () => {
+    window.addEventListener("load", () => {
       setTimeout(() => {
-        const navigation = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;
+        const navigation = performance.getEntriesByType(
+          "navigation"
+        )[0] as PerformanceNavigationTiming;
 
         if (navigation) {
-          devxLogger.info('Navigation Timing:', {
-            'DNS Lookup': `${(navigation.domainLookupEnd - navigation.domainLookupStart).toFixed(2)}ms`,
-            'TCP Connection': `${(navigation.connectEnd - navigation.connectStart).toFixed(2)}ms`,
-            'Request Time': `${(navigation.responseStart - navigation.requestStart).toFixed(2)}ms`,
-            'Response Time': `${(navigation.responseEnd - navigation.responseStart).toFixed(2)}ms`,
-            'DOM Processing': `${(navigation.domComplete - navigation.domLoading).toFixed(2)}ms`,
-            'Total Load Time': `${(navigation.loadEventEnd - navigation.fetchStart).toFixed(2)}ms`,
+          devxLogger.info("Navigation Timing:", {
+            "DNS Lookup": `${(navigation.domainLookupEnd - navigation.domainLookupStart).toFixed(2)}ms`,
+            "TCP Connection": `${(navigation.connectEnd - navigation.connectStart).toFixed(2)}ms`,
+            "Request Time": `${(navigation.responseStart - navigation.requestStart).toFixed(2)}ms`,
+            "Response Time": `${(navigation.responseEnd - navigation.responseStart).toFixed(2)}ms`,
+            "DOM Processing": `${(navigation.domComplete - navigation.domLoading).toFixed(2)}ms`,
+            "Total Load Time": `${(navigation.loadEventEnd - navigation.fetchStart).toFixed(2)}ms`,
           });
         }
       }, 0);
@@ -201,7 +206,7 @@ export class PerformanceMonitor {
    * Get performance report
    */
   getReport(): PerformanceReport {
-    const navigation = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;
+    const navigation = performance.getEntriesByType("navigation")[0] as PerformanceNavigationTiming;
 
     return {
       slowResources: this.slowResources,
@@ -222,6 +227,6 @@ export class PerformanceMonitor {
     this.longTasks = [];
     this.layoutShifts = [];
     this.paints = [];
-    devxLogger.debug('Performance Observer cleaned up');
+    devxLogger.debug("Performance Observer cleaned up");
   }
 }

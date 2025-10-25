@@ -37,7 +37,7 @@ export interface DevXConfig {
   perfOutputDir: string;
 
   // Logging configuration
-  logLevel: 'debug' | 'info' | 'warn' | 'error' | 'none';
+  logLevel: "debug" | "info" | "warn" | "error" | "none";
 }
 
 /**
@@ -54,7 +54,7 @@ export interface DevXConfig {
  */
 function parseEnvBoolean(value: string | undefined, defaultValue: boolean): boolean {
   if (value === undefined) return defaultValue;
-  return value.toLowerCase() === 'true';
+  return value.toLowerCase() === "true";
 }
 
 /**
@@ -67,10 +67,7 @@ function parseEnvBoolean(value: string | undefined, defaultValue: boolean): bool
  */
 export function getDevXConfig(): DevXConfig {
   // Master switch defaults to true in dev, false in prod
-  const masterEnabled = parseEnvBoolean(
-    import.meta.env.VITE_DEVX_ENABLED,
-    import.meta.env.DEV
-  );
+  const masterEnabled = parseEnvBoolean(import.meta.env.VITE_DEVX_ENABLED, import.meta.env.DEV);
 
   return {
     // Master switch - controls everything
@@ -93,10 +90,10 @@ export function getDevXConfig(): DevXConfig {
 
     // Performance testing configuration
     perfRuns: Number(import.meta.env.VITE_DEVX_PERF_RUNS) || 3,
-    perfOutputDir: import.meta.env.VITE_DEVX_PERF_OUTPUT_DIR || 'baseline',
+    perfOutputDir: import.meta.env.VITE_DEVX_PERF_OUTPUT_DIR || "baseline",
 
     // Logging level
-    logLevel: (import.meta.env.VITE_DEVX_LOG_LEVEL as DevXConfig['logLevel']) || 'info',
+    logLevel: (import.meta.env.VITE_DEVX_LOG_LEVEL as DevXConfig["logLevel"]) || "info",
   };
 }
 
@@ -123,8 +120,8 @@ export const devxLogger = {
    * Only shown when logLevel is 'debug'
    */
   debug: (...args: unknown[]): void => {
-    if (devxConfig.logLevel === 'debug') {
-      console.log('[DevX Debug]', ...args);
+    if (devxConfig.logLevel === "debug") {
+      console.log("[DevX Debug]", ...args);
     }
   },
 
@@ -133,8 +130,8 @@ export const devxLogger = {
    * Shown when logLevel is 'debug' or 'info'
    */
   info: (...args: unknown[]): void => {
-    if (['debug', 'info'].includes(devxConfig.logLevel)) {
-      console.log('[DevX]', ...args);
+    if (["debug", "info"].includes(devxConfig.logLevel)) {
+      console.log("[DevX]", ...args);
     }
   },
 
@@ -143,8 +140,8 @@ export const devxLogger = {
    * Shown when logLevel is 'debug', 'info', or 'warn'
    */
   warn: (...args: unknown[]): void => {
-    if (['debug', 'info', 'warn'].includes(devxConfig.logLevel)) {
-      console.warn('[DevX Warning]', ...args);
+    if (["debug", "info", "warn"].includes(devxConfig.logLevel)) {
+      console.warn("[DevX Warning]", ...args);
     }
   },
 
@@ -153,8 +150,8 @@ export const devxLogger = {
    * Shown unless logLevel is 'none'
    */
   error: (...args: unknown[]): void => {
-    if (devxConfig.logLevel !== 'none') {
-      console.error('[DevX Error]', ...args);
+    if (devxConfig.logLevel !== "none") {
+      console.error("[DevX Error]", ...args);
     }
   },
 };
@@ -187,6 +184,6 @@ export function isDevXEnabled(feature?: keyof DevXConfig): boolean {
 }
 
 // Expose configuration globally for debugging (dev mode only)
-if (import.meta.env.DEV && typeof window !== 'undefined') {
+if (import.meta.env.DEV && typeof window !== "undefined") {
   (window as Window & { __devxConfig?: DevXConfig }).__devxConfig = devxConfig;
 }
